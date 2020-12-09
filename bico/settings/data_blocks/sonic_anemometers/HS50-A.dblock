@@ -1,0 +1,49 @@
+# ========================
+# HS-50 - SONIC ANEMOMETER
+# ========================
+
+
+U        ==   {'order': 1, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'm+1_s-1', 'datablock': 'HS50-A'}
+V        ==   {'order': 2, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'm+1_s-1', 'datablock': 'HS50-A'}
+W        ==   {'order': 3, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'm+1_s-1', 'datablock': 'HS50-A'}
+T_SONIC  ==   {'order': 4, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'K', 'datablock': 'HS50-A'}
+STAA     ==   {'order': 5, 'bytes': 1, 'format': 'B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'dimensionless', 'datablock': 'HS50-A'}
+STAD     ==   {'order': 6, 'bytes': 1, 'format': 'B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'dimensionless', 'datablock': 'HS50-A'}
+INC_XY   ==   {'order': 7, 'bytes': 2, 'format': '>h', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'deg', 'datablock': 'HS50-A'}
+
+
+# NOTES
+# =====
+#
+#   'gain_on_signal' ... gain that was applied to the raw data signal, to get to units *divide* by this gain
+#   'offset_on_signal' ... offset that was added to the raw data signal, to get to units *subtract* this offset
+#   'apply_gain' ... gain that is applied during conversion, e.g. to convert to different units if needed
+#   'add_offset' ... offset that is added during conversion, e.g. to convert to different units if needed
+#
+#   BICO ID: HS50-A
+#   Old ID in FCT: hs-50_extended
+#   Old data block in FCT: data_block_sonic_hs_50_extended
+#
+#   FCT FluxCalcTool source code:
+#   https://gitlab.ethz.ch/holukas/fct-flux-calculation-tool
+#
+#   Extended data logging to comply w/ ICOS requirements.
+#   Installed in CH-DAV in 2017-07.
+#
+#   from Werner Eugster email 2017-07-10:
+#   the former 4 data bytes containing the two inclinometer angles are now used differently
+#   * first byte is the StaA byte from the sonic
+#   * second byte is the StaD byte from the sonic
+#   * third and fourth byte are still a short integer as before, but now
+#       it contains the inclinometer X angle if the record number is an odd number,
+#       or the inclinometer Y angle if the record number is an even number
+#
+#   https://docs.python.org/3.1/library/struct.html#format-characters
+#   B...unsigned char, integer, 1 Byte
+#   h...short integer, 2 Bytes
+#   >...big-endian, MSB most-significant Byte at lowest address
+#   Big-endian systems store the most significant byte of a word in the smallest address
+#   2017-07-25: EddyPro can currently not handle StaA and StaD, but it will be implemented soon for ICOS requirements
+#
+#   # https://docs.python.org/3/library/struct.html
+# """

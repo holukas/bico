@@ -1,0 +1,2 @@
+import bico
+bico.main()
