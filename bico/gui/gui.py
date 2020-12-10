@@ -4,9 +4,9 @@ from PyQt5 import QtGui as qtg
 from PyQt5 import QtWidgets as qtw
 from PyQt5.QtGui import QPixmap
 
+import settings._version as info
 from gui import gui_elements
 from help import tooltips
-import settings._version as info
 
 
 class Ui_MainWindow(object):
@@ -72,22 +72,25 @@ class Ui_MainWindow(object):
         label_txt3 = qtw.QLabel(f"v{info.__version__} / {info.__date__}")
         label_txt3.setAlignment(qtc.Qt.AlignCenter | qtc.Qt.AlignVCenter)
 
-        self.lbl_link_releases = qtw.QLabel(f"<a href='{info.__link_releases__}'>Releases</a>\n")
-        self.lbl_link_source_code = qtw.QLabel(f"<a href='{info.__link_source_code__}'>Source Code</a>\n")
-        self.lbl_link_license = qtw.QLabel(f"<a href='{info.__license__}'>License</a>\n")
-        self.lbl_link_help = qtw.QLabel(f"<a href='{info.__link_wiki__}'>Help</a>\n")
-        # label_txt_links.setAlignment(qtc.Qt.AlignCenter | qtc.Qt.AlignVCenter)
+        # Links
+        # self.lbl_link_releases = qtw.QLabel(f"<a href='{info.__link_releases__}'>Releases</a>\n")
+        # self.lbl_link_releases.setAlignment(qtc.Qt.AlignCenter | qtc.Qt.AlignVCenter)
+        # grid.addWidget(self.lbl_link_releases, 5, 0)
+
+        self.lbl_link_releases = gui_elements.add_label_link_to_grid(
+            link_txt='Releases', link_str=info.__link_releases__, grid=grid, row=5)
+        self.lbl_link_source_code = gui_elements.add_label_link_to_grid(
+            link_txt='Source Code', link_str=info.__link_source_code__, grid=grid, row=6)
+        self.lbl_link_license = gui_elements.add_label_link_to_grid(
+            link_txt='License', link_str=info.__license__, grid=grid, row=7)
+        self.lbl_link_help = gui_elements.add_label_link_to_grid(
+            link_txt='Help', link_str=info.__link_wiki__, grid=grid, row=8)
 
         grid.addWidget(label_image, 0, 0)
         grid.addWidget(qtw.QLabel(), 1, 0)
         grid.addWidget(label_txt, 2, 0)
         grid.addWidget(label_txt2, 3, 0)
         grid.addWidget(label_txt3, 4, 0)
-
-        grid.addWidget(self.lbl_link_releases, 5, 0)
-        grid.addWidget(self.lbl_link_source_code, 6, 0)
-        grid.addWidget(self.lbl_link_license, 7, 0)
-        grid.addWidget(self.lbl_link_help, 8, 0)
 
         grid.setRowStretch(9, 1)
         section.setLayout(grid)

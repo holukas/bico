@@ -40,3 +40,10 @@ def add_button_to_grid(label, grid, row, colspan=1):
     grid.addWidget(button, row, 0, 1, colspan)
     return button
 
+def add_label_link_to_grid(link_txt, link_str, grid, row, colspan=1):
+    label_link = qtw.QLabel(f"<a href='{link_str}'>{link_txt}</a>\n")
+    label_link.setProperty('labelClass', 'label_link')
+    label_link.setAlignment(qtc.Qt.AlignCenter | qtc.Qt.AlignVCenter)
+    grid.addWidget(label_link, row, 0, 1, colspan)
+    return label_link
+

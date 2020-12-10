@@ -1,15 +1,15 @@
-QLabel{color: #455a64;}  /* bluegray 700 */
-QLabel[labelClass="header_1"]{font-size: 18pt; padding: 0.1em 0 0.2em 0; font-weight: bold;}
-QLabel[labelClass="header_2"]{font-size: 14pt; padding: 1.5em 0 0.5em 0; margin-left: 10px;}
-QLabel[labelClass="header_3"]{font-weight: bold;}
-QLabel[labelClass="bold"]{font-weight: bold; margin-left: 20px;}
-
+QLabel {color: #455a64;}  /* bluegray 700 */
+QLabel[labelClass="header_1"] {font-size: 18pt; padding: 0.1em 0 0.2em 0; font-weight: bold;}
+QLabel[labelClass="header_2"] {font-size: 14pt; padding: 1.5em 0 0.5em 0; margin-left: 10px;}
+QLabel[labelClass="header_3"] {font-weight: bold;}
+QLabel[labelClass="bold"] {font-weight: bold; margin-left: 20px;}
+QLabel[labelClass="label_link"] {padding: 5px;}
 
 QFrame{}
-QFrame[labelClass="section_bg_instruments"]{background-color: white; padding: 20px; margin: 10px;}
-QFrame[labelClass="section_bg_raw_data"]{background-color: white; padding: 20px; margin: 10px;}
-QFrame[labelClass="section_bg_output"]{background-color: white; padding: 20px; margin: 10px;}
-QFrame[labelClass="section_bg_controls"]{background-color: white; padding: 20px; margin: 10px;}
+QFrame[labelClass="section_bg_instruments"] {background-color: white; padding: 20px; margin: 10px;}
+QFrame[labelClass="section_bg_raw_data"] {background-color: white; padding: 20px; margin: 10px;}
+QFrame[labelClass="section_bg_output"] {background-color: white; padding: 20px; margin: 10px;}
+QFrame[labelClass="section_bg_controls"] {background-color: white; padding: 20px; margin: 10px;}
 
 
 QComboBox{border: 1px solid #B0BEC5; padding: 10px; background: #ECEFF1; color: #424242; font-weight: bold;}  /* blue grey 200, 50, grey 800 */
