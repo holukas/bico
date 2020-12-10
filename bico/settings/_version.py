@@ -1,2 +1,6 @@
 __version__ = "0.0.1"
-__date__ = "9 Dec 2020"
+__date__ = "10 Dec 2020"
+__link_source_code__ = "https://gitlab.ethz.ch/holukas/bico"
+__link_releases__ = "https://gitlab.ethz.ch/holukas/bico/-/releases"
+__link_wiki__ = "https://gitlab.ethz.ch/holukas/bico/-/wikis/home"
+__license__ = "https://gitlab.ethz.ch/holukas/bico/-/blob/master/LICENSE"

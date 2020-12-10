@@ -6,7 +6,7 @@ from PyQt5.QtGui import QPixmap
 
 from gui import gui_elements
 from help import tooltips
-from settings._version import __version__, __date__
+import settings._version as info
 
 
 class Ui_MainWindow(object):
@@ -65,17 +65,31 @@ class Ui_MainWindow(object):
         label_txt = qtw.QLabel("BICO - Binary Conversion")
         label_txt.setProperty('labelClass', 'header_3')
         label_txt.setAlignment(qtc.Qt.AlignCenter | qtc.Qt.AlignVCenter)
+
         label_txt2 = qtw.QLabel("Convert binary files to ASCII")
         label_txt2.setAlignment(qtc.Qt.AlignCenter | qtc.Qt.AlignVCenter)
-        label_txt3 = qtw.QLabel(f"v{__version__} / {__date__}")
+
+        label_txt3 = qtw.QLabel(f"v{info.__version__} / {info.__date__}")
         label_txt3.setAlignment(qtc.Qt.AlignCenter | qtc.Qt.AlignVCenter)
+
+        self.lbl_link_releases = qtw.QLabel(f"<a href='{info.__link_releases__}'>Releases</a>\n")
+        self.lbl_link_source_code = qtw.QLabel(f"<a href='{info.__link_source_code__}'>Source Code</a>\n")
+        self.lbl_link_license = qtw.QLabel(f"<a href='{info.__license__}'>License</a>\n")
+        self.lbl_link_help = qtw.QLabel(f"<a href='{info.__link_wiki__}'>Help</a>\n")
+        # label_txt_links.setAlignment(qtc.Qt.AlignCenter | qtc.Qt.AlignVCenter)
 
         grid.addWidget(label_image, 0, 0)
         grid.addWidget(qtw.QLabel(), 1, 0)
         grid.addWidget(label_txt, 2, 0)
         grid.addWidget(label_txt2, 3, 0)
         grid.addWidget(label_txt3, 4, 0)
-        grid.setRowStretch(5, 1)
+
+        grid.addWidget(self.lbl_link_releases, 5, 0)
+        grid.addWidget(self.lbl_link_source_code, 6, 0)
+        grid.addWidget(self.lbl_link_license, 7, 0)
+        grid.addWidget(self.lbl_link_help, 8, 0)
+
+        grid.setRowStretch(9, 1)
         section.setLayout(grid)
         return section
 

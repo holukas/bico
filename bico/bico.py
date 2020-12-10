@@ -7,6 +7,7 @@ from shutil import copyfile
 import pandas as pd
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtWidgets as qtw
+from PyQt5 import QtGui as qtg
 
 import ops.logger
 import ops.setup
@@ -233,8 +234,18 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
         self.set_gui_checkbox(checkbox=self.chk_output_plots_ts_agg,
                               state=self.settings_dict['plot_ts_agg'])
 
+    def link(self, link_str):
+        """Call hyperlink from label, opens in browser"""
+        qtg.QDesktopServices.openUrl(qtc.QUrl(link_str))
+
     def connections(self):
         """Connect GUI elements to functions"""
+        # Logo
+        self.lbl_link_releases.linkActivated.connect(self.link)
+        self.lbl_link_source_code.linkActivated.connect(self.link)
+        self.lbl_link_license.linkActivated.connect(self.link)
+        self.lbl_link_help.linkActivated.connect(self.link)
+
         # Raw Data
         self.btn_rawdata_source_folder.clicked.connect(lambda: self.select_dir(
             start_dir=self.settings_dict['dir_source'], dir_setting='dir_source',
