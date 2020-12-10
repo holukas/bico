@@ -44,6 +44,7 @@ class Ui_MainWindow(object):
         with open('gui/gui.css', "r") as fh:
             mainwindow.setStyleSheet(fh.read())
 
+
         # ADD SECTIONS to LAYOUT CONTAINER
         container = qtw.QHBoxLayout()
         container.addWidget(self.add_section_logo())
