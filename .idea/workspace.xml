@@ -3,9 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="254ecb79-655b-4854-8af6-177bb7347e8a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/gui/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/bico/gui/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/_version.py" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/_version.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/start_bico.py" beforeDir="false" afterPath="$PROJECT_DIR$/bico/start_bico.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bico/ops/file.py" beforeDir="false" afterPath="$PROJECT_DIR$/bico/ops/file.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bico/ops/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/bico/ops/setup.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -281,7 +280,7 @@
       <workItem from="1607436447683" duration="6112000" />
       <workItem from="1607504715733" duration="6609000" />
       <workItem from="1607594405028" duration="3277000" />
-      <workItem from="1607607175897" duration="601000" />
+      <workItem from="1607607175897" duration="2744000" />
     </task>
     <servers />
   </component>

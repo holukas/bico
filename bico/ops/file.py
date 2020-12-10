@@ -186,7 +186,7 @@ def export_raw_data_csv(df, outdir, logger, outfile='temp', compression='gzip'):
 
 
 def export_stats_collection_csv(df, outdir, run_id, logger):
-    outpath = outdir / f"__STATS__"
-    # outpath = outdir / f"stats_{run_id}"  # TODO act run_id
+    # outpath = outdir / f"stats_"
+    outpath = outdir / f"stats_{run_id}"  # TODO act run_id
     logger.info(f"Saving stats collection to {outpath}")
     df.to_csv(f"{outpath}.csv", index=True)
