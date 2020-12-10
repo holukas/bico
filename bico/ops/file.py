@@ -145,6 +145,7 @@ class SearchAll():
         self.logger.info(f"{suffix} +++ {len(valid_files_dict)} files were larger than the selected minimum"
                          f" filesize of {min_filesize_lim}, keeping files: {list(valid_files_dict.keys())}")
         self.logger.info(f"{suffix} --- {len(_invalid_files_dict)} files were smaller than the selected minimum"
+                         
                          f" filesize of {min_filesize_lim} and will not be used: {list(_invalid_files_dict.keys())}")
         self.logger.info(f"{suffix} ============================")
         return valid_files_dict

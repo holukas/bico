@@ -98,7 +98,7 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
         # Plot stats collection from file
         if self.settings_dict['plot_ts_agg'] == '1':
             bin_found_files_dict = file.SearchAll.search_all(dir=self.settings_dict['dir_out_run_plots_agg'],
-                                                             file_id='__STATS__*.csv',
+                                                             file_id='stats_*.csv',
                                                              logger=self.logger)
             for fid, filepath in bin_found_files_dict.items():
                 df = pd.read_csv(filepath,

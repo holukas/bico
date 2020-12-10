@@ -1,0 +1,36 @@
+# ========================
+# HS-50 - SONIC ANEMOMETER
+# ========================
+
+
+U        ==   {'order': 1, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'm+1_s-1', 'datablock': 'HS50-B'}
+V        ==   {'order': 2, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'm+1_s-1', 'datablock': 'HS50-B'}
+W        ==   {'order': 3, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'm+1_s-1', 'datablock': 'HS50-B'}
+T_SONIC  ==   {'order': 4, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'K', 'datablock': 'HS50-B'}
+INC_X    ==   {'order': 5, 'bytes': 2, 'format': '>h', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'deg', 'datablock': 'HS50-B'}
+INC_Y    ==   {'order': 6, 'bytes': 2, 'format': '>h', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'deg', 'datablock': 'HS50-B'}
+
+
+# NOTES
+# =====
+#
+#   'gain_on_signal' ... gain that was applied to the raw data signal, to get to units *divide* by this gain
+#   'offset_on_signal' ... offset that was added to the raw data signal, to get to units *subtract* this offset
+#   'apply_gain' ... gain that is applied during conversion, e.g. to convert to different units if needed
+#   'add_offset' ... offset that is added during conversion, e.g. to convert to different units if needed
+#
+#   BICO ID: HS50-B
+#   Old ID in FCT: hs_50
+#   Old data block in FCT: data_block_sonic_hs_50
+#
+#   FCT FluxCalcTool source code:
+#   https://gitlab.ethz.ch/holukas/fct-flux-calculation-tool
+#
+#   https://docs.python.org/3.1/library/struct.html#format-characters
+#   B...unsigned char, integer, 1 Byte
+#   h...short integer, 2 Bytes
+#   >...big-endian, MSB most-significant Byte at lowest address
+#   Big-endian systems store the most significant byte of a word in the smallest address
+#
+#   # https://docs.python.org/3/library/struct.html
+# """

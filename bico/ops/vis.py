@@ -190,23 +190,27 @@ def high_res_histogram(df, outfile, outdir, logger):
             col_idx += 1
             ax = axes[col_idx]
 
-            # ax.plot(dblock_df[col].index, dblock_df[col], 'r,', alpha=0.5, c='#5f87ae')
-            # import seaborn as sns
-            # sns.set_context("paper", font_scale=1.1, rc={"lines.linewidth": 1})
-            # h = sns.histplot(dblock_df[col], ax=ax, kde=False)
-            ax.hist(dblock_df[col], bins=20)
+            if not dblock_df[col].dropna().empty:
+                ax.hist(dblock_df[col], bins=20)
+                _default_format(ax=ax, width=1, length=2, txt_xlabel="", txt_ylabel="Counts", fontsize=7)
+                ax.text(0.01, 0.96, f"{col[0]} {col[1]} {col[2]}", transform=ax.transAxes, horizontalalignment='left',
+                        **text_args)
+                txt_info = f"mean: {dblock_df[col].mean():.3f}    vals: {dblock_df[col].count():.0f}\n" \
+                           f"min: {dblock_df[col].min():.3f}    max:{dblock_df[col].max():.3f}"
+                ax.text(0.99, 0.96, txt_info, transform=ax.transAxes, horizontalalignment='right', **text_args)
+                for tick in ax.xaxis.get_major_ticks():
+                    tick.label.set_fontsize(6)
+                for tick in ax.yaxis.get_major_ticks():
+                    tick.label.set_fontsize(6)
+            else:
+                # If data for col is empty
+                ax.set_facecolor('xkcd:salmon')
+                ax.text(0.5, 0.5,
+                             f"(!)WARNING: variable {col} is empty and was therefore not plotted",
+                             horizontalalignment='center', verticalalignment='center', transform=ax.transAxes,
+                             size=14, color='white', backgroundcolor='red')
 
-            _default_format(ax=ax, width=1, length=2, txt_xlabel="", txt_ylabel="Counts", fontsize=7)
-            ax.text(0.01, 0.96, f"{col[0]} {col[1]} {col[2]}", transform=ax.transAxes, horizontalalignment='left',
-                    **text_args)
-            txt_info = f"mean: {dblock_df[col].mean():.3f}    vals: {dblock_df[col].count():.0f}\n" \
-                       f"min: {dblock_df[col].min():.3f}    max:{dblock_df[col].max():.3f}"
-            ax.text(0.99, 0.96, txt_info, transform=ax.transAxes, horizontalalignment='right', **text_args)
 
-            for tick in ax.xaxis.get_major_ticks():
-                tick.label.set_fontsize(6)
-            for tick in ax.yaxis.get_major_ticks():
-                tick.label.set_fontsize(6)
 
         dblock_outfile = outdir / f"{outfile}_hires_histogram_{dblock}"
         fig.savefig(f"{dblock_outfile}.png", format='png', bbox_inches='tight', facecolor='w',
