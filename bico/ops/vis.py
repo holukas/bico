@@ -1,6 +1,6 @@
 import datetime as dt
 import os
-import seaborn
+
 import matplotlib.dates as mdates
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
@@ -123,7 +123,8 @@ def aggs_ts(df, outdir, logger):
 
         text_args = dict(verticalalignment='top',
                          size=14, color='black', backgroundcolor='none', zorder=100)
-        ax1.text(0.01, 0.96, f"{var[0]} {var[1]} {var[2]}", transform=ax1.transAxes, horizontalalignment='left', **text_args)
+        ax1.text(0.01, 0.96, f"{var[0]} {var[1]} {var[2]}", transform=ax1.transAxes, horizontalalignment='left',
+                 **text_args)
 
         _default_format(ax=ax1, width=1, length=2, txt_ylabel=var[0], txt_ylabel_units=var[1])
         _default_format(ax=ax2, width=1, length=2, txt_ylabel='counts')
@@ -136,27 +137,6 @@ def aggs_ts(df, outdir, logger):
         fig.savefig(f"{outfile}.png", format='png', bbox_inches='tight', facecolor='w',
                     transparent=True, dpi=150)
 
-        # text_args = dict(verticalalignment='top',
-        #                  size=6, color='black', backgroundcolor='none', zorder=100)
-        # col_idx = -1
-        # for col in df.columns:
-        #     col_idx += 1
-        #     ax.plot(df[col].index, df[col], 'r,', alpha=0.5, c='#5f87ae')
-
-        #     ax.text(0.01, 0.96, f"{col[0]} {col[1]}", transform=ax.transAxes, horizontalalignment='left', **text_args)
-        #     txt_info = f"mean: {df[col].mean():.3f}\nvals: {df[col].count():.0f}"
-        #     ax.text(0.99, 0.96, txt_info, transform=ax.transAxes, horizontalalignment='right',**text_args)
-        #
-        #     # Show bottom labels for last axis in column
-        #     if (col_idx == figcollimit) | (col_idx == len(df.columns)-1):
-        #         ax.tick_params(labelbottom=True)
-        #     else:
-        #         ax.tick_params(labelbottom=False)
-        #
-        #     for tick in ax.xaxis.get_major_ticks():
-        #         tick.label.set_fontsize(6)
-        #     for tick in ax.yaxis.get_major_ticks():
-        #         tick.label.set_fontsize(6)
 
 def high_res_histogram(df, outfile, outdir, logger):
     logger.info("    Plotting high-res data: histograms ...")
@@ -206,15 +186,14 @@ def high_res_histogram(df, outfile, outdir, logger):
                 # If data for col is empty
                 ax.set_facecolor('xkcd:salmon')
                 ax.text(0.5, 0.5,
-                             f"(!)WARNING: variable {col} is empty and was therefore not plotted",
-                             horizontalalignment='center', verticalalignment='center', transform=ax.transAxes,
-                             size=14, color='white', backgroundcolor='red')
-
-
+                        f"(!)WARNING: variable {col} is empty and was therefore not plotted",
+                        horizontalalignment='center', verticalalignment='center', transform=ax.transAxes,
+                        size=14, color='white', backgroundcolor='red')
 
         dblock_outfile = outdir / f"{outfile}_hires_histogram_{dblock}"
         fig.savefig(f"{dblock_outfile}.png", format='png', bbox_inches='tight', facecolor='w',
                     transparent=True, dpi=100)
+
 
 def high_res_ts(df, outfile, outdir, logger):
     logger.info("    Plotting high-res data: time series ...")
@@ -230,6 +209,7 @@ def high_res_ts(df, outfile, outdir, logger):
         num_plots = len(dblock_df.columns)
         cols = dblock_df.columns
 
+        # Gridspec and axes
         gs = gridspec.GridSpec(num_plots, 1)  # rows, cols
         gs.update(wspace=0.1, hspace=0, left=0.03, right=0.99, top=0.99, bottom=0.01)
         fig = plt.Figure(facecolor='white', figsize=(16, 9))
@@ -242,17 +222,26 @@ def high_res_ts(df, outfile, outdir, logger):
 
         text_args = dict(verticalalignment='top',
                          size=6, color='black', backgroundcolor='none', zorder=100)
+
+        # Plot columns
         col_idx = -1
         for col in dblock_df.columns:
+            # if dblock == '[HS50-A]':
+            #     print(col)
             col_idx += 1
             ax = axes[col_idx]
-            ax.plot(dblock_df[col].index, dblock_df[col], 'r,', alpha=0.5, c='#5f87ae')
+
+            dataok = check_plot_data(ax=ax, df=dblock_df, col=col)
+            if dataok:
+                # Numeric data, values available
+                ax.plot(dblock_df[col].index, dblock_df[col], 'r,', alpha=0.5, c='#5f87ae')
+                txt_info = f"mean: {dblock_df[col].mean():.3f}    vals: {dblock_df[col].count():.0f}\n" \
+                           f"min: {dblock_df[col].min():.3f}    max:{dblock_df[col].max():.3f}"
+                ax.text(0.99, 0.96, txt_info, transform=ax.transAxes, horizontalalignment='right', **text_args)
+
             _default_format(ax=ax, width=1, length=2)
             ax.text(0.01, 0.96, f"{col[0]} {col[1]} {col[2]}", transform=ax.transAxes, horizontalalignment='left',
                     **text_args)
-            txt_info = f"mean: {dblock_df[col].mean():.3f}    vals: {dblock_df[col].count():.0f}\n" \
-                       f"min: {dblock_df[col].min():.3f}    max:{dblock_df[col].max():.3f}"
-            ax.text(0.99, 0.96, txt_info, transform=ax.transAxes, horizontalalignment='right', **text_args)
 
             # Show bottom labels for last axis in column
             if col_idx == len(dblock_df.columns) - 1:
@@ -269,6 +258,40 @@ def high_res_ts(df, outfile, outdir, logger):
         fig.savefig(f"{dblock_outfile}.png", format='png', bbox_inches='tight', facecolor='w',
                     transparent=True, dpi=150)
 
+def check_plot_data(ax, df, col):
+    dataok = False
+    isnumeric = False if df[col].dtypes == object else True
+    ishex = False if 'hexadecimal_value' not in col[1] else True
+    isemtpy = False if not df[col].dropna().empty else True
+
+    txt_warning = "-NOT-FOUND-"
+    facecolor = None
+
+    if not isemtpy and not isnumeric and ishex:
+        # Expected non-numeric hexadecimal data, values available
+        facecolor = 'xkcd:green'
+        txt_warning = f"NOTE: Variable {col} is a HEXADECIMAL (non-numeric) value " \
+                      f"and was therefore not plotted."
+
+    if not isemtpy and not isnumeric and not ishex:
+        # General non-numeric data, values available
+        facecolor = 'xkcd:salmon'
+        txt_warning = f"(!)WARNING: variable {col} is NON-NUMERIC and was therefore not plotted."
+
+    if isemtpy:
+        # No values available
+        facecolor = 'xkcd:aqua'
+        txt_warning = f"(!)WARNING: data for variable {col} is EMPTY and was therefore not plotted."
+
+    if not isemtpy and not ishex and isnumeric:
+        # Data are OK
+        dataok = True
+
+    if not dataok:
+        ax.text(0.5, 0.5, txt_warning,
+                horizontalalignment='center', verticalalignment='center', transform=ax.transAxes,
+                size=14, color='white', backgroundcolor=facecolor)
+    return dataok
 
 def _format_spines(ax, color, lw):
     spines = ['top', 'bottom', 'left', 'right']

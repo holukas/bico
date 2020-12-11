@@ -20,7 +20,6 @@ def read_bin_file_to_mem(binary_filename, logger):
 
 
 def read_file(binary_filename, size_header, dblocks, limit_read_lines, logger, statusbar):
-
     binary_filesize = os.path.getsize(binary_filename)
 
     # Get header for all data blocks
@@ -225,6 +224,13 @@ def read_bin_instr(open_binary, dblock, total_bytes_read, logger):
         var_val = remove_gain_offset(var_value=var_val, gain=props['gain_on_signal'], offset=props['offset_on_signal'])
         var_val = apply_gain_offset(var_value=var_val, gain=props['apply_gain'], offset=props['add_offset'])
 
+        # Convert to hex if needed
+        if props['units'] == 'hexadecimal_value':
+            var_val = convert_val_to_hex(var_val=var_val)
+        # Convert to octal if needed
+        if props['units'] == 'octal':
+            var_val = convert_val_to_octal(var_val=var_val)
+
         # Check if size info available
         if 'DATA_SIZE' in var:
             dblock_true_size = int(var_val)
@@ -297,6 +303,35 @@ def read_bin_instr(open_binary, dblock, total_bytes_read, logger):
                 dblock_data.append(bmv)
 
     return dblock_data, total_bytes_read, end_of_data_reached
+
+
+def convert_val_to_hex(var_val):
+    """Convert value to hexadecimal
+
+    Examples:
+        - var_val = 40.0, is converted to integer 40,
+            is converted to hex '0x28', is converted to hex without prefix '28'
+        - var_val = 60.0, is converted to integer 60,
+            is converted to hex '0x3c', is converted to hex without prefix '3c'
+    Returns: string
+    """
+    hex_val = hex(int(var_val))  # Note: has hexadecimal prefix '0x' at start, e.g. '0x28'
+    hex_val_no_prefix = hex_val[2:]  # Remove hex prefix from val
+    # if hex_val_no_prefix == '3c':
+    #     print("X")
+    return hex_val_no_prefix
+
+def convert_val_to_octal(var_val):
+    """Convert value to octal
+
+    Examples:
+        - var_val = 0.0, is converted to integer 0,
+            is converted to octal '0o0', is converted to octal without prefix '0'
+    Returns: int
+    """
+    oct_val = oct(int(var_val))  # Note: has octal prefix '0o' at start, e.g. '0o0'
+    oct_val_no_prefix = oct_val[2:]  # Remove octal prefix from val
+    return int(oct_val_no_prefix)
 
 
 def generate_missing_values(dict):

@@ -6,8 +6,8 @@ from shutil import copyfile
 
 import pandas as pd
 from PyQt5 import QtCore as qtc
-from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
+from PyQt5 import QtWidgets as qtw
 
 import ops.logger
 import ops.setup
@@ -358,6 +358,11 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
 
             csv_filename = f"{self.settings_dict['site']}_{csv_filedate}"
 
+            # Export file CSV
+            file.export_raw_data_csv(df=df, outfile=csv_filename, logger=logger,
+                                     outdir=self.settings_dict['dir_out_run_raw_data_csv'],
+                                     compression=self.settings_dict['file_compression'])
+
             # Plot high-resolution data
             if self.settings_dict['plot_ts_hires'] == '1':
                 vis.high_res_ts(df=df.copy(), outfile=csv_filename,
@@ -365,11 +370,6 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
             if self.settings_dict['plot_histogram_hires'] == '1':
                 vis.high_res_histogram(df=df.copy(), outfile=csv_filename,
                                        outdir=self.settings_dict['dir_out_run_plots_hires'], logger=logger)
-
-            # CSV
-            file.export_raw_data_csv(df=df, outfile=csv_filename, logger=logger,
-                                     outdir=self.settings_dict['dir_out_run_raw_data_csv'],
-                                     compression=self.settings_dict['file_compression'])
 
         return stats_coll_df
 
