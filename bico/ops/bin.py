@@ -143,6 +143,7 @@ def bit_map_extract_vals(bit_map_dict, var_binary_string):
             val = val * bit_map_props['apply_gain']
             val = val + bit_map_props['add_offset']
             bit_map_vals.append(val)
+    # print(bit_map_vals)
     return bit_map_vals
 
 
@@ -230,6 +231,9 @@ def read_bin_instr(open_binary, dblock, total_bytes_read, logger):
         # Convert to octal if needed
         if props['units'] == 'octal':
             var_val = convert_val_to_octal(var_val=var_val)
+        # Convert to octal for LGR laser analyzer
+        if props['units'] == 'octal_lgr':
+            var_val = convert_val_to_octal_lgr(var_val=var_val)
 
         # Check if size info available
         if 'DATA_SIZE' in var:
@@ -321,6 +325,7 @@ def convert_val_to_hex(var_val):
     #     print("X")
     return hex_val_no_prefix
 
+
 def convert_val_to_octal(var_val):
     """Convert value to octal
 
@@ -329,9 +334,34 @@ def convert_val_to_octal(var_val):
             is converted to octal '0o0', is converted to octal without prefix '0'
     Returns: int
     """
-    oct_val = oct(int(var_val))  # Note: has octal prefix '0o' at start, e.g. '0o0'
+    # if var_val != 0:
+    #     print("x")
+    var_val_int = int(var_val)  # Convert to integer
+    # var_val_bin = bin(var_val_int)[2:]  # Convert to binary string
+    # var_val_bin = var_val_bin.zfill(8)  # F
+    # var_val_oct = int(var_val_bin, 8)  # Elegant way to convert binary string to octal
+    # bin(int(var_val))[2:].zfill(16)
+    oct_val = oct(var_val_int)  # Note: has octal prefix '0o' at start, e.g. '0o0'
     oct_val_no_prefix = oct_val[2:]  # Remove octal prefix from val
-    return int(oct_val_no_prefix)
+    return oct_val_no_prefix
+
+
+def convert_val_to_octal_lgr(var_val):
+    """Convert value to octal for LGR laser analyzer
+
+    Format for the LGR status code that is recorded in the raw binary files.
+
+    Example:
+        - var_val = 113.0
+        - var_val_int = 113
+        - var_val_bin = '0001'
+        - var_val_oct = 1
+    Returns: int
+    """
+    var_val_int = int(var_val)  # Convert to integer
+    var_val_bin = bin(var_val_int)[-4:]  # Convert to binary string, relevant info is in last 4 bits
+    var_val_oct = int(var_val_bin, 8)  # Elegant way to convert binary string to octal
+    return var_val_oct
 
 
 def generate_missing_values(dict):

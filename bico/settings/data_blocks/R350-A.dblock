@@ -9,22 +9,3 @@ W        ==   {'order': 3, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'o
 T_SONIC  ==   {'order': 4, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'K', 'datablock': 'R350-A'}
 INC_X    ==   {'order': 5, 'bytes': 2, 'format': '>h', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'deg', 'datablock': 'R350-A'}
 INC_Y    ==   {'order': 6, 'bytes': 2, 'format': '>h', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'deg', 'datablock': 'R350-A'}
-
-
-# NOTES
-# """
-#     BICO ID: R350-A
-#     Old ID in FCT: r3-50
-#     Old data block in FCT: data_block_sonic_r3_50
-#
-#     FCT FluxCalcTool source code:
-#     https://gitlab.ethz.ch/holukas/fct-flux-calculation-tool
-#
-#     https://docs.python.org/3.1/library/struct.html#format-characters
-#     B...unsigned char, integer, 1 Byte
-#     h...short integer, 2 Bytes
-#     >...big-endian, MSB most-significant Byte at lowest address
-#     Big-endian systems store the most significant byte of a word in the smallest address
-#
-#     # https://docs.python.org/3/library/struct.html
-# """

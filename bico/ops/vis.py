@@ -133,7 +133,7 @@ def aggs_ts(df, outdir, logger):
         font = {'family': 'sans-serif', 'size': 10}
         ax1.legend(frameon=True, loc='upper right', prop=font).set_zorder(100)
 
-        outfile = outdir / f"__STATS__{var[0]}_{var[1]}_{var[2]}"
+        outfile = outdir / f"stats_agg_{var[0]}_{var[1]}_{var[2]}"
         fig.savefig(f"{outfile}.png", format='png', bbox_inches='tight', facecolor='w',
                     transparent=True, dpi=150)
 

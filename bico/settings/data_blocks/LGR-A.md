@@ -1,15 +1,24 @@
-# HS50-A
+# LGR-A
 
 ## Variables
-- U ... First horizontal wind component (x)
-- V ... Second horizontal wind component (y)
-- W ... Vertical wind component (z)
-- T_SONIC ... Sonic temperature
-- SA_DIAG_TYPE ... Status type indicator (error, inclinometer, configuration) (StaA in manual)
-- SA_DIAG_VAL ... Status value and information (StaD in manual)
-- INC_XY ... Inclinometer, alternatively x (odd record numbers) and y (even record numbers)
-
-*2017-07-25: EddyPro can currently not handle StaA and StaD, but it will be implemented soon for ICOS requirements*
+- DATA_SIZE ... Data size of current data block, number of bytes in LGR record
+  (2 = missing, 33 = available)
+- STATUS_CODE ... Status of LGR data aquisition, see Table 11 in WE's sonicread.pdf
+    - octal value converted to integer yields:
+    - 0 .. Status OK, no problems (octal yy00)
+    - 1 .. IRGA did not respond (yy01)
+    - 2 .. Status OK, old data used (yy02)
+    - 10 .. not OK, IRGA data are missing (yy10)  
+- CH4_DRY ... CH4 dry mole fraction (in **dry** air), mixing ratio, ppm (parts per million)
+- N2O_DRY ... N2O dry mole fraction (in **dry** air), mixing ratio, ppm
+- H2O ... H2O molar fraction (in **humid** air), wet mole fraction
+- CH4 ... CH4 molar fraction (in **humid** air), wet mole fraction
+- N2O ... N2O molar fraction (in **humid** air), wet mole fraction
+- P_CELL ... Pressure in cell
+- T_CELL ... Temperature in cell
+- T_AMBIENT ... Ambient temperature (in box?)
+- MIRROR_RINGDOWNTIME ... Mirror ring-down time
+- FIT_FLAG ... *TODO*
 
 ## BICO Settings
 - 'order' ... Order in the data block variable sequence
@@ -23,20 +32,12 @@
 - 'datablock' ... Data block ID
 
 *Before BICO, the binary conversion was done in FCT FluxCalcTool:*
-- Old ID in FCT: hs-50_extended
-- Old data block in FCT: data_block_sonic_hs_50_extended
+- Old ID in FCT: lgr_ino2018
+- Old data block in FCT: data_block_lgr_ino2018
 - FCT Source code: --> https://gitlab.ethz.ch/holukas/fct-flux-calculation-tool
 
 ## Details
-- Extended data logging to comply w/ ICOS requirements.
-- Installed first in CH-DAV in 2017-07.
-- from WE's email 2017-07-10:
-    - the former 4 data bytes containing the two inclinometer angles are now used differently
-    - first byte is the StaA byte from the sonic
-    - second byte is the StaD byte from the sonic 
-    - third and fourth byte are still a short integer as before, but now
-     it contains the inclinometer X angle if the record number is an odd number,
-     or the inclinometer Y angle if the record number is an even number
+- none
 
 ## Binary info
 - B...unsigned char, integer, 1 Byte
@@ -45,3 +46,4 @@
      Big-endian systems store the most significant byte of a word in the smallest address
 - --> https://docs.python.org/3/library/struct.html
 - --> https://docs.python.org/3.1/library/struct.html#format-characters
+

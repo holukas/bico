@@ -87,6 +87,7 @@ class SearchAll():
     @staticmethod
     def search_all(dir, file_id, logger):
         """Search all files in dir that match file id"""
+        logger.info("Searching for files ...")
         valid_files_dict = {}
         for root, dirs, found_files in os.walk(dir):
             for idx, file in enumerate(found_files):
@@ -145,7 +146,7 @@ class SearchAll():
         self.logger.info(f"{suffix} +++ {len(valid_files_dict)} files were larger than the selected minimum"
                          f" filesize of {min_filesize_lim}, keeping files: {list(valid_files_dict.keys())}")
         self.logger.info(f"{suffix} --- {len(_invalid_files_dict)} files were smaller than the selected minimum"
-                         
+
                          f" filesize of {min_filesize_lim} and will not be used: {list(_invalid_files_dict.keys())}")
         self.logger.info(f"{suffix} ============================")
         return valid_files_dict
@@ -187,7 +188,6 @@ def export_raw_data_csv(df, outdir, logger, outfile='temp', compression='gzip'):
 
 
 def export_stats_collection_csv(df, outdir, run_id, logger):
-    # outpath = outdir / f"stats_"
-    outpath = outdir / f"stats_{run_id}"  # TODO act run_id
+    outpath = outdir / f"stats_agg_{run_id}"
     logger.info(f"Saving stats collection to {outpath}")
     df.to_csv(f"{outpath}.csv", index=True)

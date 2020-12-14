@@ -1,10 +1,11 @@
-# =====
-# QCL-C
-# =====
+# ============================================
+# QCL-C - QUANTUM CASCADE LASER (AERODYNE QCL)
+# ============================================
+# Details: see QCL-C.md
 
 
 DATA_SIZE    ==   {'order': 1, 'bytes': 1, 'format': 'B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'Bytes', 'datablock': 'QCL-C'}
-STATUS_CODE  ==   {'order': 2, 'bytes': 1, 'format': 'B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'dimensionless', 'datablock': 'QCL-C'}
+STATUS_CODE  ==   {'order': 2, 'bytes': 1, 'format': 'B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'bit_map', 'datablock': 'QCL-C'}
 CH4_DMF      ==   {'order': 3, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'nmol+1 mol-1', 'datablock': 'QCL-C'}
 N2O_DMF      ==   {'order': 4, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'nmol+1 mol-1', 'datablock': 'QCL-C'}
 CO2_DMF      ==   {'order': 5, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'nmol+1 mol-1', 'datablock': 'QCL-C'}
@@ -14,22 +15,7 @@ P_CELL       ==   {'order': 8, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal'
 STATUS_WORD  ==   {'order': 9, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'dimensionless', 'datablock': 'QCL-C'}
 VICI         ==   {'order': 10, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'dimensionless', 'datablock': 'QCL-C'}
 
-
-# NOTES
-# =====
-#   BICO ID: QCL-C
-#   Old ID in FCT: qcl_dav2015
-#   Old data block in FCT: data_block_qcl_dav2015
-#
-#   FCT FluxCalcTool source code:
-#   https://gitlab.ethz.ch/holukas/fct-flux-calculation-tool
-#
-#   ICOS setup at CH-DAV
-#   in WE's sonicread.pdf Table 2: Version 1 Variant 6, QC-TILDAS ETHZ ICOS Davos, CH4, N2O, H2O, CO2, TEMP, PRESS,
-#   StatusW, VICI valves
-#   since V. 7.07 (2015-11-13)
-#
-#   byte 1: number of bytes in QCL record (2 = missing, 34 = available)
-#   B...unsigned char, integer, 1 Byte
-#   h...short integer, 2 Bytes
-#   >...big-endian, MSB at lowest address
+# Values extracted from STATUS_CODE:
+# ----------------------------------
+STATUS       ==   {'order': 2.01, 'bit_pos_start': 4, 'bit_pos_end': 8, 'apply_gain': 1, 'add_offset': 0, 'units': 'unused', 'output': 1, 'datablock': 'QCL-C'}
+VARIANT      ==   {'order': 2.02, 'bit_pos_start': 0, 'bit_pos_end': 4, 'apply_gain': 1, 'add_offset': 0, 'units': 'unused', 'output': 1, 'datablock': 'QCL-C'}
