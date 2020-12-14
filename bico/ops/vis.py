@@ -167,8 +167,11 @@ def high_res_histogram(df, outfile, outdir, logger):
                          size=8, color='black', backgroundcolor='none', zorder=100)
         col_idx = -1
         for col in dblock_df.columns:
+            print(f"HIST {col}")
             col_idx += 1
             ax = axes[col_idx]
+
+            # dataok = check_plot_data(ax=ax, df=dblock_df, col=col)
 
             if not dblock_df[col].dropna().empty:
                 ax.hist(dblock_df[col], bins=20)
@@ -262,6 +265,7 @@ def check_plot_data(ax, df, col):
     dataok = False
     isnumeric = False if df[col].dtypes == object else True
     ishex = False if 'hexadecimal_value' not in col[1] else True
+    # isoctal = False if 'octal' not in col[1] else True
     isemtpy = False if not df[col].dropna().empty else True
 
     txt_warning = "-NOT-FOUND-"
@@ -272,6 +276,12 @@ def check_plot_data(ax, df, col):
         facecolor = 'xkcd:green'
         txt_warning = f"NOTE: Variable {col} is a HEXADECIMAL (non-numeric) value " \
                       f"and was therefore not plotted."
+
+    # if not isemtpy and not isnumeric and not ishex and isoctal:
+    #     # Expected non-numeric octal data, values available
+    #     facecolor = 'xkcd:green'
+    #     txt_warning = f"NOTE: Variable {col} is a OCTAL (non-numeric) value " \
+    #                   f"and was therefore not plotted."
 
     if not isemtpy and not isnumeric and not ishex:
         # General non-numeric data, values available

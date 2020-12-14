@@ -343,7 +343,7 @@ def convert_val_to_octal(var_val):
     # bin(int(var_val))[2:].zfill(16)
     oct_val = oct(var_val_int)  # Note: has octal prefix '0o' at start, e.g. '0o0'
     oct_val_no_prefix = oct_val[2:]  # Remove octal prefix from val
-    return oct_val_no_prefix
+    return int(oct_val_no_prefix)
 
 
 def convert_val_to_octal_lgr(var_val):

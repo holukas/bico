@@ -15,6 +15,7 @@ from gui.gui import Ui_MainWindow
 from ops import bin, format_data, vis, file, stats
 from settings import _version
 
+# TODO dataok check for hist
 
 # TODO LATER parallelize, multiprocessing?
 # import multiprocessing as mp
