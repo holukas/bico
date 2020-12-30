@@ -28,7 +28,7 @@ def make_run_outdirs(settings_dict):
     """Set output paths and create output folders"""
 
     # Run output folder
-    # settings_dict['dir_out_run'] = Path(settings_dict['dir_out']) / "TEST_OUT"
+    # settings_dict['dir_out_run'] = Path(settings_dict['dir_out']) / "BICO_TEST_OUT"
     settings_dict['dir_out_run'] = Path(settings_dict['dir_out']) / settings_dict['run_id']  # todo act
     if not Path.is_dir(settings_dict['dir_out_run']):
         print(f"Creating folder {settings_dict['dir_out_run']} ...")

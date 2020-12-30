@@ -1,4 +1,4 @@
-run_id=BICO-20201230-141143
+run_id=BICO-20201228-001616
 
 # INSTRUMENTS
 # ===========
@@ -26,7 +26,7 @@ end_date=2020-06-02 00:00
 filename_datetime_format=yyyymmddHH.XMM
 file_ext=*.X*
 file_size_min=900
-file_limit=1
+file_limit=0
 row_limit=0
 
 # Special
@@ -35,12 +35,12 @@ select_random_files=0
 # OUTPUT
 # ======
 dir_out=A:/FLUXES/x-TEST-OUT
-dir_out_run=A:\FLUXES\x-TEST-OUT\BICO-20201230-141143
-dir_out_run_log=A:\FLUXES\x-TEST-OUT\BICO-20201230-141143\log
-dir_out_run_plots=A:\FLUXES\x-TEST-OUT\BICO-20201230-141143\plots
-dir_out_run_plots_hires=A:\FLUXES\x-TEST-OUT\BICO-20201230-141143\plots\hires
-dir_out_run_plots_agg=A:\FLUXES\x-TEST-OUT\BICO-20201230-141143\plots\agg
-dir_out_run_raw_data_csv=A:\FLUXES\x-TEST-OUT\BICO-20201230-141143\raw_data_csv
+dir_out_run=P:\Flux\RDS_calculations\INO\AES\BICO\BICO-20201215-004608
+dir_out_run_log=P:\Flux\RDS_calculations\INO\AES\BICO\BICO-20201215-004608\log
+dir_out_run_plots=P:\Flux\RDS_calculations\INO\AES\BICO\BICO-20201215-004608\plots
+dir_out_run_plots_hires=P:\Flux\RDS_calculations\INO\AES\BICO\BICO-20201215-004608\plots\hires
+dir_out_run_plots_agg=P:\Flux\RDS_calculations\INO\AES\BICO\BICO-20201215-004608\plots\agg
+dir_out_run_raw_data_csv=P:\Flux\RDS_calculations\INO\AES\BICO\BICO-20201215-004608\raw_data_csv
 
 file_compression=gzip
 

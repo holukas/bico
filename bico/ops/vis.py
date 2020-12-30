@@ -167,7 +167,7 @@ def high_res_histogram(df, outfile, outdir, logger):
                          size=8, color='black', backgroundcolor='none', zorder=100)
         col_idx = -1
         for col in dblock_df.columns:
-            print(f"HIST {col}")
+            # print(f"HIST {col}")
             col_idx += 1
             ax = axes[col_idx]
 
@@ -261,6 +261,7 @@ def high_res_ts(df, outfile, outdir, logger):
         fig.savefig(f"{dblock_outfile}.png", format='png', bbox_inches='tight', facecolor='w',
                     transparent=True, dpi=150)
 
+
 def check_plot_data(ax, df, col):
     dataok = False
     isnumeric = False if df[col].dtypes == object else True
@@ -302,6 +303,7 @@ def check_plot_data(ax, df, col):
                 horizontalalignment='center', verticalalignment='center', transform=ax.transAxes,
                 size=14, color='white', backgroundcolor=facecolor)
     return dataok
+
 
 def _format_spines(ax, color, lw):
     spines = ['top', 'bottom', 'left', 'right']

@@ -1,4 +1,4 @@
-run_id=BICO-20201215-004608
+run_id=BICO-20201230-141449
 
 # INSTRUMENTS
 # ===========
@@ -9,40 +9,40 @@ site=CH-AES
 # Data Blocks
 header=WECOM3
 instrument_1=R350-A
-instrument_2=IRGA75-A
+instrument_2=IRGA75-A-GN1
 instrument_3=LGR-A
 
 # RAW DATA
 # ========
 
 # Source Folder
-dir_source=Y:/CH-INO_InnoFarm/20_sonic_ghg/2020/08
+dir_source=Y:/CH-INO_InnoFarm/20_sonic_ghg/2020/06
 
 # Time Range
-start_date=2020-06-01 13:00
-end_date=2020-12-31 00:00
+start_date=2020-06-01 00:00
+end_date=2020-06-02 00:00
 
 # File Settings
 filename_datetime_format=yyyymmddHH.XMM
 file_ext=*.X*
 file_size_min=900
 file_limit=1
-row_limit=10000
+row_limit=0
 
 # Special
 select_random_files=0
 
 # OUTPUT
 # ======
-dir_out=P:/Flux/RDS_calculations/INO/AES/BICO
-dir_out_run=P:\Flux\RDS_calculations\INO\AES\BICO\BICO-20201215-004608
-dir_out_run_log=P:\Flux\RDS_calculations\INO\AES\BICO\BICO-20201215-004608\log
-dir_out_run_plots=P:\Flux\RDS_calculations\INO\AES\BICO\BICO-20201215-004608\plots
-dir_out_run_plots_hires=P:\Flux\RDS_calculations\INO\AES\BICO\BICO-20201215-004608\plots\hires
-dir_out_run_plots_agg=P:\Flux\RDS_calculations\INO\AES\BICO\BICO-20201215-004608\plots\agg
-dir_out_run_raw_data_csv=P:\Flux\RDS_calculations\INO\AES\BICO\BICO-20201215-004608\raw_data_csv
+dir_out=A:/FLUXES/x-TEST-OUT
+dir_out_run=A:\FLUXES\x-TEST-OUT\BICO-20201230-141449
+dir_out_run_log=A:\FLUXES\x-TEST-OUT\BICO-20201230-141449\log
+dir_out_run_plots=A:\FLUXES\x-TEST-OUT\BICO-20201230-141449\plots
+dir_out_run_plots_hires=A:\FLUXES\x-TEST-OUT\BICO-20201230-141449\plots\hires
+dir_out_run_plots_agg=A:\FLUXES\x-TEST-OUT\BICO-20201230-141449\plots\agg
+dir_out_run_raw_data_csv=A:\FLUXES\x-TEST-OUT\BICO-20201230-141449\raw_data_csv
 
-file_compression=None
+file_compression=gzip
 
 plot_file_availability=1
 plot_ts_hires=1
