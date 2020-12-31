@@ -1,4 +1,4 @@
-run_id=BICO-20201230-141143
+run_id=BICO-20201231-011421
 
 # INSTRUMENTS
 # ===========
@@ -9,7 +9,7 @@ site=CH-AES
 # Data Blocks
 header=WECOM3
 instrument_1=R350-A
-instrument_2=IRGA75-A
+instrument_2=IRGA75-A-GN1
 instrument_3=LGR-A
 
 # RAW DATA
@@ -35,13 +35,14 @@ select_random_files=0
 # OUTPUT
 # ======
 dir_out=A:/FLUXES/x-TEST-OUT
-dir_out_run=A:\FLUXES\x-TEST-OUT\BICO-20201230-141143
-dir_out_run_log=A:\FLUXES\x-TEST-OUT\BICO-20201230-141143\log
-dir_out_run_plots=A:\FLUXES\x-TEST-OUT\BICO-20201230-141143\plots
-dir_out_run_plots_hires=A:\FLUXES\x-TEST-OUT\BICO-20201230-141143\plots\hires
-dir_out_run_plots_agg=A:\FLUXES\x-TEST-OUT\BICO-20201230-141143\plots\agg
-dir_out_run_raw_data_csv=A:\FLUXES\x-TEST-OUT\BICO-20201230-141143\raw_data_csv
+dir_out_run=A:\FLUXES\x-TEST-OUT\BICO-20201230-141449
+dir_out_run_log=A:\FLUXES\x-TEST-OUT\BICO-20201230-141449\log
+dir_out_run_plots=A:\FLUXES\x-TEST-OUT\BICO-20201230-141449\plots
+dir_out_run_plots_hires=A:\FLUXES\x-TEST-OUT\BICO-20201230-141449\plots\hires
+dir_out_run_plots_agg=A:\FLUXES\x-TEST-OUT\BICO-20201230-141449\plots\agg
+dir_out_run_raw_data_csv=A:\FLUXES\x-TEST-OUT\BICO-20201230-141449\raw_data_csv
 
+output_folder_name_prefix=aaa
 file_compression=gzip
 
 plot_file_availability=1

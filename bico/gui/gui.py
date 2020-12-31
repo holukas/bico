@@ -118,12 +118,20 @@ class Ui_MainWindow(object):
         self.lbl_output_folder = qtw.QLabel("***Please select output folder...***")
         grid.addWidget(self.lbl_output_folder, 3, 0, 1, 2)
 
+        # Output folder name
+        header_rawdata_file_settings = qtw.QLabel('Output Folder Name')
+        header_rawdata_file_settings.setProperty('labelClass', 'header_2')
+        grid.addWidget(header_rawdata_file_settings, 4, 0, 1, 1)
+        self.lne_output_folder_name_prefix = \
+            gui_elements.add_label_lineedit_to_grid(label='Folder Name Prefix', grid=grid,
+                                                    row=5, value='')
+
         # File Compression
         header_output_file_compression = qtw.QLabel('File Compression')
         header_output_file_compression.setProperty('labelClass', 'header_2')
-        grid.addWidget(header_output_file_compression, 4, 0)
+        grid.addWidget(header_output_file_compression, 6, 0)
         self.cmb_output_compression = \
-            gui_elements.add_label_combobox_to_grid(label='Compression', grid=grid, row=5,
+            gui_elements.add_label_combobox_to_grid(label='Compression', grid=grid, row=7,
                                                     items=['gzip', 'None'])
 
         self.cmb_output_compression.setToolTip(tooltips.cmb_output_compression)
@@ -131,19 +139,17 @@ class Ui_MainWindow(object):
         # Plots
         header_output_plots = qtw.QLabel('Plots')
         header_output_plots.setProperty('labelClass', 'header_2')
-        grid.addWidget(header_output_plots, 6, 0, 1, 1)
+        grid.addWidget(header_output_plots, 8, 0, 1, 1)
         self.chk_output_plots_file_availability = \
-            gui_elements.add_checkbox_to_grid(label='File Availability Heatmap', grid=grid, row=7)
+            gui_elements.add_checkbox_to_grid(label='File Availability Heatmap', grid=grid, row=9)
         self.chk_output_plots_ts_hires = \
-            gui_elements.add_checkbox_to_grid(label='High-res Time Series', grid=grid, row=8)
+            gui_elements.add_checkbox_to_grid(label='High-res Time Series', grid=grid, row=10)
         self.chk_output_plots_histogram_hires = \
-            gui_elements.add_checkbox_to_grid(label='High-res Histograms', grid=grid, row=9)
+            gui_elements.add_checkbox_to_grid(label='High-res Histograms', grid=grid, row=11)
         self.chk_output_plots_ts_agg = \
-            gui_elements.add_checkbox_to_grid(label='Aggregated Time Series', grid=grid, row=10)
-        # self.chk_rd_plots_ts_histogram=\
-        #     gui_elements.add_checkbox_to_grid(label='Time Series Histogram (TODO)', grid=grid, row=12)
+            gui_elements.add_checkbox_to_grid(label='Aggregated Time Series', grid=grid, row=12)
 
-        grid.setRowStretch(11, 1)
+        grid.setRowStretch(13, 1)
         section.setLayout(grid)
         return section
 

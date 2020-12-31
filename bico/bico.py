@@ -53,13 +53,13 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
 
     def run(self):
         # Setup run
+        self.get_settings_from_gui()
+        self.save_settings_to_file(copy_to_outdir=True)
         self.settings_dict = ops.setup.make_run_outdirs(settings_dict=self.settings_dict)
         self.logger = ops.logger.setup_logger(settings_dict=self.settings_dict)
         self.logger.info(f"Run ID: {self.run_id}")
 
         self.logger.info(f"BICO Version: {_version.__version__} / {_version.__date__}")
-        self.get_settings_from_gui()
-        self.save_settings_to_file(copy_to_outdir=True)
         self.settings_dict['filename_datetime_parsing_string'] = self.make_datetime_parsing_string()
 
         self.bin_size_header = 29 if self.settings_dict['header'] == 'WECOM3' else 38  # todo better solution
@@ -161,6 +161,7 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
 
         # Output
         self.update_dict_key(key='dir_out', new_val=self.lbl_output_folder.text())
+        self.update_dict_key(key='output_folder_name_prefix', new_val=self.lne_output_folder_name_prefix.text())
         self.update_dict_key(key='file_compression', new_val=self.cmb_output_compression.currentText())
         self.update_dict_key(key='plot_file_availability',
                              new_val='1' if self.chk_output_plots_file_availability.isChecked() else '0')
@@ -225,6 +226,8 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
 
         # Output
         self.lbl_output_folder.setText(str(self.settings_dict['dir_out']))
+        self.set_gui_lineedit(lineedit=self.lne_output_folder_name_prefix,
+                              string=self.settings_dict['output_folder_name_prefix'])
         self.set_gui_combobox(combobox=self.cmb_output_compression, find_text=self.settings_dict['file_compression'])
         self.set_gui_checkbox(checkbox=self.chk_output_plots_file_availability,
                               state=self.settings_dict['plot_file_availability'])

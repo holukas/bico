@@ -1,4 +1,4 @@
-run_id=BICO-20201230-141449
+run_id=BICO-20201231-011915
 
 # INSTRUMENTS
 # ===========
@@ -9,7 +9,7 @@ site=CH-AES
 # Data Blocks
 header=WECOM3
 instrument_1=R350-A
-instrument_2=IRGA75-A-GN1
+instrument_2=IRGA75-A
 instrument_3=LGR-A
 
 # RAW DATA
@@ -27,7 +27,7 @@ filename_datetime_format=yyyymmddHH.XMM
 file_ext=*.X*
 file_size_min=900
 file_limit=1
-row_limit=0
+row_limit=100
 
 # Special
 select_random_files=0
@@ -42,6 +42,7 @@ dir_out_run_plots_hires=A:\FLUXES\x-TEST-OUT\BICO-20201230-141449\plots\hires
 dir_out_run_plots_agg=A:\FLUXES\x-TEST-OUT\BICO-20201230-141449\plots\agg
 dir_out_run_raw_data_csv=A:\FLUXES\x-TEST-OUT\BICO-20201230-141449\raw_data_csv
 
+output_folder_name_prefix=20XX_1
 file_compression=gzip
 
 plot_file_availability=1
