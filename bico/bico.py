@@ -54,8 +54,9 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
     def run(self):
         # Setup run
         self.get_settings_from_gui()
-        self.save_settings_to_file(copy_to_outdir=True)
         self.settings_dict = ops.setup.make_run_outdirs(settings_dict=self.settings_dict)
+        self.save_settings_to_file(copy_to_outdir=True)
+
         self.logger = ops.logger.setup_logger(settings_dict=self.settings_dict)
         self.logger.info(f"Run ID: {self.run_id}")
 

@@ -1,4 +1,4 @@
-run_id=BICO-20201231-011915
+run_id=BICO-20201231-014417
 
 # INSTRUMENTS
 # ===========
@@ -34,15 +34,15 @@ select_random_files=0
 
 # OUTPUT
 # ======
-dir_out=A:/FLUXES/x-TEST-OUT
-dir_out_run=A:\FLUXES\x-TEST-OUT\BICO-20201230-141449
-dir_out_run_log=A:\FLUXES\x-TEST-OUT\BICO-20201230-141449\log
-dir_out_run_plots=A:\FLUXES\x-TEST-OUT\BICO-20201230-141449\plots
-dir_out_run_plots_hires=A:\FLUXES\x-TEST-OUT\BICO-20201230-141449\plots\hires
-dir_out_run_plots_agg=A:\FLUXES\x-TEST-OUT\BICO-20201230-141449\plots\agg
-dir_out_run_raw_data_csv=A:\FLUXES\x-TEST-OUT\BICO-20201230-141449\raw_data_csv
+dir_out=A:/FLUXES/x-TEST-OUT/holz
+dir_out_run=A:\FLUXES\x-TEST-OUT\holz\_BICO-20201231-014417
+dir_out_run_log=A:\FLUXES\x-TEST-OUT\holz\_BICO-20201231-014417\log
+dir_out_run_plots=A:\FLUXES\x-TEST-OUT\holz\_BICO-20201231-014417\plots
+dir_out_run_plots_hires=A:\FLUXES\x-TEST-OUT\holz\_BICO-20201231-014417\plots\hires
+dir_out_run_plots_agg=A:\FLUXES\x-TEST-OUT\holz\_BICO-20201231-014417\plots\agg
+dir_out_run_raw_data_csv=A:\FLUXES\x-TEST-OUT\holz\_BICO-20201231-014417\raw_data_csv
 
-output_folder_name_prefix=20XX_1
+output_folder_name_prefix=
 file_compression=gzip
 
 plot_file_availability=1
