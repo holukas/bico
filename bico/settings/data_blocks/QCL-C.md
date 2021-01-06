@@ -4,22 +4,22 @@
 - DATA_SIZE ... Data size of current data block, number of bytes in QCL record
   (2 = missing, 34 = available)
 - STATUS_CODE ... Status information and extension variant information
-  - Most significant bits of this byte (bits 4–7) contain the variant information
+  - Most significant bits of this byte (bits 4–7) contain the VARIANT information
     - On Windows systems (LSB): bits 0-3
     - Gives variant information according to Table 2 in WE's sonicread.pdf
     - Example: "6" means variant 6 as listed in Table 2
-  - Least significant bits (bits 0–3) contain status information
+  - Least significant bits (bits 0–3) contain STATUS information
     - On Windows systems (LSB): bits 4-7    
     - converted to integers yields:
-      - 0 ... Status OK (0000)
-      - 1 ... Old data used (0001)
-      - 2 ... QCL did not respond (0002)
-      - 10 ... QCL data missing (0010)
+      - 0 ... Status OK (binary 0000), no bits set
+      - 1 ... Old data used (0001), bit 1 set
+      - 2 ... QCL did not respond (0010), bit 2 set
+      - 8 ... QCL data missing (1000), bit 4 set
     - Original information found in ```extdata.h```:
       - define	QCL_STATUS_OK		0000	/* no bits set	*/
       - define	QCL_OLD_DATA_USED	0001	/* bit 1 set	*/
-      - define	QCL_DID_NOT_RESPOND	0002	/* bit 2 set	*/
-      - define QCL_DATA_MISSING	0010	/* bit 4 set	*/
+      - define	QCL_DID_NOT_RESPOND	0002    /* bit 2 set	*/
+      - define QCL_DATA_MISSING	0010	    /* bit 4 set	*/
 - CH4_DRY ... CH4 dry mole fraction, mixing ratio, ppb    
 - N2O_DRY ... N2O dry mole fraction, mixing ratio, ppb    
 - CO2_DRY ... CO2 dry mole fraction, mixing ratio, ppb    

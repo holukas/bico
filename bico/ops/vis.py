@@ -266,7 +266,7 @@ def check_plot_data(ax, df, col):
     dataok = False
     isnumeric = False if df[col].dtypes == object else True
     ishex = False if 'hexadecimal_value' not in col[1] else True
-    # isoctal = False if 'octal' not in col[1] else True
+    # isoctal = False if 'status_code_irga' not in col[1] else True
     isemtpy = False if not df[col].dropna().empty else True
 
     txt_warning = "-NOT-FOUND-"

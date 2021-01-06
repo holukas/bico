@@ -4,7 +4,7 @@
 
 
 DATA_SIZE    ==   {'order': 1, 'bytes': 1, 'format': '>B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'Bytes', 'datablock': 'LGR-A'}
-STATUS_CODE  ==   {'order': 2, 'bytes': 1, 'format': '>B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'octal_lgr', 'datablock': 'LGR-A'}
+STATUS_CODE  ==   {'order': 2, 'bytes': 1, 'format': '>B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'status_code_lgr', 'datablock': 'LGR-A'}
 CH4_DRY      ==   {'order': 3, 'bytes': 4, 'format': '>B B B B', 'gain_on_signal': 10000000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'umol+1 mol-1', 'datablock': 'LGR-A'}
 N2O_DRY      ==   {'order': 4, 'bytes': 4, 'format': '>B B B B', 'gain_on_signal': 10000000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'umol+1 mol-1', 'datablock': 'LGR-A'}
 H2O          ==   {'order': 5, 'bytes': 4, 'format': '>B B B B', 'gain_on_signal': 10000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'umol+1 mol-1', 'datablock': 'LGR-A'}

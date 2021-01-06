@@ -3,12 +3,12 @@
 ## Variables
 - DATA_SIZE ... Data size of current data block, number of bytes in LGR record
   (2 = missing, 33 = available)
-- STATUS_CODE ... Status of LGR data aquisition, see Table 11 in WE's sonicread.pdf
-    - octal value converted to integer yields:
-    - 0 .. Status OK, no problems (octal yy00)
-    - 1 .. IRGA did not respond (yy01)
-    - 2 .. Status OK, old data used (yy02)
-    - 10 .. not OK, IRGA data are missing (yy10)  
+- STATUS_CODE ... Status of LGR data aquisition, see Table 11 and 13 in WE's sonicread.pdf
+    - status code converted to integer yields:
+    - 0 .. Status OK, no problems (corresponds to binary 0000)
+    - 1 .. Old LGR record replicated (0001)
+    - ? .. LGR did not respond (this is never used)
+    - 8 .. not OK, LGR data are missing (1000)  
 - CH4_DRY ... CH4 dry mole fraction (in **dry** air), mixing ratio, ppm (parts per million)
 - N2O_DRY ... N2O dry mole fraction (in **dry** air), mixing ratio, ppm
 - H2O ... H2O molar fraction (in **humid** air), wet mole fraction

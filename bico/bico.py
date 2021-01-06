@@ -15,7 +15,7 @@ from gui.gui import Ui_MainWindow
 from ops import bin, format_data, vis, file, stats
 from settings import _version
 
-# TODO dataok check for hist
+# TODO hs-50 status code format
 
 # TODO LATER parallelize, multiprocessing?
 # import multiprocessing as mp
@@ -305,6 +305,7 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
     def loop(self, bin_found_files_dict, dblocks_props, stats_coll_df, logger):
         """Process files"""
         logger.info("Processing files ...")
+        num_bin_files = len(bin_found_files_dict)
 
         # Get header for all data blocks
         logger.info("Found variables:")
@@ -332,7 +333,7 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
 
             logger.info(f"[{bin_file}]")
             logger.info("=" * (len(bin_file) + 2))
-            logger.info("    Reading binary file ...")
+            logger.info(f"    Reading binary file #{counter_bin_files} of {num_bin_files}: {bin_file}...")
             logger.info(f"    Data block sequence: {self.dblocks_seq}")
 
             # Read binary data

@@ -3,13 +3,13 @@
 # =========================
 
 
-U        ==   {'order': 1, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'm+1_s-1', 'datablock': 'HS50-A'}
-V        ==   {'order': 2, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'm+1_s-1', 'datablock': 'HS50-A'}
-W        ==   {'order': 3, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'm+1_s-1', 'datablock': 'HS50-A'}
-T_SONIC  ==   {'order': 4, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'K', 'datablock': 'HS50-A'}
-STAA     ==   {'order': 5, 'bytes': 1, 'format': 'B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'dimensionless', 'datablock': 'HS50-A'}
-STAD     ==   {'order': 6, 'bytes': 1, 'format': 'B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'dimensionless', 'datablock': 'HS50-A'}
-INC_XY   ==   {'order': 7, 'bytes': 2, 'format': '>h', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'deg', 'datablock': 'HS50-A'}
+U        ==   {'order': 1, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'm+1_s-1', 'datablock': 'HS100-A'}
+V        ==   {'order': 2, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'm+1_s-1', 'datablock': 'HS100-A'}
+W        ==   {'order': 3, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'm+1_s-1', 'datablock': 'HS100-A'}
+T_SONIC  ==   {'order': 4, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'K', 'datablock': 'HS100-A'}
+STAA     ==   {'order': 5, 'bytes': 1, 'format': 'B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'dimensionless', 'datablock': 'HS100-A'}
+STAD     ==   {'order': 6, 'bytes': 1, 'format': 'B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'dimensionless', 'datablock': 'HS100-A'}
+INC_XY   ==   {'order': 7, 'bytes': 2, 'format': '>h', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'deg', 'datablock': 'HS100-A'}
 
 
 # NOTES
@@ -22,9 +22,9 @@ INC_XY   ==   {'order': 7, 'bytes': 2, 'format': '>h', 'gain_on_signal': 1, 'off
 #   'apply_gain' ... gain that is applied during conversion, e.g. to convert to different units if needed
 #   'add_offset' ... offset that is added during conversion, e.g. to convert to different units if needed
 #
-#   BICO ID: HS50-A
-#   Old ID in FCT: hs-50_extended
-#   Old data block in FCT: data_block_sonic_hs_50_extended
+#   BICO ID: HS100-A
+#   Old ID in FCT: hs_100
+#   Old data block in FCT: data_block_sonic_hs_100
 #
 #   FCT FluxCalcTool source code:
 #   https://gitlab.ethz.ch/holukas/fct-flux-calculation-tool

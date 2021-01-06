@@ -1,4 +1,4 @@
-run_id=BICO-20201231-014417
+run_id=BICO-20210106-160838
 
 # INSTRUMENTS
 # ===========
@@ -16,39 +16,39 @@ instrument_3=LGR-A
 # ========
 
 # Source Folder
-dir_source=Y:/CH-INO_InnoFarm/20_sonic_ghg/2020/06
+dir_source=Y:/CH-INO_InnoFarm/20_sonic_ghg/2020/05
 
 # Time Range
-start_date=2020-06-01 00:00
-end_date=2020-06-02 00:00
+start_date=2020-05-13 13:00
+end_date=2020-05-13 13:00
 
 # File Settings
 filename_datetime_format=yyyymmddHH.XMM
 file_ext=*.X*
 file_size_min=900
-file_limit=1
-row_limit=100
+file_limit=0
+row_limit=0
 
 # Special
 select_random_files=0
 
 # OUTPUT
 # ======
-dir_out=A:/FLUXES/x-TEST-OUT/holz
-dir_out_run=A:\FLUXES\x-TEST-OUT\holz\_BICO-20201231-014417
-dir_out_run_log=A:\FLUXES\x-TEST-OUT\holz\_BICO-20201231-014417\log
-dir_out_run_plots=A:\FLUXES\x-TEST-OUT\holz\_BICO-20201231-014417\plots
-dir_out_run_plots_hires=A:\FLUXES\x-TEST-OUT\holz\_BICO-20201231-014417\plots\hires
-dir_out_run_plots_agg=A:\FLUXES\x-TEST-OUT\holz\_BICO-20201231-014417\plots\agg
-dir_out_run_raw_data_csv=A:\FLUXES\x-TEST-OUT\holz\_BICO-20201231-014417\raw_data_csv
+dir_out=A:/FLUXES/x-TEST-OUT
+dir_out_run=A:\FLUXES\x-TEST-OUT\AES_BICO-20210106-160838
+dir_out_run_log=A:\FLUXES\x-TEST-OUT\AES_BICO-20210106-160838\log
+dir_out_run_plots=A:\FLUXES\x-TEST-OUT\AES_BICO-20210106-160838\plots
+dir_out_run_plots_hires=A:\FLUXES\x-TEST-OUT\AES_BICO-20210106-160838\plots\hires
+dir_out_run_plots_agg=A:\FLUXES\x-TEST-OUT\AES_BICO-20210106-160838\plots\agg
+dir_out_run_raw_data_csv=A:\FLUXES\x-TEST-OUT\AES_BICO-20210106-160838\raw_data_csv
 
-output_folder_name_prefix=
-file_compression=gzip
+output_folder_name_prefix=AES
+file_compression=None
 
-plot_file_availability=1
-plot_ts_hires=1
-plot_histogram_hires=1
-plot_ts_agg=1
+plot_file_availability=0
+plot_ts_hires=0
+plot_histogram_hires=0
+plot_ts_agg=0
 
 # DIRECTORIES
 # ===================
