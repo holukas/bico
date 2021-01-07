@@ -15,8 +15,6 @@ from gui.gui import Ui_MainWindow
 from ops import bin, format_data, vis, file, stats
 from settings import _version
 
-# TODO hs-50 status code format
-
 # TODO LATER parallelize, multiprocessing?
 # import multiprocessing as mp
 # print("Number of processors: ", mp.cpu_count())

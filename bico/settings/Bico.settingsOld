@@ -1,33 +1,33 @@
-run_id=BICO-20210106-160838
+run_id=BICO-20210107-224515
 
 # INSTRUMENTS
 # ===========
 
 # Site
-site=CH-AES
+site=CH-CHA
 
 # Data Blocks
 header=WECOM3
 instrument_1=R350-A
 instrument_2=IRGA75-A
-instrument_3=LGR-A
+instrument_3=QCL-A3
 
 # RAW DATA
 # ========
 
 # Source Folder
-dir_source=Y:/CH-INO_InnoFarm/20_sonic_ghg/2020/05
+dir_source=Y:/CH-CHA_Chamau/20_sonic_ghg/2018/11
 
 # Time Range
-start_date=2020-05-13 13:00
-end_date=2020-05-13 13:00
+start_date=2018-11-27 09:00
+end_date=2018-11-27 23:00
 
 # File Settings
-filename_datetime_format=yyyymmddHH.XMM
-file_ext=*.X*
+filename_datetime_format=yyyymmddHH.CMM
+file_ext=*.C*
 file_size_min=900
-file_limit=0
-row_limit=0
+file_limit=1
+row_limit=1000
 
 # Special
 select_random_files=0
@@ -35,14 +35,14 @@ select_random_files=0
 # OUTPUT
 # ======
 dir_out=A:/FLUXES/x-TEST-OUT
-dir_out_run=A:\FLUXES\x-TEST-OUT\AES_BICO-20210106-160838
-dir_out_run_log=A:\FLUXES\x-TEST-OUT\AES_BICO-20210106-160838\log
-dir_out_run_plots=A:\FLUXES\x-TEST-OUT\AES_BICO-20210106-160838\plots
-dir_out_run_plots_hires=A:\FLUXES\x-TEST-OUT\AES_BICO-20210106-160838\plots\hires
-dir_out_run_plots_agg=A:\FLUXES\x-TEST-OUT\AES_BICO-20210106-160838\plots\agg
-dir_out_run_raw_data_csv=A:\FLUXES\x-TEST-OUT\AES_BICO-20210106-160838\raw_data_csv
+dir_out_run=A:\FLUXES\x-TEST-OUT\CHA_BICO-20210107-224515
+dir_out_run_log=A:\FLUXES\x-TEST-OUT\CHA_BICO-20210107-224515\log
+dir_out_run_plots=A:\FLUXES\x-TEST-OUT\CHA_BICO-20210107-224515\plots
+dir_out_run_plots_hires=A:\FLUXES\x-TEST-OUT\CHA_BICO-20210107-224515\plots\hires
+dir_out_run_plots_agg=A:\FLUXES\x-TEST-OUT\CHA_BICO-20210107-224515\plots\agg
+dir_out_run_raw_data_csv=A:\FLUXES\x-TEST-OUT\CHA_BICO-20210107-224515\raw_data_csv
 
-output_folder_name_prefix=AES
+output_folder_name_prefix=CHA
 file_compression=None
 
 plot_file_availability=0

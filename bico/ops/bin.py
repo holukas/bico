@@ -63,7 +63,6 @@ class ReadInstrDatablock:
                 # If datablock has the expected size, proceed normally
                 if self.dblock_true_size == self.dblock_nominal_size:
                     pass
-
                 # If datablock does not have the expected size, generate missing data
                 elif self.dblock_bytes_read == 2:
                     # In this case there are analyzer data missing, i.e. the whole data block is either only 2 Bytes
@@ -85,13 +84,12 @@ class ReadInstrDatablock:
 
                     if self.dblock_true_size != 2:
                         self.read_rest_of_bytes()
-
                     break
 
                     # return self.dblock_data, self.total_bytes_read, self.end_of_data_reached
 
-                # Convert to hex or octal if needed
-                var_val = self.convert_val(props=props, var_val=var_val)
+            # Convert to hex or octal if needed
+            var_val = self.convert_val(props=props, var_val=var_val)
 
             # Add value to data
             self.dblock_data.append(var_val)
@@ -108,30 +106,42 @@ class ReadInstrDatablock:
 
     def convert_val(self, props, var_val):
         """Convert var value to hex or octal"""
-        # Convert to hex
-        if props['units'] == 'hexadecimal_value':
-            var_val = self.convert_val_to_hex(var_val=var_val)
-        # Convert to octal
+        if props['units'] == 'diag_val_hs':
+            var_val = self.convert_val_to_diag_val_hs(var_val=var_val)
         if props['units'] == 'status_code_irga':
             var_val = self.convert_val_to_status_code_irga(var_val=var_val)
-        # Convert to octal for LGR laser analyzer
         if props['units'] == 'status_code_lgr':
             var_val = self.convert_val_to_status_code_lgr(var_val=var_val)
         return var_val
 
-    def convert_val_to_hex(self, var_val):
-        """Convert value to hexadecimal
+    def convert_val_to_diag_val_hs(self, var_val):
+        """Convert value to diagnostic value for Gill HS-50 and HS-100 sonic anemometers
+
+        Saved as an integer value. The integer can be converted to binary to get more
+        information. Since the information in this variable is quite complex, please
+        refer to the sonic anemometer manual for details.
 
         Examples:
-            - var_val = 40.0, is converted to integer 40,
-                is converted to hex '0x28', is converted to hex without prefix '28'
-            - var_val = 60.0, is converted to integer 60,
-                is converted to hex '0x3c', is converted to hex without prefix '3c'
+            - var_val = 47.0, is converted to integer 47, this is the value that is
+              then stored in the converted ASCII file.
+
+        Notes:
+            - The variable SA_DIAG_TYPE from the sonic HS anmometers gives info
+              which type of information is given in SA_DIAG_VAL.
+            - To get more information from the integer, it can be converted to
+              binary, e.g. integer 47 becomes binary "0b101111"
+              In Python, this can be done with bin(47) --> "0b101111"
+            - The first two characters "0b" mean that this is binary format
+            - The information is contained in "101111", it tells us which bits are
+              set to 1 or 0. This can be interpreted using the sonic manual, there
+              is a list what each bit set to 1 or 0 means.
+
         Returns: string
         """
-        hex_val = hex(int(var_val))  # Note: has hexadecimal prefix '0x' at start, e.g. '0x28'
-        hex_val_no_prefix = hex_val[2:]  # Remove hex prefix from val
-        return hex_val_no_prefix
+        # hex_val = hex(int(var_val))  # Note: has hexadecimal prefix '0x' at start, e.g. '0x28'
+        # hex_val_no_prefix = hex_val[2:]  # Remove hex prefix from val
+        diag_val_hs = int(var_val)
+        return diag_val_hs
 
     def convert_val_to_status_code_irga(self, var_val):
         """Convert value to octal

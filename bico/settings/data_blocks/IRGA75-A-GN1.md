@@ -24,7 +24,7 @@ Based on IRGA75-A but with a different gain on CO2_CONC.
   **A GAIN of 0.974 is applied to this signal to correct for the usage of a wrong calibration gas.  
   For more info, see here: https://www.swissfluxnet.ethz.ch/index.php/knowledge-base/wrong-calibration-gas-2017/**
 - T_BOX ... Ambient temperature measured in the control box
-- P_BOX ... Atmospheric pressure measured in the control box
+- PRESS_BOX ... Atmospheric pressure measured in the control box
 - COOLER_V ... Cooler voltage
 
 ## BICO Settings

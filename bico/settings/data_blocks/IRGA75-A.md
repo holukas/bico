@@ -21,7 +21,7 @@
 - H2O_CONC ... H2O concentration density, molar density
 - CO2_CONC ... CO2 concentration density, molar density
 - T_BOX ... Ambient temperature measured in the control box
-- P_BOX ... Atmospheric pressure measured in the control box
+- PRESS_BOX ... Atmospheric pressure measured in the control box
 - COOLER_V ... Cooler voltage
 
 ## BICO Settings
