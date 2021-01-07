@@ -2,29 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="254ecb79-655b-4854-8af6-177bb7347e8a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/bico/settings/data_blocks/HS100-A.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-A.dblock" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-A.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-A2.dblock" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-A2.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-A3.dblock" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-A3.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/bico.py" beforeDir="false" afterPath="$PROJECT_DIR$/bico/bico.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/gui/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/bico/gui/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/ops/bin.py" beforeDir="false" afterPath="$PROJECT_DIR$/bico/ops/bin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/Bico.settings" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/Bico.settings" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/Bico.settingsOld" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/Bico.settingsOld" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/_version.py" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/_version.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/HS100-A.dblock" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/HS100-A.dblock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/HS50-A.dblock" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/HS50-A.dblock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/HS50-A.md" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/HS50-A.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA72-B.dblock" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA75-A-GN1.dblock" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA75-A-GN1.dblock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA75-A-GN1.md" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA75-A-GN1.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA75-A.dblock" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA75-A.dblock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA75-A.md" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA75-A.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-C.dblock" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-C.dblock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-A3.dblock" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-A3.dblock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -332,6 +311,8 @@
       <workItem from="1609970074199" duration="1322000" />
       <workItem from="1609972599782" duration="2676000" />
       <workItem from="1610015969067" duration="13596000" />
+      <workItem from="1610057500140" duration="16000" />
+      <workItem from="1610058040204" duration="27000" />
     </task>
     <servers />
   </component>
