@@ -14,9 +14,9 @@
 - H2O ... H2O molar fraction (in **humid** air), wet mole fraction
 - CH4 ... CH4 molar fraction (in **humid** air), wet mole fraction
 - N2O ... N2O molar fraction (in **humid** air), wet mole fraction
-- P_CELL ... Pressure in cell
+- PRESS_CELL ... Pressure in cell
 - T_CELL ... Temperature in cell
-- T_AMBIENT ... Ambient temperature (in box?)
+- T_UNKNOWN ... Unknown temperature (similar to T_CELL, maybe around cell somewhere?)
 - MIRROR_RINGDOWNTIME ... Mirror ring-down time
 - FIT_FLAG ... *TODO*
 

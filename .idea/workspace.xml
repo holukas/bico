@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="254ecb79-655b-4854-8af6-177bb7347e8a" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-A3.dblock" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-A3.dblock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bico/settings/_version.py" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/_version.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/LGR-A.dblock" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/LGR-A.dblock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/LGR-A.md" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/LGR-A.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -313,6 +314,7 @@
       <workItem from="1610015969067" duration="13596000" />
       <workItem from="1610057500140" duration="16000" />
       <workItem from="1610058040204" duration="27000" />
+      <workItem from="1610099095747" duration="877000" />
     </task>
     <servers />
   </component>
