@@ -1,6 +1,7 @@
-# ========================
-# HS-50 - SONIC ANEMOMETER
-# ========================
+# =========================
+# HS50-B - SONIC ANEMOMETER
+# =========================
+# Details: see HS50-B.md
 
 
 U        ==   {'order': 1, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'm+1_s-1', 'datablock': 'HS50-B'}
