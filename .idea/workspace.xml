@@ -2,12 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="254ecb79-655b-4854-8af6-177bb7347e8a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA72-B.dblock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bico/settings/data_blocks/HS50-B.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA72-B.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bico/settings/Bico.settings" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/Bico.settings" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bico/settings/Bico.settingsOld" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/Bico.settingsOld" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bico/settings/_version.py" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/_version.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/HS50-B.dblock" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/HS50-B.dblock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA72-B.dblock" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA72-B.dblock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -321,6 +322,7 @@
       <workItem from="1610135291866" duration="1775000" />
       <workItem from="1610145522443" duration="1445000" />
       <workItem from="1610235475279" duration="791000" />
+      <workItem from="1610289783723" duration="6634000" />
     </task>
     <servers />
   </component>
@@ -340,11 +342,6 @@
           <line>142</line>
           <option name="timeStamp" value="28" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/bico/ops/bin.py</url>
-          <line>192</line>
-          <option name="timeStamp" value="31" />
-        </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
@@ -363,7 +360,7 @@
     <SUITE FILE_PATH="coverage/BICO$main.coverage" NAME="bico Coverage Results" MODIFIED="1598258463691" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bico" />
     <SUITE FILE_PATH="coverage/BICO_Binary_Converter$gui.coverage" NAME="gui Coverage Results" MODIFIED="1606435918815" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bico" />
     <SUITE FILE_PATH="coverage/BICO_Binary_Converter$main.coverage" NAME="main Coverage Results" MODIFIED="1596498134562" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bico" />
-    <SUITE FILE_PATH="coverage/BICO_Binary_Converter$start_bico.coverage" NAME="start_bico Coverage Results" MODIFIED="1610235479171" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bico" />
+    <SUITE FILE_PATH="coverage/BICO_Binary_Converter$start_bico.coverage" NAME="start_bico Coverage Results" MODIFIED="1610322270675" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bico" />
     <SUITE FILE_PATH="coverage/BICO_Binary_Converter$example.coverage" NAME="example Coverage Results" MODIFIED="1606348759035" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/example" />
   </component>
 </project>

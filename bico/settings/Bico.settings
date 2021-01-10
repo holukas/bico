@@ -1,4 +1,4 @@
-run_id=BICO-20210110-003801
+run_id=BICO-20210111-004431
 
 # INSTRUMENTS
 # ===========
@@ -10,37 +10,37 @@ site=CH-DAV
 header=WECOM3
 instrument_1=HS50-B
 instrument_2=IRGA72-B
-instrument_3=-None-
+instrument_3=QCL-C
 
 # RAW DATA
 # ========
 
 # Source Folder
-dir_source=Y:/CH-DAV_Davos/20_sonic_ghg/2015
+dir_source=Y:/CH-DAV_Davos/20_sonic_ghg/2015/11
 
 # Time Range
-start_date=2015-06-01 08:00
-end_date=2015-11-01 23:00
+start_date=2015-11-15 08:00
+end_date=2015-11-15 23:00
 
 # File Settings
-filename_datetime_format=yyyymmddHH.dMM
-file_ext=*.d*
+filename_datetime_format=yyyymmddHH.XMM
+file_ext=*.X*
 file_size_min=900
 file_limit=0
-row_limit=10
+row_limit=0
 
 # Special
-select_random_files=50
+select_random_files=0
 
 # OUTPUT
 # ======
 dir_out=A:/FLUXES/x-TEST-OUT
-dir_out_run=A:\FLUXES\x-TEST-OUT\DAV_2015_BICO-20210110-003801
-dir_out_run_log=A:\FLUXES\x-TEST-OUT\DAV_2015_BICO-20210110-003801\log
-dir_out_run_plots=A:\FLUXES\x-TEST-OUT\DAV_2015_BICO-20210110-003801\plots
-dir_out_run_plots_hires=A:\FLUXES\x-TEST-OUT\DAV_2015_BICO-20210110-003801\plots\hires
-dir_out_run_plots_agg=A:\FLUXES\x-TEST-OUT\DAV_2015_BICO-20210110-003801\plots\agg
-dir_out_run_raw_data_csv=A:\FLUXES\x-TEST-OUT\DAV_2015_BICO-20210110-003801\raw_data_csv
+dir_out_run=A:\FLUXES\x-TEST-OUT\DAV_2015_BICO-20210111-004431
+dir_out_run_log=A:\FLUXES\x-TEST-OUT\DAV_2015_BICO-20210111-004431\log
+dir_out_run_plots=A:\FLUXES\x-TEST-OUT\DAV_2015_BICO-20210111-004431\plots
+dir_out_run_plots_hires=A:\FLUXES\x-TEST-OUT\DAV_2015_BICO-20210111-004431\plots\hires
+dir_out_run_plots_agg=A:\FLUXES\x-TEST-OUT\DAV_2015_BICO-20210111-004431\plots\agg
+dir_out_run_raw_data_csv=A:\FLUXES\x-TEST-OUT\DAV_2015_BICO-20210111-004431\raw_data_csv
 
 output_folder_name_prefix=DAV_2015
 file_compression=None
@@ -48,7 +48,7 @@ file_compression=None
 plot_file_availability=0
 plot_ts_hires=0
 plot_histogram_hires=0
-plot_ts_agg=1
+plot_ts_agg=0
 
 # DIRECTORIES
 # ===================
