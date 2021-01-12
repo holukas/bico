@@ -1,3 +1,4 @@
+import csv
 import mmap
 import os
 import struct
@@ -40,8 +41,11 @@ def bit_map_extract_header(bit_map_dict):
 
 
 class ReadFile:
+    """
+    Read and convert binary data to ASCII, write to file
+    """
 
-    def __init__(self, binary_filename, size_header, dblocks, limit_read_lines, logger):
+    def __init__(self, binary_filename, size_header, dblocks, limit_read_lines, logger, outfile_ascii_path):
         self.tic = time.time()  # Start time
         self.binary_filename = binary_filename
         self.binary_filesize = os.path.getsize(self.binary_filename)
@@ -52,47 +56,78 @@ class ReadFile:
         self.file_counter_lines = 0
         self.file_total_bytes_read = 0
         self.file_data_rows = []  # Collects all data, i.e. all line records
+        self.ascii_filename = outfile_ascii_path
+        self.dblock_headers = []
 
         self.logger.info(f"    File size: {self.binary_filesize} Bytes")
 
     def run(self):
-        self.dblock_headers = self.make_file_header()
         self.open_binary = self.read_bin_file_to_mem(binary_filename=self.binary_filename, logger=self.logger)
 
-        # First read header at top of file
+        # First read binary header at top of file, but don't write to output file
         settings.data_blocks.header.wecom3.data_block_header(open_file_object=self.open_binary,
                                                              size_header=self.size_header)
 
-        self.convert()
+        self.convert_to_ascii()
 
-    def convert(self):
+    # def get_data(self):
+    #     return self.dblock_headers
+
+    def write_multirow_header_to_ascii(self, asciiWriter):
+        """Write header info from list of tuples to file as multi-row header
+
+        Since self.dblock_headers is a list of tuples and the output ascii is
+        written row-by-row, the header info is extracted from the list: each tuple
+        in the list comprises three elements (variable name, units and instrument).
+        Therefore, first the first element of each tuple (all variable names) is written
+        to the first row of the file, then all second elements (units) are written to the
+        second row, and finally the third elements (instrument) are written to the
+        third row of the output file.
+
+        """
+        for headerrow in range(0, 3):
+            headerrow_out = [i[headerrow] for i in self.dblock_headers]
+            asciiWriter.writerow(headerrow_out)
+
+    def convert_to_ascii(self):
         self.logger.info(f"    Reading file data, converting to ASCII ...")
         end_of_data_reached = False  # Reset for each file
 
-        while not end_of_data_reached:
-            # Read data blocks per instrument
-            # tic = time.time()
-            # print(time.time() - tic)
-            file_newrow_records = []
-            for instr in self.dblocks:
-                incoming_dblock_data, end_of_data_reached = self.read_instr_dblock(dblock=instr)
-                if not end_of_data_reached:
-                    file_newrow_records = file_newrow_records + incoming_dblock_data
-                else:
-                    file_newrow_records = False
-                    break  # Breaks FOR loop
+        with open(self.ascii_filename, 'w', newline='') as open_ascii:
+            asciiWriter = csv.writer(open_ascii, delimiter=',')
 
-            if file_newrow_records:
-                self.file_counter_lines += 1
-                # print(self.counter_lines)
-                self.file_data_rows.append(file_newrow_records)
+            # File header
+            self.dblock_headers = self.make_file_header()
+            self.write_multirow_header_to_ascii(asciiWriter=asciiWriter)
 
-            # Limit = 0 means no limit
-            if self.limit_read_lines > 0:
-                if self.file_counter_lines == self.limit_read_lines:
-                    break
+            # Data records
+            while not end_of_data_reached:
+                # Read data blocks per instrument
+                file_newrow_records = []
+                for instr in self.dblocks:
+                    incoming_dblock_data, end_of_data_reached = self.read_instr_dblock(dblock=instr)
+                    if not end_of_data_reached:
+                        file_newrow_records = file_newrow_records + incoming_dblock_data
+                    else:
+                        file_newrow_records = False
+                        break  # Breaks FOR loop
+
+                if file_newrow_records:
+                    self.file_counter_lines += 1
+                    asciiWriter.writerow(file_newrow_records)
+                    # self.file_data_rows.append(file_newrow_records)
+
+                # Limit = 0 means no limit
+                if self.limit_read_lines > 0:
+                    if self.file_counter_lines == self.limit_read_lines:
+                        break
 
         self.open_binary.close()
+        open_ascii.close()
+
+        self.logger.info(f"    Finished conversion to ASCII.")
+        self.logger.info(f"    ASCII data saved to file {self.ascii_filename}")
+        self.file_speedstats()
 
     def read_instr_dblock(self, dblock):
         """Cycle through vars in data block"""
@@ -412,11 +447,11 @@ class ReadFile:
                 bit_map_dict[bit_map_var] = bit_map_props
         return bit_map_dict
 
-    def get_data(self):
-        return self.file_data_rows, self.dblock_headers, self.tic, self.file_counter_lines
-
     def make_file_header(self):
-        """Make header for converted ASCII file, for all data blocks"""
+        """Make header for converted ASCII file, for all data blocks
+
+        Returns list of tuples
+        """
         dblock_headers = []
         for dblock in self.dblocks:
             dblock_header = make_header(dblock=dblock)
@@ -436,6 +471,14 @@ class ReadFile:
         logger.info(f"    Done reading file to memory.")
         return open_binary
 
+    def file_speedstats(self):
+        toc = time.time() - self.tic
+        try:
+            runtime_line_avg = self.file_counter_lines / toc
+        except ZeroDivisionError:
+            runtime_line_avg = 0
+        _len = f"    {self.file_counter_lines} rows read in {toc:.2f}s, speed: {int(runtime_line_avg)} rows s-1"
+        self.logger.info(_len)
 
 # def read_file(binary_filename, size_header, dblocks, limit_read_lines, logger, statusbar):
 # binary_filesize = os.path.getsize(binary_filename)
@@ -504,16 +547,6 @@ class ReadFile:
 # open_binary.close()
 # data_header = dblock_headers
 # return data_rows, data_header, tic, counter_lines
-
-
-def speedstats(tic, counter_lines, logger):
-    toc = time.time() - tic
-    try:
-        runtime_line_avg = counter_lines / toc
-    except ZeroDivisionError:
-        runtime_line_avg = 0
-    _len = f"    {counter_lines} lines read in {toc:.2f}s, speed: {int(runtime_line_avg)} lines s-1"
-    logger.info(_len)
 
 # def generate_file_header(dblocks):
 #     """Make header for converted output file"""

@@ -1,3 +1,4 @@
+import gzip
 import datetime as dt
 import os
 import sys
@@ -319,7 +320,12 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
         for bin_file, bin_filepath in bin_found_files_dict.items():
             bin_filedate = dt.datetime.strptime(bin_filepath.name,
                                                 self.settings_dict['filename_datetime_parsing_string'])
-            csv_filedate = bin_filedate.strftime('%Y%m%d%H%M')  # w/o extension
+            ascii_filedate = bin_filedate.strftime('%Y%m%d%H%M')  # w/o extension
+            ascii_filename = f"{self.settings_dict['site']}_{ascii_filedate}.csv"
+            ascii_filepath = self.settings_dict['dir_out_run_raw_data_ascii'] / ascii_filename
+            ascii_filename_gzip = f"{self.settings_dict['site']}_{ascii_filedate}.csv.gz"
+            ascii_filepath_gzip = self.settings_dict['dir_out_run_raw_data_ascii'] / ascii_filename_gzip
+
             counter_bin_files += 1
             self.statusbar.showMessage(f"Working on file #{counter_bin_files}: {bin_file}")
 
@@ -340,41 +346,54 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
                                size_header=self.bin_size_header,
                                dblocks=dblocks_props,
                                limit_read_lines=int(self.settings_dict['row_limit']),
-                               logger=self.logger)
+                               logger=self.logger,
+                               outfile_ascii_path=ascii_filepath)
             obj.run()
-            data_lines, header, tic, counter_lines = obj.get_data()
 
-            bin.speedstats(tic=tic, counter_lines=counter_lines, logger=logger)
+            # Read the converted file that was created
+            file_contents_ascii_df = self.read_converted_ascii(filepath=ascii_filepath)
 
-            # Make DataFrame
-            df = format_data.make_df(data_lines=data_lines, header=header, logger=logger)
+            # Compress uncompressed ASCII to gzip, delete uncompressed if gzip selected
+            if self.settings_dict['file_compression'] == 'gzip':
+                with open(ascii_filepath, 'rb') as f_in, gzip.open(ascii_filepath_gzip, 'wb') as f_out:
+                    f_out.writelines(f_in)
+                os.remove(ascii_filepath)  # Delete uncompressed
 
-            # Stats #todo -9999 NaNs
-            stats_coll_df = stats.calc(stats_df=df.copy(),
+            # Stats
+            stats_coll_df = stats.calc(stats_df=file_contents_ascii_df.copy(),
                                        stats_coll_df=stats_coll_df,
                                        bin_filedate=bin_filedate,
                                        counter_bin_files=counter_bin_files,
                                        logger=logger)
             stats_coll_df.loc[bin_filedate, ('_filesize', '[Bytes]', '[FILE]', 'total')] = os.path.getsize(bin_filepath)
-            stats_coll_df.loc[bin_filedate, ('_columns', '[#]', '[FILE]', 'total')] = len(df.columns)
-            stats_coll_df.loc[bin_filedate, ('_total_values', '[#]', '[FILE]', 'total')] = df.size
-
-            csv_filename = f"{self.settings_dict['site']}_{csv_filedate}"
-
-            # Export file CSV
-            file.export_raw_data_ascii(df=df, outfile=csv_filename, logger=logger,
-                                       outdir=self.settings_dict['dir_out_run_raw_data_ascii'],
-                                       compression=self.settings_dict['file_compression'])
+            stats_coll_df.loc[bin_filedate, ('_columns', '[#]', '[FILE]', 'total')] = len(
+                file_contents_ascii_df.columns)
+            stats_coll_df.loc[bin_filedate, ('_total_values', '[#]', '[FILE]', 'total')] = file_contents_ascii_df.size
 
             # Plot high-resolution data
             if self.settings_dict['plot_ts_hires'] == '1':
-                vis.high_res_ts(df=df.copy(), outfile=csv_filename,
+                vis.high_res_ts(df=file_contents_ascii_df.copy(), outfile=ascii_filename,
                                 outdir=self.settings_dict['dir_out_run_plots_hires'], logger=logger)
             if self.settings_dict['plot_histogram_hires'] == '1':
-                vis.high_res_histogram(df=df.copy(), outfile=csv_filename,
+                vis.high_res_histogram(df=file_contents_ascii_df.copy(), outfile=ascii_filename,
                                        outdir=self.settings_dict['dir_out_run_plots_hires'], logger=logger)
 
         return stats_coll_df
+
+    def read_converted_ascii(self, filepath):
+        """Read converted file"""
+        file_contents_ascii_df = pd.read_csv(filepath,
+                                             skiprows=None,
+                                             header=[0, 1, 2],
+                                             na_values=-9999,
+                                             encoding='utf-8',
+                                             delimiter=',',
+                                             # keep_date_col=True,
+                                             parse_dates=False,
+                                             date_parser=None,
+                                             index_col=None,
+                                             dtype=None)
+        return file_contents_ascii_df
 
     def assemble_datablock_sequence(self):
         dblocks_seq = []
