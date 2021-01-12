@@ -2,48 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="254ecb79-655b-4854-8af6-177bb7347e8a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/bico/ops/bin_conversion_exceptions.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-A4.dblock" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-A4.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bico/settings/data_blocks/R2-A.dblock" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bico/settings/data_blocks/R2-A.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bico/settings/data_blocks/_help_bico_settings.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/BICO_Binary_Converter.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/BICO_Binary_Converter.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/bico.py" beforeDir="false" afterPath="$PROJECT_DIR$/bico/bico.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/gui/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/bico/gui/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/ops/bin.py" beforeDir="false" afterPath="$PROJECT_DIR$/bico/ops/bin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/ops/file.py" beforeDir="false" afterPath="$PROJECT_DIR$/bico/ops/file.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/ops/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/bico/ops/setup.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/Bico - Kopie (2).settings" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/Bico - Kopie.settings" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/Bico - Kopie.settings" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/Bico - Kopie.settingsOld" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/bico/settings/Bico.settings" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/Bico.settings" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bico/settings/Bico.settingsOld" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/Bico.settingsOld" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/_version.py" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/_version.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/HS100-A.dblock" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/HS100-A.dblock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/HS100-A.md" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/HS100-A.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/HS50-A.dblock" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/HS50-A.dblock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/HS50-A.md" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/HS50-A.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/HS50-B.dblock" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/HS50-B.dblock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/HS50-B.md" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/HS50-B.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA72-A.dblock" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA72-A.dblock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA72-A.md" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA72-A.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA72-B.dblock" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA72-B.dblock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA72-B.md" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA72-B.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA75-A-GN1.md" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA75-A-GN1.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA75-A-GN1.dblock" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA75-A-GN1.dblock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA75-A.dblock" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA75-A.dblock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA75-A.md" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/IRGA75-A.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/LGR-A.dblock" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/LGR-A.dblock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/LGR-A.md" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/LGR-A.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-A.dblock" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-A.dblock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-A.md" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-A.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-A2.dblock" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-A2.dblock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-A2.md" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-A2.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-A3.md" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-A3.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-C.dblock" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-C.dblock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-C.md" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-C.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/R350-A.dblock" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/R350-A.dblock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/R350-A.md" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/R350-A.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-A3.dblock" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-A3.dblock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-A4.dblock" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/data_blocks/QCL-A4.dblock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -360,7 +328,8 @@
       <workItem from="1610289783723" duration="12792000" />
       <workItem from="1610363681251" duration="869000" />
       <workItem from="1610377337549" duration="10396000" />
-      <workItem from="1610442714131" duration="4439000" />
+      <workItem from="1610442714131" duration="7942000" />
+      <workItem from="1610466344660" duration="744000" />
     </task>
     <servers />
   </component>
@@ -393,7 +362,7 @@
     <SUITE FILE_PATH="coverage/BICO$main.coverage" NAME="bico Coverage Results" MODIFIED="1598258463691" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bico" />
     <SUITE FILE_PATH="coverage/BICO_Binary_Converter$gui.coverage" NAME="gui Coverage Results" MODIFIED="1606435918815" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bico" />
     <SUITE FILE_PATH="coverage/BICO_Binary_Converter$main.coverage" NAME="main Coverage Results" MODIFIED="1596498134562" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bico" />
-    <SUITE FILE_PATH="coverage/BICO_Binary_Converter$start_bico.coverage" NAME="start_bico Coverage Results" MODIFIED="1610448630228" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bico" />
+    <SUITE FILE_PATH="coverage/BICO_Binary_Converter$start_bico.coverage" NAME="start_bico Coverage Results" MODIFIED="1610466706195" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bico" />
     <SUITE FILE_PATH="coverage/BICO_Binary_Converter$example.coverage" NAME="example Coverage Results" MODIFIED="1606348759035" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/example" />
   </component>
 </project>

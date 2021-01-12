@@ -1,33 +1,33 @@
-run_id=BICO-20210112-115031
+run_id=BICO-20210112-165148
 
 # INSTRUMENTS
 # ===========
 
 # Site
-site=CH-OE2
+site=CH-DAV
 
 # Data Blocks
 header=WECOM3
-instrument_1=R2-A
-instrument_2=IRGA72-A
-instrument_3=-None-
+instrument_1=R350-A
+instrument_2=IRGA75-A
+instrument_3=QCL-A2
 
 # RAW DATA
 # ========
 
 # Source Folder
-dir_source=Y:/CH-OE2_Oensingen/20_sonic_ghg/2020/10
+dir_source=Y:/CH-CHA_Chamau/20_sonic_ghg/2020
 
 # Time Range
-start_date=2020-10-16 07:00
-end_date=2020-10-16 23:00
+start_date=2020-02-12 19:00
+end_date=2020-02-12 19:00
 
 # File Settings
-filename_datetime_format=yyyymmddHH.oMM
-file_ext=*.o*
+filename_datetime_format=yyyymmddHH.CMM
+file_ext=*.C*
 file_size_min=900
-file_limit=1
-row_limit=100
+file_limit=0
+row_limit=0
 
 # Special
 select_random_files=0
@@ -35,14 +35,14 @@ select_random_files=0
 # OUTPUT
 # ======
 dir_out=A:/FLUXES/x-TEST-OUT
-dir_out_run=A:\FLUXES\x-TEST-OUT\OE2_BICO-20210112-115031
-dir_out_run_log=A:\FLUXES\x-TEST-OUT\OE2_BICO-20210112-115031\log
-dir_out_run_plots=A:\FLUXES\x-TEST-OUT\OE2_BICO-20210112-115031\plots
-dir_out_run_plots_hires=A:\FLUXES\x-TEST-OUT\OE2_BICO-20210112-115031\plots\hires
-dir_out_run_plots_agg=A:\FLUXES\x-TEST-OUT\OE2_BICO-20210112-115031\plots\agg
-dir_out_run_raw_data_ascii=A:\FLUXES\x-TEST-OUT\OE2_BICO-20210112-115031\raw_data_ascii
+dir_out_run=A:\FLUXES\x-TEST-OUT\CHA_BICO-20210112-165148
+dir_out_run_log=A:\FLUXES\x-TEST-OUT\CHA_BICO-20210112-165148\log
+dir_out_run_plots=A:\FLUXES\x-TEST-OUT\CHA_BICO-20210112-165148\plots
+dir_out_run_plots_hires=A:\FLUXES\x-TEST-OUT\CHA_BICO-20210112-165148\plots\hires
+dir_out_run_plots_agg=A:\FLUXES\x-TEST-OUT\CHA_BICO-20210112-165148\plots\agg
+dir_out_run_raw_data_ascii=A:\FLUXES\x-TEST-OUT\CHA_BICO-20210112-165148\raw_data_ascii
 
-output_folder_name_prefix=OE2
+output_folder_name_prefix=CHA
 file_compression=None
 
 plot_file_availability=0
