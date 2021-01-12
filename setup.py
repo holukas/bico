@@ -8,7 +8,7 @@ setuptools.setup(
     name='bico',
     packages=setuptools.find_packages(),
     # packages=['dyco'],
-    version='0.1.0',
+    version='0.1.1',
     license='GNU General Public License v3 (GPLv3)',
     description='A Python package to convert binary files to ASCII',
     long_description=long_description,

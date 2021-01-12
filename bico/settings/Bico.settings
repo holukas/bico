@@ -1,4 +1,4 @@
-run_id=BICO-20210112-165148
+run_id=BICO-20210112-170051
 
 # INSTRUMENTS
 # ===========
@@ -35,12 +35,12 @@ select_random_files=0
 # OUTPUT
 # ======
 dir_out=A:/FLUXES/x-TEST-OUT
-dir_out_run=A:\FLUXES\x-TEST-OUT\CHA_BICO-20210112-165148
-dir_out_run_log=A:\FLUXES\x-TEST-OUT\CHA_BICO-20210112-165148\log
-dir_out_run_plots=A:\FLUXES\x-TEST-OUT\CHA_BICO-20210112-165148\plots
-dir_out_run_plots_hires=A:\FLUXES\x-TEST-OUT\CHA_BICO-20210112-165148\plots\hires
-dir_out_run_plots_agg=A:\FLUXES\x-TEST-OUT\CHA_BICO-20210112-165148\plots\agg
-dir_out_run_raw_data_ascii=A:\FLUXES\x-TEST-OUT\CHA_BICO-20210112-165148\raw_data_ascii
+dir_out_run=A:\FLUXES\x-TEST-OUT\CHA_BICO-20210112-170051
+dir_out_run_log=A:\FLUXES\x-TEST-OUT\CHA_BICO-20210112-170051\log
+dir_out_run_plots=A:\FLUXES\x-TEST-OUT\CHA_BICO-20210112-170051\plots
+dir_out_run_plots_hires=A:\FLUXES\x-TEST-OUT\CHA_BICO-20210112-170051\plots\hires
+dir_out_run_plots_agg=A:\FLUXES\x-TEST-OUT\CHA_BICO-20210112-170051\plots\agg
+dir_out_run_raw_data_ascii=A:\FLUXES\x-TEST-OUT\CHA_BICO-20210112-170051\raw_data_ascii
 
 output_folder_name_prefix=CHA
 file_compression=None
