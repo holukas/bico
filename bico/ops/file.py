@@ -178,7 +178,7 @@ class SearchAll():
         return valid_files_dict
 
 
-def export_raw_data_csv(df, outdir, logger, outfile='temp', compression='gzip'):
+def export_raw_data_ascii(df, outdir, logger, outfile='temp', compression='gzip'):
     logger.info("    Saving raw data csv ...")
     outpath = outdir / outfile
     if compression == 'gzip':

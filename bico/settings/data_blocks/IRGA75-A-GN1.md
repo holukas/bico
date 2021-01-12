@@ -28,15 +28,7 @@ Based on IRGA75-A but with a different gain on CO2_CONC.
 - COOLER_V ... Cooler voltage
 
 ## BICO Settings
-- 'order' ... Order in the data block variable sequence
-- 'bytes' ... Number of bytes in the binary data
-- 'format' ... Format to convert from binary to integers, floats, etc.
-- 'gain_on_signal' ... Gain that was applied to the raw data signal, to get to units *divide* by this gain
-- 'offset_on_signal' ... Offset that was added to the raw data signal, to get to units *subtract* this offset
-- 'apply_gain' ... Gain that is applied during conversion, e.g. to convert to different units if needed
-- 'add_offset' ... Offset that is added during conversion, e.g. to convert to different units if needed
-- 'units' ... Units
-- 'datablock' ... Data block ID
+- For an explanation of the different variable property settings, please see ```_help_bico_settings.md```.
 
 *Before BICO, the binary conversion was done in FCT FluxCalcTool:*
 - Old ID in FCT: li-7500_co2_gain0974

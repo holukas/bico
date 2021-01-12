@@ -4,67 +4,139 @@ import struct
 import time
 
 import settings.data_blocks.header.wecom3
+from . import bin_conversion_exceptions as bce
 
 
-class ReadInstrDatablock:
-    """Read datablock of instrument"""
+def make_header(dblock):
+    """Get header info for data block, including for variables from bit maps"""
+    dblock_header = []  # Collects header
+    for var, props in dblock.items():
+        if 'bytes' not in props.keys():  # Skip bit map variables
+            continue
+        # Add var name, units in brackets and datablock in brackets
+        dblock_header.append((var, f"[{props['units']}]", f"[{props['datablock']}]"))
 
-    def __init__(self, open_binary, dblock, total_bytes_read, logger):
-        self.open_binary = open_binary
-        self.dblock = dblock
-        self.total_bytes_read = total_bytes_read
+        # Extract variables from bit map
+        if props['units'] == 'bit_map':
+            bit_map_dict = ReadFile.bit_map_get_vars(dblock=dblock)
+            bit_map_headers = bit_map_extract_header(bit_map_dict=bit_map_dict)
+            for bmh in bit_map_headers:
+                dblock_header.append(bmh)
+    return dblock_header
+
+
+def bit_map_extract_header(bit_map_dict):
+    """Extract bit map values from binary string"""
+    bit_map_headers = []
+    for bit_map_var, bit_map_props in bit_map_dict.items():
+        if bit_map_props['output'] == 1:
+            # Collect header info
+            cur_var = bit_map_var
+            cur_units = bit_map_props['units']
+            cur_datablock = bit_map_props['datablock']
+            cur_header = (cur_var, f"[{cur_units}]", f"[{cur_datablock}]")
+            bit_map_headers.append(cur_header)
+    return bit_map_headers
+
+
+class ReadFile:
+
+    def __init__(self, binary_filename, size_header, dblocks, limit_read_lines, logger):
+        self.tic = time.time()  # Start time
+        self.binary_filename = binary_filename
+        self.binary_filesize = os.path.getsize(self.binary_filename)
+        self.size_header = size_header
+        self.dblocks = dblocks
+        self.limit_read_lines = limit_read_lines
         self.logger = logger
+        self.file_counter_lines = 0
+        self.file_total_bytes_read = 0
+        self.file_data_rows = []  # Collects all data, i.e. all line records
 
-        self.end_of_data_reached = False
-        self.dblock_true_size = False
-        self.dblock_data = []
-        self.dblock_bytes_read = 0
-        self.dblock_vars_read = 0
-        self.dblock_nominal_size, \
-        self.dblock_numvars = self.block_info(dblock=self.dblock)
-        self.dblock_true_size = False  # Reset to False for each datablock
+        self.logger.info(f"    File size: {self.binary_filesize} Bytes")
 
-        self.loop_dblock()
+    def run(self):
+        self.dblock_headers = self.make_file_header()
+        self.open_binary = self.read_bin_file_to_mem(binary_filename=self.binary_filename, logger=self.logger)
 
-    def get_dblock_data(self):
-        return self.dblock_data, self.total_bytes_read, self.end_of_data_reached
+        # First read header at top of file
+        settings.data_blocks.header.wecom3.data_block_header(open_file_object=self.open_binary,
+                                                             size_header=self.size_header)
 
-    def loop_dblock(self):
+        self.convert()
+
+    def convert(self):
+        self.logger.info(f"    Reading file data, converting to ASCII ...")
+        end_of_data_reached = False  # Reset for each file
+
+        while not end_of_data_reached:
+            # Read data blocks per instrument
+            # tic = time.time()
+            # print(time.time() - tic)
+            file_newrow_records = []
+            for instr in self.dblocks:
+                incoming_dblock_data, end_of_data_reached = self.read_instr_dblock(dblock=instr)
+                if not end_of_data_reached:
+                    file_newrow_records = file_newrow_records + incoming_dblock_data
+                else:
+                    file_newrow_records = False
+                    break  # Breaks FOR loop
+
+            if file_newrow_records:
+                self.file_counter_lines += 1
+                # print(self.counter_lines)
+                self.file_data_rows.append(file_newrow_records)
+
+            # Limit = 0 means no limit
+            if self.limit_read_lines > 0:
+                if self.file_counter_lines == self.limit_read_lines:
+                    break
+
+        self.open_binary.close()
+
+    def read_instr_dblock(self, dblock):
         """Cycle through vars in data block"""
-        for var, props in self.dblock.items():
+        dblock_nominal_size, dblock_numvars = self.block_info(dblock=dblock)
+        dblock_true_size = False  # Reset to False for each datablock
+        dblock_data = []
+        dblock_bytes_read = 0
+        dblock_vars_read = 0
+        end_of_data_reached = False
+
+        for var, props in dblock.items():
 
             if 'bit_pos_start' in props.keys():  # Skip bit map variables, will be extracted later
                 continue
             varbytes = self.open_binary.read(props['bytes'])  # Read Bytes for current var
 
             # Check if end of data
-            self.end_of_data_reached = self.check_if_end_of_data(varbytes=varbytes,
-                                                                 required_varbytes=props['bytes'])
-            if self.end_of_data_reached:
+            end_of_data_reached = self.check_if_end_of_data(varbytes=varbytes,
+                                                            required_varbytes=props['bytes'])
+            if end_of_data_reached:
                 break  # Stop for loop
 
             # Continue if bytes are available
-            self.total_bytes_read += len(varbytes)  # Total bytes of data file
-            self.dblock_bytes_read += len(varbytes)  # Bytes read for current instrument data block
-            self.dblock_vars_read += 1
+            self.file_total_bytes_read += len(varbytes)  # Total bytes of data file
+            dblock_bytes_read += len(varbytes)  # Bytes read for current instrument data block
+            dblock_vars_read += 1
 
             # Get var value
-            var_val = self.get_var_val(props=props, varbytes=varbytes)
+            var_val = self.get_var_val(var=var, props=props, varbytes=varbytes)
 
             # Check if variable gives data block size info
             if 'DATA_SIZE' in var:
-                self.dblock_true_size = int(var_val)
-                self.check_if_dblock_size_zero()
-                if self.end_of_data_reached:
+                dblock_true_size = int(var_val)
+                self.check_if_dblock_size_zero(dblock_true_size=dblock_true_size)
+                if end_of_data_reached:
                     break  # Stop for loop
 
             # Check for missing or erroneous data blocks
-            if self.dblock_true_size:
+            if dblock_true_size:
                 # If datablock has the expected size, proceed normally
-                if self.dblock_true_size == self.dblock_nominal_size:
+                if dblock_true_size == dblock_nominal_size:
                     pass
                 # If datablock does not have the expected size, generate missing data
-                elif self.dblock_bytes_read == 2:
+                elif dblock_bytes_read == 2:
                     # In this case there are analyzer data missing, i.e. the whole data block is either only 2 Bytes
                     # instead of e.g. 34 Bytes, or any other size, e.g. due to logging errors (e.g. the IRGA72 datablock
                     # can be 16 instead of 26). It is still necessary to read 2 Bytes in total. If the 2 Bytes were read,
@@ -74,35 +146,37 @@ class ReadInstrDatablock:
                     var_val = self.convert_val(props=props, var_val=var_val)
 
                     # Add value to data
-                    self.dblock_data.append(var_val)
+                    dblock_data.append(var_val)
 
                     # Missing values for missing main vars
-                    self.dblock_data = self.set_vars_notread_to_missing(dblock_data_so_far=self.dblock_data)
+                    dblock_data = self.set_vars_notread_to_missing(dblock_data_so_far=dblock_data,
+                                                                   dblock_numvars=dblock_numvars,
+                                                                   dblock_vars_read=dblock_vars_read)
 
                     # Add missing value -9999 for each of the bit map vars that was selected for output
-                    self.dblock_data = self.set_extracted_vars_to_missing(dblock_data_so_far=self.dblock_data)
+                    dblock_data = self.set_extracted_vars_to_missing(dblock=dblock,
+                                                                     dblock_data_so_far=dblock_data)
 
-                    if self.dblock_true_size != 2:
-                        self.read_rest_of_bytes()
+                    if dblock_true_size != 2:
+                        self.read_rest_of_bytes(dblock_true_size=dblock_true_size,
+                                                dblock_bytes_read=dblock_bytes_read)
                     break
-
-                    # return self.dblock_data, self.total_bytes_read, self.end_of_data_reached
 
             # Convert to hex or octal if needed
             var_val = self.convert_val(props=props, var_val=var_val)
 
             # Add value to data
-            self.dblock_data.append(var_val)
+            dblock_data.append(var_val)
 
             # Extract variables from bit map
             if props['units'] == 'bit_map':
                 bit_map_vals = self.extract_bit_map(var_val=var_val,
                                                     props=props,
-                                                    dblock=self.dblock)
+                                                    dblock=dblock)
                 for bmv in bit_map_vals:
-                    self.dblock_data.append(bmv)
+                    dblock_data.append(bmv)
 
-            # return self.dblock_data, self.total_bytes_read, self.end_of_data_reached
+        return dblock_data, end_of_data_reached
 
     def convert_val(self, props, var_val):
         """Convert var value to hex or octal"""
@@ -114,7 +188,8 @@ class ReadInstrDatablock:
             var_val = self.convert_val_to_status_code_lgr(var_val=var_val)
         return var_val
 
-    def convert_val_to_diag_val_hs(self, var_val):
+    @staticmethod
+    def convert_val_to_diag_val_hs(var_val):
         """Convert value to diagnostic value for Gill HS-50 and HS-100 sonic anemometers
 
         Saved as an integer value. The integer can be converted to binary to get more
@@ -143,7 +218,8 @@ class ReadInstrDatablock:
         diag_val_hs = int(var_val)
         return diag_val_hs
 
-    def convert_val_to_status_code_irga(self, var_val):
+    @staticmethod
+    def convert_val_to_status_code_irga(var_val):
         """Convert value to octal
 
         Examples:
@@ -162,7 +238,8 @@ class ReadInstrDatablock:
         oct_val_no_prefix = oct_val[2:]  # Remove octal prefix from val
         return int(oct_val_no_prefix)
 
-    def convert_val_to_status_code_lgr(self, var_val):
+    @staticmethod
+    def convert_val_to_status_code_lgr(var_val):
         """Convert value to status code for LGR laser analyzer
 
         Format for the LGR status code that is recorded in the raw binary files.
@@ -194,7 +271,7 @@ class ReadInstrDatablock:
                                                  var_binary_string=var_binary_string)
         return bit_map_vals
 
-    def read_rest_of_bytes(self):
+    def read_rest_of_bytes(self, dblock_true_size, dblock_bytes_read):
         """Read rest of datablock bytes but do nothing with the data
 
         This happens when the datablock is not the nominal size (e.g. 26 for IRGA72)
@@ -202,33 +279,32 @@ class ReadInstrDatablock:
         e.g. for the IRGA72 that sometimes shows a datasize of 16 bytes due to
          inconsistencies in the logging script.
         """
-        bytes_notread = self.dblock_true_size - self.dblock_bytes_read
+        bytes_notread = dblock_true_size - dblock_bytes_read
         _varbytes = self.open_binary.read(bytes_notread)
         return None
 
-    def set_extracted_vars_to_missing(self, dblock_data_so_far):
+    @staticmethod
+    def set_extracted_vars_to_missing(dblock, dblock_data_so_far):
         """Add missing value -9999 for each of the bit map vars that was selected for output"""
-        for var, props in self.dblock.items():
+        for var, props in dblock.items():
             if 'bit_pos_start' in props.keys():
                 if props['output'] == 1:
                     dblock_data_so_far.append(-9999)
         return dblock_data_so_far
 
-    def set_vars_notread_to_missing(self, dblock_data_so_far):
+    @staticmethod
+    def set_vars_notread_to_missing(dblock_data_so_far, dblock_numvars, dblock_vars_read):
         """Generate missing values for main vars that were not read"""
-        vars_notread = self.dblock_numvars - self.dblock_vars_read
+        vars_notread = dblock_numvars - dblock_vars_read
         for v in range(0, vars_notread):
             dblock_data_so_far.append(-9999)
         return dblock_data_so_far
 
-    def check_if_dblock_size_zero(self):
+    @staticmethod
+    def check_if_dblock_size_zero(dblock_true_size):
         """Immediately stop if data block is zero bytes"""
-        end_of_data_reached = True if self.dblock_true_size == 0 else False
+        end_of_data_reached = True if dblock_true_size == 0 else False
         return end_of_data_reached
-        # self.dblock_data = self.set_datablock_to_missing()
-        # else:
-        #     end_of_data_reached = False
-        # return dblock_data, end_of_data_reached
 
     def check_if_end_of_data(self, varbytes, required_varbytes):
         """Check if the end of available data is reached"""
@@ -245,27 +321,22 @@ class ReadInstrDatablock:
 
         return end_of_data_reached
 
-    def set_datablock_to_missing(self):
-        """Set the complete datablock to missing values"""
-        dblock_data = []
-
-        # Set each var in data block to missing -9999
-        for v in self.dblock.items():
-            var_val = -9999
-            dblock_data.append(var_val)
-
-        # Set each extracted bit map var to missing -9999
-        dblock_data = self.set_extracted_vars_to_missing(dblock_data_so_far=dblock_data)
-
-        return dblock_data
-
-    def get_var_val(self, props, varbytes):
+    def get_var_val(self, var, props, varbytes):
         dblock_struct = struct.Struct(props['format'])  # Define format of read bytes
         dblock_unpacked = dblock_struct.unpack(varbytes)
         var_val = self.convert_bytes_to_value(unpacked_data=dblock_unpacked)
-        var_val = self.remove_gain_offset(var_value=var_val, gain=props['gain_on_signal'],
-                                          offset=props['offset_on_signal'])
-        var_val = self.apply_gain_offset(var_value=var_val, gain=props['apply_gain'], offset=props['add_offset'])
+
+        if props['conversion_type'] == 'regular':
+            var_val = self.remove_gain_offset(var_value=var_val, gain=props['gain_on_signal'],
+                                              offset=props['offset_on_signal'])
+            var_val = self.apply_gain_offset(var_value=var_val, gain=props['apply_gain'], offset=props['add_offset'])
+
+        elif props['conversion_type'] == 'exception':
+            if (props['datablock'] == 'R2-A') & (var == 'T_SONIC'):
+                var_val = bce.dblock_r2a_t_sonic(var_val=var_val)
+
+        else:
+            var_val = '-conversion-type-not-defined-'
         return var_val
 
     @staticmethod
@@ -341,122 +412,98 @@ class ReadInstrDatablock:
                 bit_map_dict[bit_map_var] = bit_map_props
         return bit_map_dict
 
+    def get_data(self):
+        return self.file_data_rows, self.dblock_headers, self.tic, self.file_counter_lines
 
-def make_header(dblock):
-    """Get header info for data block, including for variables from bit maps"""
-    dblock_header = []  # Collects header
-    for var, props in dblock.items():
-        if 'bytes' not in props.keys():  # Skip bit map variables
-            continue
-        # Add var name, units in brackets and datablock in brackets
-        dblock_header.append((var, f"[{props['units']}]", f"[{props['datablock']}]"))
+    def make_file_header(self):
+        """Make header for converted ASCII file, for all data blocks"""
+        dblock_headers = []
+        for dblock in self.dblocks:
+            dblock_header = make_header(dblock=dblock)
+            for dblock_var in dblock_header:
+                dblock_headers.append(dblock_var)
+        return dblock_headers
 
-        # Extract variables from bit map
-        if props['units'] == 'bit_map':
-            bit_map_dict = ReadInstrDatablock.bit_map_get_vars(dblock=dblock)
-            bit_map_headers = bit_map_extract_header(bit_map_dict=bit_map_dict)
-            for bmh in bit_map_headers:
-                dblock_header.append(bmh)
-    return dblock_header
+    def read_bin_file_to_mem(self, binary_filename, logger):
+        """Read binary file to memory
 
-
-def bit_map_extract_header(bit_map_dict):
-    """Extract bit map values from binary string"""
-    bit_map_headers = []
-    for bit_map_var, bit_map_props in bit_map_dict.items():
-        if bit_map_props['output'] == 1:
-            # Collect header info
-            cur_var = bit_map_var
-            cur_units = bit_map_props['units']
-            cur_datablock = bit_map_props['datablock']
-            cur_header = (cur_var, f"[{cur_units}]", f"[{cur_datablock}]")
-            bit_map_headers.append(cur_header)
-    return bit_map_headers
+        This works much faster than previously.
+        see: http://infinityquest.com/python-tutorials/memory-mapping-binary-files-python/
+        """
+        size = os.path.getsize(binary_filename)
+        fd = os.open(binary_filename, os.O_RDONLY)
+        open_binary = mmap.mmap(fd, size, access=mmap.ACCESS_READ)
+        logger.info(f"    Done reading file to memory.")
+        return open_binary
 
 
-def read_bin_file_to_mem(binary_filename, logger):
-    """Read binary file to memory
+# def read_file(binary_filename, size_header, dblocks, limit_read_lines, logger, statusbar):
+# binary_filesize = os.path.getsize(binary_filename)
+# logger.info(f"    File size: {binary_filesize} Bytes")
 
-    This works much faster than previously.
-    see: http://infinityquest.com/python-tutorials/memory-mapping-binary-files-python/
-    """
-    size = os.path.getsize(binary_filename)
-    fd = os.open(binary_filename, os.O_RDONLY)
-    open_binary = mmap.mmap(fd, size, access=mmap.ACCESS_READ)
-    logger.info(f"    Done reading file to memory.")
-    return open_binary
+# # File header
+# # Make header for all data blocks
+# dblock_headers = []
+# for dblock in dblocks:
+#     dblock_header = make_header(dblock=dblock)
+#     for dblock_var in dblock_header:
+#         dblock_headers.append(dblock_var)
 
+# Open binary file
+# tic = time.time()
+# open_binary = read_bin_file_to_mem(binary_filename=binary_filename, logger=logger)
+# counter_lines = 0
+# total_bytes_read = 0
+# data_rows = []  # Collects all data, i.e. all line records
 
-def read_file(binary_filename, size_header, dblocks, limit_read_lines, logger, statusbar):
-    binary_filesize = os.path.getsize(binary_filename)
-    logger.info(f"    File size: {binary_filesize} Bytes")
+# # First read header at top of file
+# settings.data_blocks.header.wecom3.data_block_header(open_binary, size_header)
 
-    # File header
-    # Make header for all data blocks
-    dblock_headers = []
-    for dblock in dblocks:
-        dblock_header = make_header(dblock=dblock)
-        for dblock_var in dblock_header:
-            dblock_headers.append(dblock_var)
+# Then loop through rest of binary file contents
+# logger.info(f"    Reading file data, converting to ASCII ...")
+# end_of_data_reached = False
+# while not end_of_data_reached:
+#     newdata_onerow_records = []
+#     # Read data blocks per instrument
+#     for instr in dblocks:
+#         obj = ReadInstrDatablock(open_binary=open_binary,
+#                                  dblock=instr,
+#                                  total_bytes_read=total_bytes_read,
+#                                  logger=logger)
+#         newdata_instr, total_bytes_read, end_of_data_reached = obj.get_dblock_data()
+#         # print(len(newdata_instr))
+#
+#         if not end_of_data_reached:
+#             newdata_onerow_records = newdata_onerow_records + newdata_instr
+#         else:
+#             newdata_onerow_records = False
+#             break  # Breaks FOR loop
+#
+#     if newdata_onerow_records:
+#         counter_lines += 1
+#         data_rows.append(newdata_onerow_records)
+#         # Check if all bytes of current files were read
+#         # if total_bytes_read >= binary_filesize:
+#         #     print("X")
+#
+#         # # Info stats
+#         # if counter_lines % 15000 == 0:
+#         #     toc = time.time() - tic
+#         #     time_per_byte = toc / total_bytes_read
+#         #     bytes_not_read = binary_filesize - total_bytes_read
+#         #     rem_time = bytes_not_read * time_per_byte
+#         #     bytes_read_perc = (total_bytes_read / binary_filesize) * 100
+#         #     print(f"\r    Read {counter_lines} lines / {total_bytes_read} Bytes ({bytes_read_perc:.1f}%) / "
+#         #           f"time remaining: {rem_time:.1f}s ...", end='')
+#
+#     # Limit = 0 means no limit
+#     if limit_read_lines > 0:
+#         if counter_lines == limit_read_lines:
+#             break
 
-    # Open binary file
-    tic = time.time()
-    open_binary = read_bin_file_to_mem(binary_filename=binary_filename, logger=logger)
-    counter_lines = 0
-    total_bytes_read = 0
-    data_rows = []  # Collects all data, i.e. all line records
-
-    # First read header at top of file
-    settings.data_blocks.header.wecom3.data_block_header(open_binary, size_header)
-
-    # Then loop through rest of binary file contents
-    logger.info(f"    Reading file data, converting to ASCII ...")
-    end_of_data_reached = False
-    while not end_of_data_reached:
-        newdata_onerow_records = []
-        # Read data blocks per instrument
-        # if counter_lines == 34227:
-        #     print("34227")
-        # print(counter_lines)
-        for instr in dblocks:
-            obj = ReadInstrDatablock(open_binary=open_binary,
-                                     dblock=instr,
-                                     total_bytes_read=total_bytes_read,
-                                     logger=logger)
-            newdata_instr, total_bytes_read, end_of_data_reached = obj.get_dblock_data()
-            # print(len(newdata_instr))
-
-            if not end_of_data_reached:
-                newdata_onerow_records = newdata_onerow_records + newdata_instr
-            else:
-                newdata_onerow_records = False
-                break  # Breaks FOR loop
-
-        if newdata_onerow_records:
-            counter_lines += 1
-            data_rows.append(newdata_onerow_records)
-            # Check if all bytes of current files were read
-            # if total_bytes_read >= binary_filesize:
-            #     print("X")
-
-            # # Info stats
-            # if counter_lines % 15000 == 0:
-            #     toc = time.time() - tic
-            #     time_per_byte = toc / total_bytes_read
-            #     bytes_not_read = binary_filesize - total_bytes_read
-            #     rem_time = bytes_not_read * time_per_byte
-            #     bytes_read_perc = (total_bytes_read / binary_filesize) * 100
-            #     print(f"\r    Read {counter_lines} lines / {total_bytes_read} Bytes ({bytes_read_perc:.1f}%) / "
-            #           f"time remaining: {rem_time:.1f}s ...", end='')
-
-        # Limit = 0 means no limit
-        if limit_read_lines > 0:
-            if counter_lines == limit_read_lines:
-                break
-
-    open_binary.close()
-    data_header = dblock_headers
-    return data_rows, data_header, tic, counter_lines
+# open_binary.close()
+# data_header = dblock_headers
+# return data_rows, data_header, tic, counter_lines
 
 
 def speedstats(tic, counter_lines, logger):
@@ -479,3 +526,14 @@ def speedstats(tic, counter_lines, logger):
 #     header = list(zip(header, units))  # List of tuples: header name and units
 #     return header
 #     # a= (instr.keys(), key = lambda x: (instr[x][by])
+
+
+# # Info stats
+# if counter_lines % 15000 == 0:
+#     toc = time.time() - tic
+#     time_per_byte = toc / total_bytes_read
+#     bytes_not_read = binary_filesize - total_bytes_read
+#     rem_time = bytes_not_read * time_per_byte
+#     bytes_read_perc = (total_bytes_read / binary_filesize) * 100
+#     print(f"\r    Read {counter_lines} lines / {total_bytes_read} Bytes ({bytes_read_perc:.1f}%) / "
+#           f"time remaining: {rem_time:.1f}s ...", end='')

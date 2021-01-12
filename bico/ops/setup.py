@@ -41,12 +41,12 @@ def make_run_outdirs(settings_dict):
     settings_dict['dir_out_run_plots_agg'] = settings_dict['dir_out_run_plots'] / 'agg'
 
     # Files
-    settings_dict['dir_out_run_raw_data_csv'] = settings_dict['dir_out_run'] / 'raw_data_csv'
+    settings_dict['dir_out_run_raw_data_ascii'] = settings_dict['dir_out_run'] / 'raw_data_ascii'
     settings_dict['dir_out_run_log'] = settings_dict['dir_out_run'] / 'log'
 
     # Make dirs
     create_dirs = ['dir_out_run_plots', 'dir_out_run_plots_hires', 'dir_out_run_plots_agg',
-                   'dir_out_run_raw_data_csv', 'dir_out_run_log']
+                   'dir_out_run_raw_data_ascii', 'dir_out_run_log']
     for d in create_dirs:
         if not Path.is_dir(settings_dict[d]):
             print(f"Creating folder {settings_dict[d]} ...")

@@ -1,23 +1,26 @@
-# R350-A
+# R2-A
 
 ## Variables
 - U ...  First horizontal wind component (x)
 - V ...  Second horizontal wind component (y)
 - W ...  Vertical wind component (z)
 - T_SONIC ... Sonic temperature
-- INC_X ... Inclinometer x
-- INC_Y ... Inclinometer y
+  Note that this variable has ```'conversion_type': 'exception'```, because a special conversion
+  is needed to convert from binary to proper units. See Details below for conversion steps.
 
 ## BICO Settings
 - For an explanation of the different variable property settings, please see ```_help_bico_settings.md```.
 
 *Before BICO, the binary conversion was done in FCT FluxCalcTool:*
-- Old ID in FCT: r3-50
-- Old data block in FCT: data_block_sonic_r3_50
+- Old ID in FCT: r2_1_without_extrabyte
+- Old data block in FCT: data_block_sonic_r2_1_without_extrabyte
 - FCT Source code: --> https://gitlab.ethz.ch/holukas/fct-flux-calculation-tool
 
 ## Details
-- none
+- Regarding T_SONIC --> C code from ethconvert:  
+  ```if(is_R2_sonic){c=0.02*dataWECOM3.Tv; Tv=c*c/403.0-273.15;	/* Tv in degrees C */```  
+  In BICO, the conversion is done in module ```bin_conversion_exceptions.py```.
+
 
 ## Binary info
 - B...unsigned char, integer, 1 Byte

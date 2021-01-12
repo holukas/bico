@@ -3,15 +3,15 @@
 # =====
 
 
-DATA_SIZE    ==   {'order': 1, 'bytes': 1, 'format': '>B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'Bytes', 'datablock': 'LGR-A'}
-STATUS_CODE  ==   {'order': 2, 'bytes': 1, 'format': '>B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'status_code_lgr', 'datablock': 'LGR-A'}
-CH4_DRY      ==   {'order': 3, 'bytes': 4, 'format': '>B B B B', 'gain_on_signal': 10000000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'umol+1 mol-1', 'datablock': 'LGR-A'}
-N2O_DRY      ==   {'order': 4, 'bytes': 4, 'format': '>B B B B', 'gain_on_signal': 10000000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'umol+1 mol-1', 'datablock': 'LGR-A'}
-H2O          ==   {'order': 5, 'bytes': 4, 'format': '>B B B B', 'gain_on_signal': 10000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'umol+1 mol-1', 'datablock': 'LGR-A'}
-CH4          ==   {'order': 6, 'bytes': 4, 'format': '>B B B B', 'gain_on_signal': 10000000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'umol+1 mol-1', 'datablock': 'LGR-A'}
-N2O          ==   {'order': 7, 'bytes': 4, 'format': '>B B B B', 'gain_on_signal': 10000000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'umol+1 mol-1', 'datablock': 'LGR-A'}
-PRESS_CELL   ==   {'order': 8, 'bytes': 2, 'format': '>B B', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'Torr', 'datablock': 'LGR-A'}
-T_CELL       ==   {'order': 9, 'bytes': 2, 'format': '>B B', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'degC', 'datablock': 'LGR-A'}
-T_UNKNOWN    ==   {'order': 10, 'bytes': 2, 'format': '>B B', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'degC', 'datablock': 'LGR-A'}
-MIRROR_RINGDOWNTIME == {'order': 11, 'bytes': 4, 'format': '>B B B B', 'gain_on_signal': 1000000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'us', 'datablock': 'LGR-A'}
-FIT_FLAG     ==   {'order': 12, 'bytes': 1, 'format': '>B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'flag', 'datablock': 'LGR-A'}
+DATA_SIZE    ==   {'order': 1, 'bytes': 1, 'format': '>B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'Bytes', 'conversion_type': 'regular', 'datablock': 'LGR-A'}
+STATUS_CODE  ==   {'order': 2, 'bytes': 1, 'format': '>B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'status_code_lgr', 'conversion_type': 'regular', 'datablock': 'LGR-A'}
+CH4_DRY      ==   {'order': 3, 'bytes': 4, 'format': '>B B B B', 'gain_on_signal': 10000000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'umol+1 mol-1', 'conversion_type': 'regular', 'datablock': 'LGR-A'}
+N2O_DRY      ==   {'order': 4, 'bytes': 4, 'format': '>B B B B', 'gain_on_signal': 10000000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'umol+1 mol-1', 'conversion_type': 'regular', 'datablock': 'LGR-A'}
+H2O          ==   {'order': 5, 'bytes': 4, 'format': '>B B B B', 'gain_on_signal': 10000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'umol+1 mol-1', 'conversion_type': 'regular', 'datablock': 'LGR-A'}
+CH4          ==   {'order': 6, 'bytes': 4, 'format': '>B B B B', 'gain_on_signal': 10000000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'umol+1 mol-1', 'conversion_type': 'regular', 'datablock': 'LGR-A'}
+N2O          ==   {'order': 7, 'bytes': 4, 'format': '>B B B B', 'gain_on_signal': 10000000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'umol+1 mol-1', 'conversion_type': 'regular', 'datablock': 'LGR-A'}
+PRESS_CELL   ==   {'order': 8, 'bytes': 2, 'format': '>B B', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'Torr', 'conversion_type': 'regular', 'datablock': 'LGR-A'}
+T_CELL       ==   {'order': 9, 'bytes': 2, 'format': '>B B', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'degC', 'conversion_type': 'regular', 'datablock': 'LGR-A'}
+T_UNKNOWN    ==   {'order': 10, 'bytes': 2, 'format': '>B B', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'degC', 'conversion_type': 'regular', 'datablock': 'LGR-A'}
+MIRROR_RINGDOWNTIME == {'order': 11, 'bytes': 4, 'format': '>B B B B', 'gain_on_signal': 1000000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'us', 'conversion_type': 'regular', 'datablock': 'LGR-A'}
+FIT_FLAG     ==   {'order': 12, 'bytes': 1, 'format': '>B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'flag', 'conversion_type': 'regular', 'datablock': 'LGR-A'}

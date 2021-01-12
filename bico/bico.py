@@ -15,6 +15,7 @@ from gui.gui import Ui_MainWindow
 from ops import bin, format_data, vis, file, stats
 from settings import _version
 
+
 # TODO LATER parallelize, multiprocessing?
 # import multiprocessing as mp
 # print("Number of processors: ", mp.cpu_count())
@@ -334,16 +335,14 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
             logger.info(f"    Reading binary file #{counter_bin_files} of {num_bin_files}: {bin_file}...")
             logger.info(f"    Data block sequence: {self.dblocks_seq}")
 
-            # Read binary data
-            data_lines, header, tic, counter_lines = \
-                bin.read_file(binary_filename=bin_filepath,
-                              size_header=self.bin_size_header,
-                              dblocks=dblocks_props,
-                              limit_read_lines=int(self.settings_dict['row_limit']),
-                              logger=self.logger,
-                              statusbar=self.statusbar)
-            # if not data_lines:
-            #     continue
+            # Read binary data file
+            obj = bin.ReadFile(binary_filename=bin_filepath,
+                               size_header=self.bin_size_header,
+                               dblocks=dblocks_props,
+                               limit_read_lines=int(self.settings_dict['row_limit']),
+                               logger=self.logger)
+            obj.run()
+            data_lines, header, tic, counter_lines = obj.get_data()
 
             bin.speedstats(tic=tic, counter_lines=counter_lines, logger=logger)
 
@@ -363,9 +362,9 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
             csv_filename = f"{self.settings_dict['site']}_{csv_filedate}"
 
             # Export file CSV
-            file.export_raw_data_csv(df=df, outfile=csv_filename, logger=logger,
-                                     outdir=self.settings_dict['dir_out_run_raw_data_csv'],
-                                     compression=self.settings_dict['file_compression'])
+            file.export_raw_data_ascii(df=df, outfile=csv_filename, logger=logger,
+                                       outdir=self.settings_dict['dir_out_run_raw_data_ascii'],
+                                       compression=self.settings_dict['file_compression'])
 
             # Plot high-resolution data
             if self.settings_dict['plot_ts_hires'] == '1':

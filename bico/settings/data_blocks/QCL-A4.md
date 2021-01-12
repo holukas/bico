@@ -1,4 +1,5 @@
-# QCL-A3
+# QCL-A4
+Basically the same as QCL-A, but with gain 1000 on H2O signal instead of gain 1.
 
 ## Variables
 - DATA_SIZE ... Data size of current data block, number of bytes in QCL record
@@ -21,31 +22,26 @@
       - define	QCL_DID_NOT_RESPOND	0002    /* bit 2 set	*/
       - define QCL_DATA_MISSING	0010	    /* bit 4 set	*/
 - CH4_DRY ... CH4 dry mole fraction, mixing ratio, ppb    
-- H2O_DRY ... H2O dry mole fraction, mixing ratio, ppb  
-  (!) This H2O_DRY is a special case, because it does not provide the full 
-  measurement resolution, more info below.  
 - N2O_DRY ... N2O dry mole fraction, mixing ratio, ppb    
-- DUMMY ... (!) Do not use
+- H2O_DRY ... H2O dry mole fraction, mixing ratio, ppb    
 - T_CELL ... Temperature of the measurement cell
+- PRESS_CELL ... Pressure in the measurement cell
 
 ## BICO Settings
 - For an explanation of the different variable property settings, please see ```_help_bico_settings.md```.
 
 *Before BICO, the binary conversion was done in FCT FluxCalcTool:*
-- Old ID in FCT: qcl_v1v6b_ch-cha_2018_2
-- Old data block in FCT: data_block_qcl_ver1_var6_b_ch_cha_2018_2
+- Old ID in FCT: -none-
+- Old data block in FCT: -none-
 - FCT Source code: --> https://gitlab.ethz.ch/holukas/fct-flux-calculation-tool
 
 # Details
-- This format was not intended.
-- Note the different gains in comparison to other QCL-A formats.
-- Note the different colum order in comparison to other QCL-A formats. 
-- H2O does not have the full resolution and looks rather static in the raw data files. 
-  However, it gives the correct order of magnitude and generally its values are realistic.
-  Note that in this format H2O_DRY has a very different 'gain_on_signal' than in other
-  QCL-A formats. In this format, the recorded H2O signal is too low, therefore the
-  'gain_on_signal' was set to 0.001, which means that the raw signal is multiplied by 1000
-  to yield ppb in the converted ASCII files. 
+- Was used for 2 days at CH-CHA in 2020. By accident, the gain on the H2O signal was set to 1000 instead
+  of the correct gain 1.
+- This format is similar to: in WE's sonicread.pdf Table 2: QCL Version 1 Variant 6, QC-TILDAS ETHZ, 
+  Columns: "CH4, N2O, H2O, TEMP, PRESS since V. 7.06 (2015-05-18)"
+- Modified data acquisition to also record QCL temperature and pressure.
+- Now there are 5 QCL variables that are detected (there were 3 in previous versions).
 
 ## Binary info
 - B...unsigned char, integer, 1 Byte

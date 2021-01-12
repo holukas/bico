@@ -4,13 +4,13 @@
 # Details: see QCL-A.md
 
 
-DATA_SIZE    ==   {'order': 1, 'bytes': 1, 'format': 'B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'Bytes', 'datablock': 'QCL-A'}
-STATUS_CODE  ==   {'order': 2, 'bytes': 1, 'format': 'B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'bit_map', 'datablock': 'QCL-A'}
-CH4_DRY      ==   {'order': 3, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'nmol+1 mol-1', 'datablock': 'QCL-A'}
-N2O_DRY      ==   {'order': 4, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'nmol+1 mol-1', 'datablock': 'QCL-A'}
-H2O_DRY      ==   {'order': 5, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'nmol+1 mol-1', 'datablock': 'QCL-A'}
-T_CELL       ==   {'order': 6, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'K', 'datablock': 'QCL-A'}
-PRESS_CELL   ==   {'order': 7, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'Torr', 'datablock': 'QCL-A'}
+DATA_SIZE    ==   {'order': 1, 'bytes': 1, 'format': 'B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'Bytes', 'conversion_type': 'regular', 'datablock': 'QCL-A'}
+STATUS_CODE  ==   {'order': 2, 'bytes': 1, 'format': 'B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'bit_map', 'conversion_type': 'regular', 'datablock': 'QCL-A'}
+CH4_DRY      ==   {'order': 3, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'nmol+1 mol-1', 'conversion_type': 'regular', 'datablock': 'QCL-A'}
+N2O_DRY      ==   {'order': 4, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'nmol+1 mol-1', 'conversion_type': 'regular', 'datablock': 'QCL-A'}
+H2O_DRY      ==   {'order': 5, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'nmol+1 mol-1', 'conversion_type': 'regular', 'datablock': 'QCL-A'}
+T_CELL       ==   {'order': 6, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'K', 'conversion_type': 'regular', 'datablock': 'QCL-A'}
+PRESS_CELL   ==   {'order': 7, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'Torr', 'conversion_type': 'regular', 'datablock': 'QCL-A'}
 
 # Values extracted from STATUS_CODE:
 # ----------------------------------
