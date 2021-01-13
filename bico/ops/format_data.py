@@ -2,6 +2,7 @@ import pandas as pd
 
 
 def make_df(data_lines, header, logger):
+    """Make dataframe from list of record rows"""
     logger.info("    Converting to dataframe ...")
     df = pd.DataFrame(data_lines, columns=pd.MultiIndex.from_tuples(header))
     return df

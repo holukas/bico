@@ -1,5 +1,4 @@
 import datetime as dt
-import gzip
 import os
 import sys
 from pathlib import Path
@@ -14,6 +13,7 @@ import ops.logger
 import ops.setup
 from gui.gui import Ui_MainWindow
 from ops import bin, vis, file, stats
+from ops import format_data
 from settings import _version
 
 
@@ -321,10 +321,11 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
             bin_filedate = dt.datetime.strptime(bin_filepath.name,
                                                 self.settings_dict['filename_datetime_parsing_string'])
             ascii_filedate = bin_filedate.strftime('%Y%m%d%H%M')  # w/o extension
-            ascii_filename = f"{self.settings_dict['site']}_{ascii_filedate}.csv"
-            ascii_filepath = self.settings_dict['dir_out_run_raw_data_ascii'] / ascii_filename
-            ascii_filename_gzip = f"{self.settings_dict['site']}_{ascii_filedate}.csv.gz"
-            ascii_filepath_gzip = self.settings_dict['dir_out_run_raw_data_ascii'] / ascii_filename_gzip
+            ascii_filename = f"{self.settings_dict['site']}_{ascii_filedate}"  # w/o extension
+            # ascii_filename = f"{self.settings_dict['site']}_{ascii_filedate}.csv"
+            # ascii_filepath = self.settings_dict['dir_out_run_raw_data_ascii'] / ascii_filename
+            # ascii_filename_gzip = f"{self.settings_dict['site']}_{ascii_filedate}.csv.gz"
+            # ascii_filepath_gzip = self.settings_dict['dir_out_run_raw_data_ascii'] / ascii_filename_gzip
 
             counter_bin_files += 1
             self.statusbar.showMessage(f"Working on file #{counter_bin_files}: {bin_file}")
@@ -342,22 +343,36 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
             logger.info(f"    Data block sequence: {self.dblocks_seq}")
 
             # Read binary data file
-            obj = bin.ReadFile(binary_filename=bin_filepath,
-                               size_header=self.bin_size_header,
-                               dblocks=dblocks_props,
-                               limit_read_lines=int(self.settings_dict['row_limit']),
-                               logger=self.logger,
-                               outfile_ascii_path=ascii_filepath)
+            obj = bin.ConvertData(binary_filename=bin_filepath,
+                                  size_header=self.bin_size_header,
+                                  dblocks=dblocks_props,
+                                  limit_read_lines=int(self.settings_dict['row_limit']),
+                                  logger=self.logger,
+                                  file_number=counter_bin_files)
             obj.run()
+            dblock_headers, file_data_rows = obj.get_data()
+
+            # Make dataframe of data
+            ascii_df = format_data.make_df(data_lines=file_data_rows,
+                                           header=dblock_headers,
+                                           logger=self.logger)
+
+            # Save to file
+            ascii_filepath = file.export_raw_data_ascii(df=ascii_df,
+                                                        outdir=self.settings_dict['dir_out_run_raw_data_ascii'],
+                                                        outfilename=ascii_filename,
+                                                        logger=self.logger,
+                                                        compression=self.settings_dict['file_compression'])
 
             # Read the converted file that was created
-            file_contents_ascii_df = self.read_converted_ascii(filepath=ascii_filepath)
+            file_contents_ascii_df = self.read_converted_ascii(filepath=ascii_filepath,
+                                                               compression=self.settings_dict['file_compression'])
 
-            # Compress uncompressed ASCII to gzip, delete uncompressed if gzip selected
-            if self.settings_dict['file_compression'] == 'gzip':
-                with open(ascii_filepath, 'rb') as f_in, gzip.open(ascii_filepath_gzip, 'wb') as f_out:
-                    f_out.writelines(f_in)
-                os.remove(ascii_filepath)  # Delete uncompressed
+            # # Compress uncompressed ASCII to gzip, delete uncompressed if gzip selected
+            # if self.settings_dict['file_compression'] == 'gzip':
+            #     with open(ascii_filepath, 'rb') as f_in, gzip.open(ascii_filepath_gzip, 'wb') as f_out:
+            #         f_out.writelines(f_in)
+            #     os.remove(ascii_filepath)  # Delete uncompressed
 
             # Stats
             stats_coll_df = stats.calc(stats_df=file_contents_ascii_df.copy(),
@@ -380,8 +395,9 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
 
         return stats_coll_df
 
-    def read_converted_ascii(self, filepath):
+    def read_converted_ascii(self, filepath, compression):
         """Read converted file"""
+        compression = None if compression == 'None' else compression
         file_contents_ascii_df = pd.read_csv(filepath,
                                              skiprows=None,
                                              header=[0, 1, 2],
@@ -392,7 +408,8 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
                                              parse_dates=False,
                                              date_parser=None,
                                              index_col=None,
-                                             dtype=None)
+                                             dtype=None,
+                                             compression=compression)
         return file_contents_ascii_df
 
     def assemble_datablock_sequence(self):

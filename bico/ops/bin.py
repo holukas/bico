@@ -1,3 +1,4 @@
+import pandas as pd
 import csv
 import mmap
 import os
@@ -6,7 +7,7 @@ import time
 
 import settings.data_blocks.header.wecom3
 from . import bin_conversion_exceptions as bce
-
+from ops import format_data, file
 
 def make_header(dblock):
     """Get header info for data block, including for variables from bit maps"""
@@ -19,7 +20,7 @@ def make_header(dblock):
 
         # Extract variables from bit map
         if props['units'] == 'bit_map':
-            bit_map_dict = ReadFile.bit_map_get_vars(dblock=dblock)
+            bit_map_dict = ConvertData.bit_map_get_vars(dblock=dblock)
             bit_map_headers = bit_map_extract_header(bit_map_dict=bit_map_dict)
             for bmh in bit_map_headers:
                 dblock_header.append(bmh)
@@ -40,12 +41,12 @@ def bit_map_extract_header(bit_map_dict):
     return bit_map_headers
 
 
-class ReadFile:
+class ConvertData:
     """
     Read and convert binary data to ASCII, write to file
     """
 
-    def __init__(self, binary_filename, size_header, dblocks, limit_read_lines, logger, outfile_ascii_path):
+    def __init__(self, binary_filename, size_header, dblocks, limit_read_lines, logger, file_number):
         self.tic = time.time()  # Start time
         self.binary_filename = binary_filename
         self.binary_filesize = os.path.getsize(self.binary_filename)
@@ -56,7 +57,8 @@ class ReadFile:
         self.file_counter_lines = 0
         self.file_total_bytes_read = 0
         self.file_data_rows = []  # Collects all data, i.e. all line records
-        self.ascii_filename = outfile_ascii_path
+        self.data_df = pd.DataFrame()
+        # self.ascii_filename = outfile_ascii_path
         self.dblock_headers = []
 
         self.logger.info(f"    File size: {self.binary_filesize} Bytes")
@@ -70,8 +72,8 @@ class ReadFile:
 
         self.convert_to_ascii()
 
-    # def get_data(self):
-    #     return self.dblock_headers
+    def get_data(self):
+        return self.dblock_headers, self.file_data_rows
 
     def write_multirow_header_to_ascii(self, asciiWriter):
         """Write header info from list of tuples to file as multi-row header
@@ -93,40 +95,42 @@ class ReadFile:
         self.logger.info(f"    Reading file data, converting to ASCII ...")
         end_of_data_reached = False  # Reset for each file
 
-        with open(self.ascii_filename, 'w', newline='') as open_ascii:
-            asciiWriter = csv.writer(open_ascii, delimiter=',')
+        # with open(self.ascii_filename, 'w', newline='') as open_ascii:
+        #     asciiWriter = csv.writer(open_ascii, delimiter=',')
 
-            # File header
-            self.dblock_headers = self.make_file_header()
-            self.write_multirow_header_to_ascii(asciiWriter=asciiWriter)
+        # File header
+        self.dblock_headers = self.make_file_header()
+        self.data_df = pd.DataFrame(columns=self.dblock_headers)
+        # self.write_multirow_header_to_ascii(asciiWriter=asciiWriter)
 
-            # Data records
-            while not end_of_data_reached:
-                # Read data blocks per instrument
-                file_newrow_records = []
-                for instr in self.dblocks:
-                    incoming_dblock_data, end_of_data_reached = self.read_instr_dblock(dblock=instr)
-                    if not end_of_data_reached:
-                        file_newrow_records = file_newrow_records + incoming_dblock_data
-                    else:
-                        file_newrow_records = False
-                        break  # Breaks FOR loop
+        # Data records
+        while not end_of_data_reached:
+            # Read data blocks per instrument
+            file_newrow_records = []
+            for instr in self.dblocks:
+                incoming_dblock_data, end_of_data_reached = self.read_instr_dblock(dblock=instr)
+                if not end_of_data_reached:
+                    file_newrow_records = file_newrow_records + incoming_dblock_data
+                else:
+                    file_newrow_records = False
+                    break  # Breaks FOR loop
 
-                if file_newrow_records:
-                    self.file_counter_lines += 1
-                    asciiWriter.writerow(file_newrow_records)
-                    # self.file_data_rows.append(file_newrow_records)
+            if file_newrow_records:
+                self.file_counter_lines += 1
+                # asciiWriter.writerow(file_newrow_records)
+                self.file_data_rows.append(file_newrow_records)
+                self.data_df.append(file_newrow_records)
 
-                # Limit = 0 means no limit
-                if self.limit_read_lines > 0:
-                    if self.file_counter_lines == self.limit_read_lines:
-                        break
+            # Limit = 0 means no limit
+            if self.limit_read_lines > 0:
+                if self.file_counter_lines == self.limit_read_lines:
+                    break
 
         self.open_binary.close()
-        open_ascii.close()
+        # open_ascii.close()
 
         self.logger.info(f"    Finished conversion to ASCII.")
-        self.logger.info(f"    ASCII data saved to file {self.ascii_filename}")
+        # self.logger.info(f"    ASCII data saved to file {self.ascii_filename}")
         self.file_speedstats()
 
     def read_instr_dblock(self, dblock):

@@ -178,13 +178,25 @@ class SearchAll():
         return valid_files_dict
 
 
-def export_raw_data_ascii(df, outdir, logger, outfile='temp', compression='gzip'):
+def export_raw_data_ascii(df, outdir, logger, outfilename='temp', compression='gzip'):
     logger.info("    Saving raw data csv ...")
-    outpath = outdir / outfile
+
     if compression == 'gzip':
-        df.to_csv(f"{outpath}.csv.gz", index=False, compression='gzip')
+        outfilename_ext = '.csv.gz'
+        compression = 'gzip'
+
     elif compression == 'None':
-        df.to_csv(f"{outpath}.csv", index=False)
+        outfilename_ext = '.csv'
+        compression = None
+
+    else:
+        outfilename_ext = '.csv'
+        compression = None
+
+    outfilename_ext = outfilename + outfilename_ext
+    outpath = outdir / outfilename_ext
+    df.to_csv(f"{outpath}", index=False, compression=compression)
+    return outpath
 
 
 def export_stats_collection_csv(df, outdir, run_id, logger):
