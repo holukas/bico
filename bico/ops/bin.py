@@ -138,22 +138,11 @@ class ReadFile:
         dblock_vars_read = 0
         end_of_data_reached = False
 
-        # for var, props in dblock.items():
-        #     if 'DATA_SIZE' in var:
-        #         check=True
-
         for var, props in dblock.items():
-
 
             if 'bit_pos_start' in props.keys():  # Skip bit map variables, will be extracted later
                 continue
             varbytes = self.open_binary.read(props['bytes'])  # Read Bytes for current var
-
-            # tic = time.time()
-            # much=int(10000000)
-            # for i in range(0, much):
-            #     self.open_binary.read(100)
-            # print(time.time()-tic)
 
             # Check if end of data
             end_of_data_reached = self.check_if_end_of_data(varbytes=varbytes,
