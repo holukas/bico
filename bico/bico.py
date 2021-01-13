@@ -1,5 +1,5 @@
-import gzip
 import datetime as dt
+import gzip
 import os
 import sys
 from pathlib import Path
@@ -13,7 +13,7 @@ from PyQt5 import QtWidgets as qtw
 import ops.logger
 import ops.setup
 from gui.gui import Ui_MainWindow
-from ops import bin, format_data, vis, file, stats
+from ops import bin, vis, file, stats
 from settings import _version
 
 

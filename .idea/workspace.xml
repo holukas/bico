@@ -2,6 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="254ecb79-655b-4854-8af6-177bb7347e8a" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bico/bico.py" beforeDir="false" afterPath="$PROJECT_DIR$/bico/bico.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bico/del.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bico/ops/bin.py" beforeDir="false" afterPath="$PROJECT_DIR$/bico/ops/bin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bico/settings/Bico.settings" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/Bico.settings" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bico/settings/Bico.settingsOld" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/Bico.settingsOld" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bico/settings/_version.py" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/_version.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -65,6 +71,28 @@
     </key>
   </component>
   <component name="RunManager" selected="Python.start_bico">
+    <configuration name="_test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="BICO_Binary_Converter" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/bico" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/bico/_test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="bico" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="BICO_Binary_Converter" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -101,28 +129,6 @@
       <module name="" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/bico/bico.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="example" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="BICO_Binary_Converter" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="C:\Users\holukas\Anaconda3\envs\BICO1\python.exe" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/example" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/example/example.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -199,18 +205,18 @@
     </configuration>
     <list>
       <item itemvalue="Python.bico" />
-      <item itemvalue="Python.example" />
       <item itemvalue="Python.gui" />
       <item itemvalue="Python.gui (1)" />
       <item itemvalue="Python.start_bico" />
+      <item itemvalue="Python._test" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.start_bico" />
+        <item itemvalue="Python._test" />
         <item itemvalue="Python.bico" />
         <item itemvalue="Python.gui (1)" />
         <item itemvalue="Python.gui" />
-        <item itemvalue="Python.example" />
       </list>
     </recent_temporary>
   </component>
@@ -324,6 +330,9 @@
       <workItem from="1610467243727" duration="132000" />
       <workItem from="1610468410978" duration="11871000" />
       <workItem from="1610492571218" duration="52000" />
+      <workItem from="1610494627121" duration="3765000" />
+      <workItem from="1610499634762" duration="1562000" />
+      <workItem from="1610528020539" duration="10670000" />
     </task>
     <servers />
   </component>
@@ -332,6 +341,23 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/bico/ops/bin.py</url>
+          <line>124</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/bico/ops/bin.py</url>
+          <line>151</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/bico/ops/bin.py</url>
+          <line>158</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+      </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
           <properties notifyOnTerminate="true" exception="BaseException">
@@ -343,13 +369,14 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/BICO_Binary_Converter$bico.coverage" NAME="bico Coverage Results" MODIFIED="1607386154607" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bico" />
+    <SUITE FILE_PATH="coverage/BICO_Binary_Converter$_test.coverage" NAME="_test Coverage Results" MODIFIED="1610535335094" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bico" />
     <SUITE FILE_PATH="coverage/BICO_Binary_Converter$bico__1_.coverage" NAME="bico (1) Coverage Results" MODIFIED="1606867491349" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bico" />
     <SUITE FILE_PATH="coverage/BICO_Binary_Converter$gui__1_.coverage" NAME="gui (1) Coverage Results" MODIFIED="1607085886870" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bico/gui" />
     <SUITE FILE_PATH="coverage/BICO$example.coverage" NAME="example Coverage Results" MODIFIED="1598268282092" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/example" />
     <SUITE FILE_PATH="coverage/BICO$main.coverage" NAME="bico Coverage Results" MODIFIED="1598258463691" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bico" />
     <SUITE FILE_PATH="coverage/BICO_Binary_Converter$gui.coverage" NAME="gui Coverage Results" MODIFIED="1606435918815" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bico" />
     <SUITE FILE_PATH="coverage/BICO_Binary_Converter$main.coverage" NAME="main Coverage Results" MODIFIED="1596498134562" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bico" />
-    <SUITE FILE_PATH="coverage/BICO_Binary_Converter$start_bico.coverage" NAME="start_bico Coverage Results" MODIFIED="1610491966587" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bico" />
+    <SUITE FILE_PATH="coverage/BICO_Binary_Converter$start_bico.coverage" NAME="start_bico Coverage Results" MODIFIED="1610538046729" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bico" />
     <SUITE FILE_PATH="coverage/BICO_Binary_Converter$example.coverage" NAME="example Coverage Results" MODIFIED="1606348759035" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/example" />
   </component>
 </project>

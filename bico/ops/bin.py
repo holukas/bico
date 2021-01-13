@@ -138,11 +138,22 @@ class ReadFile:
         dblock_vars_read = 0
         end_of_data_reached = False
 
+        # for var, props in dblock.items():
+        #     if 'DATA_SIZE' in var:
+        #         check=True
+
         for var, props in dblock.items():
+
 
             if 'bit_pos_start' in props.keys():  # Skip bit map variables, will be extracted later
                 continue
             varbytes = self.open_binary.read(props['bytes'])  # Read Bytes for current var
+
+            # tic = time.time()
+            # much=int(10000000)
+            # for i in range(0, much):
+            #     self.open_binary.read(100)
+            # print(time.time()-tic)
 
             # Check if end of data
             end_of_data_reached = self.check_if_end_of_data(varbytes=varbytes,
@@ -156,7 +167,14 @@ class ReadFile:
             dblock_vars_read += 1
 
             # Get var value
-            var_val = self.get_var_val(var=var, props=props, varbytes=varbytes)
+            var_val = self.get_var_val(var=var, varbytes=varbytes,
+                                       gain_on_signal=props['gain_on_signal'],
+                                       offset_on_signal=props['offset_on_signal'],
+                                       apply_gain=props['apply_gain'],
+                                       add_offset=props['add_offset'],
+                                       conversion_type=props['conversion_type'],
+                                       datablock=props['datablock'],
+                                       format=props['format'])
 
             # Check if variable gives data block size info
             if 'DATA_SIZE' in var:
@@ -178,7 +196,7 @@ class ReadFile:
                     # then stop this data block and return.
 
                     # Convert to hex or octal if needed
-                    var_val = self.convert_val(props=props, var_val=var_val)
+                    var_val = self.convert_val(units=props['units'], var_val=var_val)
 
                     # Add value to data
                     dblock_data.append(var_val)
@@ -198,7 +216,7 @@ class ReadFile:
                     break
 
             # Convert to hex or octal if needed
-            var_val = self.convert_val(props=props, var_val=var_val)
+            var_val = self.convert_val(units=props['units'], var_val=var_val)
 
             # Add value to data
             dblock_data.append(var_val)
@@ -206,20 +224,20 @@ class ReadFile:
             # Extract variables from bit map
             if props['units'] == 'bit_map':
                 bit_map_vals = self.extract_bit_map(var_val=var_val,
-                                                    props=props,
+                                                    num_bytes=props['bytes'],
                                                     dblock=dblock)
                 for bmv in bit_map_vals:
                     dblock_data.append(bmv)
 
         return dblock_data, end_of_data_reached
 
-    def convert_val(self, props, var_val):
+    def convert_val(self, units, var_val):
         """Convert var value to hex or octal"""
-        if props['units'] == 'diag_val_hs':
+        if units == 'diag_val_hs':
             var_val = self.convert_val_to_diag_val_hs(var_val=var_val)
-        if props['units'] == 'status_code_irga':
+        if units == 'status_code_irga':
             var_val = self.convert_val_to_status_code_irga(var_val=var_val)
-        if props['units'] == 'status_code_lgr':
+        if units == 'status_code_lgr':
             var_val = self.convert_val_to_status_code_lgr(var_val=var_val)
         return var_val
 
@@ -298,9 +316,9 @@ class ReadFile:
         # return var_val_int
         return status_code
 
-    def extract_bit_map(self, var_val, props, dblock):
+    def extract_bit_map(self, var_val, num_bytes, dblock):
         """Extract multiple variables from one bit map variable"""
-        var_binary_string = self.bit_map_var_to_bin(var_val=var_val, num_bytes=props['bytes'])
+        var_binary_string = self.bit_map_var_to_bin(var_val=var_val, num_bytes=num_bytes)
         bit_map_dict = self.bit_map_get_vars(dblock=dblock)
         bit_map_vals = self.bit_map_extract_vals(bit_map_dict=bit_map_dict,
                                                  var_binary_string=var_binary_string)
@@ -356,18 +374,20 @@ class ReadFile:
 
         return end_of_data_reached
 
-    def get_var_val(self, var, props, varbytes):
-        dblock_struct = struct.Struct(props['format'])  # Define format of read bytes
+    def get_var_val(self, var, varbytes, gain_on_signal, offset_on_signal,
+                    apply_gain, add_offset, conversion_type, datablock, format):
+        dblock_struct = struct.Struct(format)  # Define format of read bytes
         dblock_unpacked = dblock_struct.unpack(varbytes)
         var_val = self.convert_bytes_to_value(unpacked_data=dblock_unpacked)
 
-        if props['conversion_type'] == 'regular':
-            var_val = self.remove_gain_offset(var_value=var_val, gain=props['gain_on_signal'],
-                                              offset=props['offset_on_signal'])
-            var_val = self.apply_gain_offset(var_value=var_val, gain=props['apply_gain'], offset=props['add_offset'])
+        if conversion_type == 'regular':
+            var_val = self.remove_gain_offset(var_value=var_val,
+                                              gain=gain_on_signal,
+                                              offset=offset_on_signal)
+            var_val = self.apply_gain_offset(var_value=var_val, gain=apply_gain, offset=add_offset)
 
-        elif props['conversion_type'] == 'exception':
-            if (props['datablock'] == 'R2-A') & (var == 'T_SONIC'):
+        elif conversion_type == 'exception':
+            if (datablock == 'R2-A') & (var == 'T_SONIC'):
                 var_val = bce.dblock_r2a_t_sonic(var_val=var_val)
 
         else:
