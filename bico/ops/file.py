@@ -57,6 +57,8 @@ class SearchAll():
         self.valid_files_dict = self.keep_files_up_to_filelimit()
         self.valid_files_dict = self.keep_random_files(valid_files_dict=self.valid_files_dict)
 
+        # sorted(self.valid_files_dict)  # todo sort dict necessary?
+
         return self.valid_files_dict
 
     def keep_random_files(self, valid_files_dict):

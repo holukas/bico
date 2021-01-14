@@ -163,6 +163,8 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
         # Output
         self.update_dict_key(key='dir_out', new_val=self.lbl_output_folder.text())
         self.update_dict_key(key='output_folder_name_prefix', new_val=self.lne_output_folder_name_prefix.text())
+        self.update_dict_key(key='add_instr_to_varname',
+                             new_val='1' if self.chk_output_variables_add_instr_to_varname.isChecked() else '0')
         self.update_dict_key(key='file_compression', new_val=self.cmb_output_compression.currentText())
         self.update_dict_key(key='plot_file_availability',
                              new_val='1' if self.chk_output_plots_file_availability.isChecked() else '0')
@@ -229,6 +231,8 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
         self.lbl_output_folder.setText(str(self.settings_dict['dir_out']))
         self.set_gui_lineedit(lineedit=self.lne_output_folder_name_prefix,
                               string=self.settings_dict['output_folder_name_prefix'])
+        self.set_gui_checkbox(checkbox=self.chk_output_variables_add_instr_to_varname,
+                              state=self.settings_dict['add_instr_to_varname'])
         self.set_gui_combobox(combobox=self.cmb_output_compression, find_text=self.settings_dict['file_compression'])
         self.set_gui_checkbox(checkbox=self.chk_output_plots_file_availability,
                               state=self.settings_dict['plot_file_availability'])
@@ -348,9 +352,14 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
                                   dblocks=dblocks_props,
                                   limit_read_lines=int(self.settings_dict['row_limit']),
                                   logger=self.logger,
-                                  file_number=counter_bin_files)
+                                  cur_file_number=counter_bin_files)
             obj.run()
+            # ascii_df = obj.get_data()
             dblock_headers, file_data_rows = obj.get_data()
+
+            # Add instrument info to variable name
+            if self.settings_dict['add_instr_to_varname'] == '1':
+                dblock_headers = self.add_instr_to_varname(dblock_headers=dblock_headers)
 
             # Make dataframe of data
             ascii_df = format_data.make_df(data_lines=file_data_rows,
@@ -367,12 +376,6 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
             # Read the converted file that was created
             file_contents_ascii_df = self.read_converted_ascii(filepath=ascii_filepath,
                                                                compression=self.settings_dict['file_compression'])
-
-            # # Compress uncompressed ASCII to gzip, delete uncompressed if gzip selected
-            # if self.settings_dict['file_compression'] == 'gzip':
-            #     with open(ascii_filepath, 'rb') as f_in, gzip.open(ascii_filepath_gzip, 'wb') as f_out:
-            #         f_out.writelines(f_in)
-            #     os.remove(ascii_filepath)  # Delete uncompressed
 
             # Stats
             stats_coll_df = stats.calc(stats_df=file_contents_ascii_df.copy(),
@@ -394,6 +397,16 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
                                        outdir=self.settings_dict['dir_out_run_plots_hires'], logger=logger)
 
         return stats_coll_df
+
+    def add_instr_to_varname(self, dblock_headers):
+        """Add instrument info to variable name to avoid duplicates
+
+            e.g. The var STATUS_CODE exists both in IRGA72-A and QCL-C
+            and are renamed to STATUS_CODE_IRGA75-A and STATUS_CODE_QCL-C
+        """
+        for idx_h, h in enumerate(dblock_headers):
+            dblock_headers[idx_h] = (f"{h[0]}_{h[2]}", h[1], h[2])
+        return dblock_headers
 
     def read_converted_ascii(self, filepath, compression):
         """Read converted file"""
@@ -430,3 +443,9 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# # Compress uncompressed ASCII to gzip, delete uncompressed if gzip selected
+# if self.settings_dict['file_compression'] == 'gzip':
+#     with open(ascii_filepath, 'rb') as f_in, gzip.open(ascii_filepath_gzip, 'wb') as f_out:
+#         f_out.writelines(f_in)
+#     os.remove(ascii_filepath)  # Delete uncompressed

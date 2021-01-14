@@ -1,13 +1,13 @@
-import pandas as pd
-import csv
 import mmap
 import os
 import struct
 import time
 
+import pandas as pd
+
 import settings.data_blocks.header.wecom3
 from . import bin_conversion_exceptions as bce
-from ops import format_data, file
+
 
 def make_header(dblock):
     """Get header info for data block, including for variables from bit maps"""
@@ -46,7 +46,7 @@ class ConvertData:
     Read and convert binary data to ASCII, write to file
     """
 
-    def __init__(self, binary_filename, size_header, dblocks, limit_read_lines, logger, file_number):
+    def __init__(self, binary_filename, size_header, dblocks, limit_read_lines, logger, cur_file_number):
         self.tic = time.time()  # Start time
         self.binary_filename = binary_filename
         self.binary_filesize = os.path.getsize(self.binary_filename)
@@ -60,6 +60,7 @@ class ConvertData:
         self.data_df = pd.DataFrame()
         # self.ascii_filename = outfile_ascii_path
         self.dblock_headers = []
+        self.cur_file_number = cur_file_number
 
         self.logger.info(f"    File size: {self.binary_filesize} Bytes")
 
@@ -73,53 +74,46 @@ class ConvertData:
         self.convert_to_ascii()
 
     def get_data(self):
+        # return self.data_df
         return self.dblock_headers, self.file_data_rows
-
-    def write_multirow_header_to_ascii(self, asciiWriter):
-        """Write header info from list of tuples to file as multi-row header
-
-        Since self.dblock_headers is a list of tuples and the output ascii is
-        written row-by-row, the header info is extracted from the list: each tuple
-        in the list comprises three elements (variable name, units and instrument).
-        Therefore, first the first element of each tuple (all variable names) is written
-        to the first row of the file, then all second elements (units) are written to the
-        second row, and finally the third elements (instrument) are written to the
-        third row of the output file.
-
-        """
-        for headerrow in range(0, 3):
-            headerrow_out = [i[headerrow] for i in self.dblock_headers]
-            asciiWriter.writerow(headerrow_out)
 
     def convert_to_ascii(self):
         self.logger.info(f"    Reading file data, converting to ASCII ...")
         end_of_data_reached = False  # Reset for each file
 
-        # with open(self.ascii_filename, 'w', newline='') as open_ascii:
-        #     asciiWriter = csv.writer(open_ascii, delimiter=',')
-
         # File header
         self.dblock_headers = self.make_file_header()
-        self.data_df = pd.DataFrame(columns=self.dblock_headers)
         # self.write_multirow_header_to_ascii(asciiWriter=asciiWriter)
 
         # Data records
         while not end_of_data_reached:
             # Read data blocks per instrument
             file_newrow_records = []
-            for instr in self.dblocks:
-                incoming_dblock_data, end_of_data_reached = self.read_instr_dblock(dblock=instr)
-                if not end_of_data_reached:
-                    file_newrow_records = file_newrow_records + incoming_dblock_data
-                else:
-                    file_newrow_records = False
-                    break  # Breaks FOR loop
+            _end_of_data_reached = []
+
+            results = [self.read_instr_dblock(dblock=d) for d in self.dblocks]
+            for r in results:
+                file_newrow_records.extend(r[0])
+                _end_of_data_reached.append(r[1])
+            # end_of_data_reached = True if True in _end_of_data_reached else False
+            if True in _end_of_data_reached:
+                end_of_data_reached = True
+                file_newrow_records = False
+
+            # for instr in self.dblocks:
+            #     incoming_dblock_data, end_of_data_reached = self.read_instr_dblock(dblock=instr)
+            #     if not end_of_data_reached:
+            #         file_newrow_records.extend(incoming_dblock_data)
+            #         # file_newrow_records = file_newrow_records + incoming_dblock_data
+            #     else:
+            #         file_newrow_records = False
+            #         break  # Breaks FOR loop
 
             if file_newrow_records:
                 self.file_counter_lines += 1
                 # asciiWriter.writerow(file_newrow_records)
                 self.file_data_rows.append(file_newrow_records)
-                self.data_df.append(file_newrow_records)
+                # self.data_df.append(file_newrow_records)
 
             # Limit = 0 means no limit
             if self.limit_read_lines > 0:
@@ -142,9 +136,11 @@ class ConvertData:
         dblock_vars_read = 0
         end_of_data_reached = False
 
+        # todo hier weiter var-by-var
+
         for var, props in dblock.items():
 
-            if 'bit_pos_start' in props.keys():  # Skip bit map variables, will be extracted later
+            if 'bit_pos_start' in props.keys():  # Skip variables from bit map, will be extracted later
                 continue
             varbytes = self.open_binary.read(props['bytes'])  # Read Bytes for current var
 
@@ -222,6 +218,7 @@ class ConvertData:
                 for bmv in bit_map_vals:
                     dblock_data.append(bmv)
 
+        # return dblock_data
         return dblock_data, end_of_data_reached
 
     def convert_val(self, units, var_val):
@@ -490,7 +487,7 @@ class ConvertData:
             runtime_line_avg = self.file_counter_lines / toc
         except ZeroDivisionError:
             runtime_line_avg = 0
-        _len = f"    {self.file_counter_lines} rows read in {toc:.2f}s, speed: {int(runtime_line_avg)} rows s-1"
+        _len = f"    {self.file_counter_lines} data rows converted in {toc:.2f}s, speed: {int(runtime_line_avg)} rows s-1"
         self.logger.info(_len)
 
 # def read_file(binary_filename, size_header, dblocks, limit_read_lines, logger, statusbar):
@@ -583,3 +580,20 @@ class ConvertData:
 #     bytes_read_perc = (total_bytes_read / binary_filesize) * 100
 #     print(f"\r    Read {counter_lines} lines / {total_bytes_read} Bytes ({bytes_read_perc:.1f}%) / "
 #           f"time remaining: {rem_time:.1f}s ...", end='')
+
+
+# def write_multirow_header_to_ascii(self, asciiWriter):
+#     """Write header info from list of tuples to file as multi-row header
+#
+#     Since self.dblock_headers is a list of tuples and the output ascii is
+#     written row-by-row, the header info is extracted from the list: each tuple
+#     in the list comprises three elements (variable name, units and instrument).
+#     Therefore, first the first element of each tuple (all variable names) is written
+#     to the first row of the file, then all second elements (units) are written to the
+#     second row, and finally the third elements (instrument) are written to the
+#     third row of the output file.
+#
+#     """
+#     for headerrow in range(0, 3):
+#         headerrow_out = [i[headerrow] for i in self.dblock_headers]
+#         asciiWriter.writerow(headerrow_out)

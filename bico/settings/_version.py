@@ -1,5 +1,5 @@
-__version__ = "0.2.1"
-__date__ = "13 Jan 2021"
+__version__ = "0.3.0"
+__date__ = "14 Jan 2021"
 __link_source_code__ = "https://gitlab.ethz.ch/holukas/bico"
 __link_releases__ = "https://gitlab.ethz.ch/holukas/bico/-/releases"
 __link_wiki__ = "https://gitlab.ethz.ch/holukas/bico/-/wikis/home"
