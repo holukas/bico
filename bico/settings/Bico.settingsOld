@@ -1,4 +1,4 @@
-run_id=BICO-20210114-101216
+run_id=BICO-20210115-162354
 
 # INSTRUMENTS
 # ===========
@@ -27,7 +27,7 @@ filename_datetime_format=yyyymmddHH.XMM
 file_ext=*.X*
 file_size_min=900
 file_limit=1
-row_limit=10
+row_limit=1000
 
 # Special
 select_random_files=0
@@ -35,12 +35,12 @@ select_random_files=0
 # OUTPUT
 # ======
 dir_out=A:/FLUXES/x-TEST-OUT
-dir_out_run=A:\FLUXES\x-TEST-OUT\DAV_BICO-20210114-101216
-dir_out_run_log=A:\FLUXES\x-TEST-OUT\DAV_BICO-20210114-101216\log
-dir_out_run_plots=A:\FLUXES\x-TEST-OUT\DAV_BICO-20210114-101216\plots
-dir_out_run_plots_hires=A:\FLUXES\x-TEST-OUT\DAV_BICO-20210114-101216\plots\hires
-dir_out_run_plots_agg=A:\FLUXES\x-TEST-OUT\DAV_BICO-20210114-101216\plots\agg
-dir_out_run_raw_data_ascii=A:\FLUXES\x-TEST-OUT\DAV_BICO-20210114-101216\raw_data_ascii
+dir_out_run=A:\FLUXES\x-TEST-OUT\DAV_BICO-20210115-162354
+dir_out_run_log=A:\FLUXES\x-TEST-OUT\DAV_BICO-20210115-162354\log
+dir_out_run_plots=A:\FLUXES\x-TEST-OUT\DAV_BICO-20210115-162354\plots
+dir_out_run_plots_hires=A:\FLUXES\x-TEST-OUT\DAV_BICO-20210115-162354\plots\hires
+dir_out_run_plots_agg=A:\FLUXES\x-TEST-OUT\DAV_BICO-20210115-162354\plots\agg
+dir_out_run_raw_data_ascii=A:\FLUXES\x-TEST-OUT\DAV_BICO-20210115-162354\raw_data_ascii
 
 output_folder_name_prefix=DAV
 file_compression=None
