@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="254ecb79-655b-4854-8af6-177bb7347e8a" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/ops/bin.py" beforeDir="false" afterPath="$PROJECT_DIR$/bico/ops/bin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/Bico.settings" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/Bico.settings" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/Bico.settingsOld" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/Bico.settingsOld" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bico/settings/_version.py" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/_version.py" afterDir="false" />
-    </list>
+    <list default="true" id="254ecb79-655b-4854-8af6-177bb7347e8a" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -333,12 +327,35 @@
       <workItem from="1610528020539" duration="10670000" />
       <workItem from="1610612175310" duration="9929000" />
       <workItem from="1610633667143" duration="18253000" />
-      <workItem from="1610697403721" duration="16187000" />
+      <workItem from="1610697403721" duration="17069000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="master" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
