@@ -196,11 +196,11 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.bico" />
-      <item itemvalue="Python.gui" />
-      <item itemvalue="Python.gui (1)" />
-      <item itemvalue="Python.start_bico" />
       <item itemvalue="Python._test" />
+      <item itemvalue="Python.bico" />
+      <item itemvalue="Python.gui (1)" />
+      <item itemvalue="Python.gui" />
+      <item itemvalue="Python.start_bico" />
     </list>
     <recent_temporary>
       <list>
