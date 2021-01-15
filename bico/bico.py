@@ -297,8 +297,6 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
             copyfile(old_settings_file, run_settings_file_path)
             pass
 
-        # return settings_dict
-
     def select_dir(self, start_dir, dir_setting, update_label, dialog_txt):
         """ Select directory, update dict and label"""
         selected_dir = qtw.QFileDialog.getExistingDirectory(None, dialog_txt, str(start_dir))  # Open dialog
@@ -326,10 +324,6 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
                                                 self.settings_dict['filename_datetime_parsing_string'])
             ascii_filedate = bin_filedate.strftime('%Y%m%d%H%M')  # w/o extension
             ascii_filename = f"{self.settings_dict['site']}_{ascii_filedate}"  # w/o extension
-            # ascii_filename = f"{self.settings_dict['site']}_{ascii_filedate}.csv"
-            # ascii_filepath = self.settings_dict['dir_out_run_raw_data_ascii'] / ascii_filename
-            # ascii_filename_gzip = f"{self.settings_dict['site']}_{ascii_filedate}.csv.gz"
-            # ascii_filepath_gzip = self.settings_dict['dir_out_run_raw_data_ascii'] / ascii_filename_gzip
 
             counter_bin_files += 1
             self.statusbar.showMessage(f"Working on file #{counter_bin_files}: {bin_file}")

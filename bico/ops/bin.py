@@ -83,7 +83,6 @@ class ConvertData:
 
         # File header
         self.dblock_headers = self.make_file_header()
-        # self.write_multirow_header_to_ascii(asciiWriter=asciiWriter)
 
         # Data records
         while not end_of_data_reached:
@@ -91,29 +90,17 @@ class ConvertData:
             file_newrow_records = []
             _end_of_data_reached = []
 
-            results = [self.read_instr_dblock(dblock=d) for d in self.dblocks]
-            for r in results:
-                file_newrow_records.extend(r[0])
-                _end_of_data_reached.append(r[1])
-            # end_of_data_reached = True if True in _end_of_data_reached else False
+            onerow_records = [self.read_instr_dblock(dblock=d) for d in self.dblocks]
+            for dblock_records in onerow_records:
+                file_newrow_records.extend(dblock_records[0])
+                _end_of_data_reached.append(dblock_records[1])
             if True in _end_of_data_reached:
                 end_of_data_reached = True
                 file_newrow_records = False
 
-            # for instr in self.dblocks:
-            #     incoming_dblock_data, end_of_data_reached = self.read_instr_dblock(dblock=instr)
-            #     if not end_of_data_reached:
-            #         file_newrow_records.extend(incoming_dblock_data)
-            #         # file_newrow_records = file_newrow_records + incoming_dblock_data
-            #     else:
-            #         file_newrow_records = False
-            #         break  # Breaks FOR loop
-
             if file_newrow_records:
                 self.file_counter_lines += 1
-                # asciiWriter.writerow(file_newrow_records)
                 self.file_data_rows.append(file_newrow_records)
-                # self.data_df.append(file_newrow_records)
 
             # Limit = 0 means no limit
             if self.limit_read_lines > 0:
@@ -121,10 +108,8 @@ class ConvertData:
                     break
 
         self.open_binary.close()
-        # open_ascii.close()
 
         self.logger.info(f"    Finished conversion to ASCII.")
-        # self.logger.info(f"    ASCII data saved to file {self.ascii_filename}")
         self.file_speedstats()
 
     def read_instr_dblock(self, dblock):
@@ -135,8 +120,6 @@ class ConvertData:
         dblock_bytes_read = 0
         dblock_vars_read = 0
         end_of_data_reached = False
-
-        # todo hier weiter var-by-var
 
         for var, props in dblock.items():
 
@@ -204,7 +187,7 @@ class ConvertData:
                                                 dblock_bytes_read=dblock_bytes_read)
                     break
 
-            # Convert to hex or octal if needed
+            # Convert if needed
             var_val = self.convert_val(units=props['units'], var_val=var_val)
 
             # Add value to data
@@ -217,6 +200,7 @@ class ConvertData:
                                                     dblock=dblock)
                 for bmv in bit_map_vals:
                     dblock_data.append(bmv)
+
 
         # return dblock_data
         return dblock_data, end_of_data_reached
