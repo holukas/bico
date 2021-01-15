@@ -1,4 +1,5 @@
 import mmap
+import numbers
 import os
 import struct
 import time
@@ -62,6 +63,8 @@ class ConvertData:
         self.dblock_headers = []
         self.cur_file_number = cur_file_number
 
+        self.end_of_data_reached = False
+
         self.logger.info(f"    File size: {self.binary_filesize} Bytes")
 
     def run(self):
@@ -70,6 +73,7 @@ class ConvertData:
         # First read binary header at top of file, but don't write to output file
         settings.data_blocks.header.wecom3.data_block_header(open_file_object=self.open_binary,
                                                              size_header=self.size_header)
+        self.file_total_bytes_read += self.size_header
 
         self.convert_to_ascii()
 
@@ -77,43 +81,47 @@ class ConvertData:
         # return self.data_df
         return self.dblock_headers, self.file_data_rows
 
+    def flatten_results(self, results):
+        list_in_list = True
+        while list_in_list:
+            results_flat = []
+            list_in_list = False
+            for r in results:
+                if isinstance(r, numbers.Number):
+                    results_flat.extend([r])
+                elif isinstance(r, list):
+                    results_flat.extend(r)
+                    list_in_list = True
+            results = results_flat
+        return results
+
+    # def x(self, r):
+    #     for r in results
+    #         if isinstance(r, numbers.Number):
+    #             results_flat.extend([r])
+    #         elif isinstance(r, list):
+    #             results_flat.extend(r)
+    #             list_in_list = True
+
     def convert_to_ascii(self):
         self.logger.info(f"    Reading file data, converting to ASCII ...")
-        end_of_data_reached = False  # Reset for each file
 
         # File header
         self.dblock_headers = self.make_file_header()
-        # self.write_multirow_header_to_ascii(asciiWriter=asciiWriter)
 
         # Data records
-        while not end_of_data_reached:
+        while not self.end_of_data_reached:
             # Read data blocks per instrument
-            file_newrow_records = []
-            _end_of_data_reached = []
-
             results = [self.read_instr_dblock(dblock=d) for d in self.dblocks]
-            for r in results:
-                file_newrow_records.extend(r[0])
-                _end_of_data_reached.append(r[1])
-            # end_of_data_reached = True if True in _end_of_data_reached else False
-            if True in _end_of_data_reached:
-                end_of_data_reached = True
-                file_newrow_records = False
+            # r = [r for _list in results for r in _list]
+            # Merge instrument dblocks into one list
+            file_newrow_records = self.flatten_results(results=results)
 
-            # for instr in self.dblocks:
-            #     incoming_dblock_data, end_of_data_reached = self.read_instr_dblock(dblock=instr)
-            #     if not end_of_data_reached:
-            #         file_newrow_records.extend(incoming_dblock_data)
-            #         # file_newrow_records = file_newrow_records + incoming_dblock_data
-            #     else:
-            #         file_newrow_records = False
-            #         break  # Breaks FOR loop
 
             if file_newrow_records:
                 self.file_counter_lines += 1
-                # asciiWriter.writerow(file_newrow_records)
                 self.file_data_rows.append(file_newrow_records)
-                # self.data_df.append(file_newrow_records)
+                # print(f"{self.file_total_bytes_read}   {self.binary_filesize}")
 
             # Limit = 0 means no limit
             if self.limit_read_lines > 0:
@@ -129,100 +137,157 @@ class ConvertData:
 
     def read_instr_dblock(self, dblock):
         """Cycle through vars in data block"""
-        dblock_nominal_size, dblock_numvars = self.block_info(dblock=dblock)
-        dblock_true_size = False  # Reset to False for each datablock
-        dblock_data = []
-        dblock_bytes_read = 0
-        dblock_vars_read = 0
-        end_of_data_reached = False
 
-        # todo hier weiter var-by-var
+        self.dblock_nominal_size, self.dblock_numvars = self.block_info(dblock=dblock)
+        self.dblock_bytes_read = 0
+        self.dblock_true_size = None  # Reset to None for each datablock
+        self.dblock_missing_regular = False
+        self.dblock_missing_irregular = False
+        self.dblock_missing_allzeros = False
 
-        for var, props in dblock.items():
+        # num_extracted = 0
+        # for var, props in dblock.items():
+        #     if 'bit_pos_start' in props.keys():
+        #         num_extracted +=1
 
-            if 'bit_pos_start' in props.keys():  # Skip variables from bit map, will be extracted later
-                continue
-            varbytes = self.open_binary.read(props['bytes'])  # Read Bytes for current var
+        # missing_extracted = [self.set_extracted_vars_to_missing(var=var, props=props)
+        #                      for var, props in dblock.items()
+        #                      if 'bit_pos_start' in props.keys()]
 
-            # Check if end of data
-            end_of_data_reached = self.check_if_end_of_data(varbytes=varbytes,
-                                                            required_varbytes=props['bytes'])
-            if end_of_data_reached:
-                break  # Stop for loop
+        results = [self.lc(var=var, props=props,
+                           dblock=dblock, dblock_nominal_size=self.dblock_nominal_size)
+                   for var, props in dblock.items()
+                   if ('bit_pos_start' not in props.keys()) & (not self.end_of_data_reached)]
+        # print(results)
+        return results
 
-            # Continue if bytes are available
-            self.file_total_bytes_read += len(varbytes)  # Total bytes of data file
-            dblock_bytes_read += len(varbytes)  # Bytes read for current instrument data block
-            dblock_vars_read += 1
+    def lc(self, var, props, dblock, dblock_nominal_size):
+        """Get values for datablock, executed as list comprehension"""
 
-            # Get var value
-            var_val = self.get_var_val(var=var, varbytes=varbytes,
-                                       gain_on_signal=props['gain_on_signal'],
-                                       offset_on_signal=props['offset_on_signal'],
-                                       apply_gain=props['apply_gain'],
-                                       add_offset=props['add_offset'],
-                                       conversion_type=props['conversion_type'],
-                                       datablock=props['datablock'],
-                                       format=props['format'])
+        # CHECK DBLOCK STATUS
+        # ===================
 
-            # Check if variable gives data block size info
-            if 'DATA_SIZE' in var:
-                dblock_true_size = int(var_val)
-                self.check_if_dblock_size_zero(dblock_true_size=dblock_true_size)
-                if end_of_data_reached:
-                    break  # Stop for loop
 
-            # Check for missing or erroneous data blocks
-            if dblock_true_size:
-                # If datablock has the expected size, proceed normally
-                if dblock_true_size == dblock_nominal_size:
-                    pass
-                # If datablock does not have the expected size, generate missing data
-                elif dblock_bytes_read == 2:
-                    # In this case there are analyzer data missing, i.e. the whole data block is either only 2 Bytes
-                    # instead of e.g. 34 Bytes, or any other size, e.g. due to logging errors (e.g. the IRGA72 datablock
-                    # can be 16 instead of 26). It is still necessary to read 2 Bytes in total. If the 2 Bytes were read,
-                    # then stop this data block and return.
+        if self.dblock_missing_regular:
+            if self.dblock_bytes_read == 1:
+                pass  # Continue reading the next byte
+            elif self.dblock_bytes_read == 2:
+                if props['units'] != 'bit_map':
+                    return -9999  # All bytes in dblock were read
+                else:
+                    # Add missing value -9999 for each of the bit map vars that
+                    # was selected for output
+                    missing_var_val = [-9999]
+                    missing_extracted = [self.set_extracted_vars_to_missing(var=var, props=props)
+                                         for var, props in dblock.items()
+                                         if 'bit_pos_start' in props.keys()]
+                    missing_var_val.extend(missing_extracted)
+                    # missing_var_val = [val for sublist in missing_var_val for val in sublist]
+                    return missing_var_val
 
-                    # Convert to hex or octal if needed
-                    var_val = self.convert_val(units=props['units'], var_val=var_val)
+        elif self.dblock_missing_irregular:
+            if self.dblock_bytes_read == 1:
+                pass
 
-                    # Add value to data
-                    dblock_data.append(var_val)
+        elif self.dblock_missing_allzeros:
+            if self.dblock_bytes_read > 0:
+                return -9999
 
-                    # Missing values for missing main vars
-                    dblock_data = self.set_vars_notread_to_missing(dblock_data_so_far=dblock_data,
-                                                                   dblock_numvars=dblock_numvars,
-                                                                   dblock_vars_read=dblock_vars_read)
+        varbytes = self.open_binary.read(props['bytes'])  # Read Bytes for current var
 
-                    # Add missing value -9999 for each of the bit map vars that was selected for output
-                    dblock_data = self.set_extracted_vars_to_missing(dblock=dblock,
-                                                                     dblock_data_so_far=dblock_data)
+        # No more data to read
+        if len(varbytes) == 0:
+            self.end_of_data_reached = True
+            return None
 
-                    if dblock_true_size != 2:
-                        self.read_rest_of_bytes(dblock_true_size=dblock_true_size,
-                                                dblock_bytes_read=dblock_bytes_read)
-                    break
+        self.file_total_bytes_read += len(varbytes)  # Total bytes of data file
+        self.dblock_bytes_read += len(varbytes)  # Bytes already read in this dblock
 
-            # Convert to hex or octal if needed
-            var_val = self.convert_val(units=props['units'], var_val=var_val)
+        # Get var value
+        var_val = self.get_var_val(var=var, varbytes=varbytes,
+                                   gain_on_signal=props['gain_on_signal'],
+                                   offset_on_signal=props['offset_on_signal'],
+                                   apply_gain=props['apply_gain'],
+                                   add_offset=props['add_offset'],
+                                   conversion_type=props['conversion_type'],
+                                   datablock=props['datablock'],
+                                   format=props['format'])
 
-            # Add value to data
-            dblock_data.append(var_val)
+        # Convert if needed
+        var_val = self.convert_val(units=props['units'], var_val=var_val)
 
-            # Extract variables from bit map
-            if props['units'] == 'bit_map':
-                bit_map_vals = self.extract_bit_map(var_val=var_val,
-                                                    num_bytes=props['bytes'],
-                                                    dblock=dblock)
-                for bmv in bit_map_vals:
-                    dblock_data.append(bmv)
+        # Check for datablock size information
+        # Check if variable gives data block size info, set flags
+        if 'DATA_SIZE' in var:
+            self.dblock_true_size = int(var_val)
 
-        # return dblock_data
-        return dblock_data, end_of_data_reached
+            if self.dblock_true_size == dblock_nominal_size:
+                pass
+
+            elif self.dblock_true_size != dblock_nominal_size:
+                if self.dblock_true_size == 2:
+                    # Only 2 bytes means the following vars in the dblock are missing
+                    self.dblock_missing_regular = True
+                else:
+                    if var_val == 0:
+                        self.dblock_missing_allzeros = True
+                    else:
+                        self.dblock_missing_irregular = True
+
+        if self.dblock_missing_irregular:
+            if self.dblock_bytes_read == 2:
+                ignore_bytes = (self.dblock_true_size - self.dblock_bytes_read)
+                _ = self.open_binary.read(ignore_bytes)
+                self.dblock_missing_regular = True
+                self.dblock_missing_irregular = False
+
+        # Return or extract variables from bit map then return
+        if props['units'] != 'bit_map':
+            return var_val
+        else:
+            bmvs = []
+            bit_map_vals = self.extract_bit_map(var_val=var_val,
+                                                num_bytes=props['bytes'],
+                                                dblock=dblock)
+            for bmv in bit_map_vals:
+                bmvs.append(bmv)
+            return [var_val, bmvs]
+
+        # # Check for missing or erroneous data blocks
+        # if dblock_true_size:
+        #     # If datablock has the expected size, proceed normally
+        #     if dblock_true_size == dblock_nominal_size:
+        #         pass
+        #     # If datablock does not have the expected size, generate missing data
+        #     elif dblock_bytes_read == 2:
+        #         # In this case there are analyzer data missing, i.e. the whole data block is either only 2 Bytes
+        #         # instead of e.g. 34 Bytes, or any other size, e.g. due to logging errors (e.g. the IRGA72 datablock
+        #         # can be 16 instead of 26). It is still necessary to read 2 Bytes in total. If the 2 Bytes were read,
+        #         # then stop this data block and return.
+        #
+        #         # Convert to hex or octal if needed
+        #         var_val = self.convert_val(units=props['units'], var_val=var_val)
+        #
+        #         # Add value to data
+        #         dblock_data.append(var_val)
+        #
+        #         # Missing values for missing main vars
+        #         dblock_data = self.set_vars_notread_to_missing(dblock_data_so_far=dblock_data,
+        #                                                        dblock_numvars=dblock_numvars,
+        #                                                        dblock_vars_read=dblock_vars_read)
+        #
+        #         # Add missing value -9999 for each of the bit map vars that was selected for output
+        #         dblock_data = self.set_extracted_vars_to_missing(dblock=dblock,
+        #                                                          dblock_data_so_far=dblock_data)
+        #
+        #         if dblock_true_size != 2:
+        #             self.read_rest_of_bytes(dblock_true_size=dblock_true_size,
+        #                                     dblock_bytes_read=dblock_bytes_read)
+        #         return None
+        #         # break
 
     def convert_val(self, units, var_val):
-        """Convert var value to hex or octal"""
+        """Convert value"""
         if units == 'diag_val_hs':
             var_val = self.convert_val_to_diag_val_hs(var_val=var_val)
         if units == 'status_code_irga':
@@ -327,13 +392,21 @@ class ConvertData:
         return None
 
     @staticmethod
-    def set_extracted_vars_to_missing(dblock, dblock_data_so_far):
+    def set_extracted_vars_to_missing(var, props):
         """Add missing value -9999 for each of the bit map vars that was selected for output"""
-        for var, props in dblock.items():
-            if 'bit_pos_start' in props.keys():
-                if props['output'] == 1:
-                    dblock_data_so_far.append(-9999)
-        return dblock_data_so_far
+        if props['output'] == 1:
+            return -9999
+        # missing = []
+        # if 'bit_pos_start' in props.keys():
+        #     if props['output'] == 1:
+        #         missing.append(-9999)
+
+        # missing = []
+        # for var, props in dblock.items():
+        #     if 'bit_pos_start' in props.keys():
+        #         if props['output'] == 1:
+        #             missing.append(-9999)
+        # return missing
 
     @staticmethod
     def set_vars_notread_to_missing(dblock_data_so_far, dblock_numvars, dblock_vars_read):
