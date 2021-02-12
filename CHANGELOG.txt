@@ -1,0 +1,7 @@
+BICO Changelog
+==============
+
+v0.3.1 - 12 Feb 2021
+    - bug: IRGA75-A-GN1.dblock: 'datablock' was incorrectly named 'IRGA75-A'
+    - added: CHANGELOG.txt
+

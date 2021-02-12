@@ -3,6 +3,7 @@ dist/
 _archive/
 _raw_photoshop/
 _tests/
+_versions/
 example/
 
 # Byte-compiled / optimized / DLL files
