@@ -14,7 +14,9 @@
 - H2O ... H2O molar fraction (in **humid** air), wet mole fraction
 - CH4 ... CH4 molar fraction (in **humid** air), wet mole fraction
 - N2O ... N2O molar fraction (in **humid** air), wet mole fraction
-- PRESS_CELL ... Pressure in cell
+- PRESS_CELL ... Pressure in cell, originally output in Torr, but is converted to hPa.
+  This conversion is done because EddyPro cannot handle Torr as input units for cell pressure
+  during flux calculations. 
 - T_CELL ... Temperature in cell
 - T_UNKNOWN ... Unknown temperature (similar to T_CELL, maybe around cell somewhere?)
 - MIRROR_RINGDOWNTIME ... Mirror ring-down time

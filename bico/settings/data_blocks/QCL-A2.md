@@ -24,7 +24,9 @@
 - N2O_DRY ... N2O dry mole fraction (in **dry** air), mixing ratio, ppb
 - CH4 ... CH4 molar fraction (in **humid** air), wet mole fraction
 - T_CELL ... Temperature of the measurement cell
-- PRESS_CELL ... Pressure in the measurement cell
+- PRESS_CELL ... Pressure in the measurement cell, originally output in Torr, but is converted to hPa.
+  This conversion is done because EddyPro cannot handle Torr as input units for cell pressure
+  during flux calculations.
 
 ## BICO Settings
 - For an explanation of the different variable property settings, please see ```_help_bico_settings.md```.

@@ -25,7 +25,9 @@
 - CO2_DRY ... CO2 dry mole fraction, mixing ratio, ppb    
 - H2O_DRY ... H2O dry mole fraction, mixing ratio, ppb    
 - T_CELL ... Temperature of the measurement cell
-- PRESS_CELL ... Pressure in the measurement cell
+- PRESS_CELL ... Pressure in the measurement cell, originally output in Torr, but is converted to hPa.
+  This conversion is done because EddyPro cannot handle Torr as input units for cell pressure
+  during flux calculations.
 - STATUS_WORD ... 
 - VICI ... 
 

@@ -10,7 +10,7 @@ CH4_DRY      ==   {'order': 3, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal'
 N2O_DRY      ==   {'order': 4, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'nmol+1 mol-1', 'conversion_type': 'regular', 'datablock': 'QCL-A2'}
 CH4          ==   {'order': 5, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'nmol+1 mol-1', 'conversion_type': 'regular', 'datablock': 'QCL-A2'}
 T_CELL       ==   {'order': 6, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'K', 'conversion_type': 'regular', 'datablock': 'QCL-A2'}
-PRESS_CELL   ==   {'order': 7, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'Torr', 'conversion_type': 'regular', 'datablock': 'QCL-A2'}
+PRESS_CELL   ==   {'order': 7, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1.33322368, 'add_offset': 0, 'units': 'hPa', 'conversion_type': 'regular', 'datablock': 'QCL-A2'}
 
 # Values extracted from STATUS_CODE:
 # ----------------------------------

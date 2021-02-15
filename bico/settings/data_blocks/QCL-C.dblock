@@ -11,7 +11,7 @@ N2O_DRY      ==   {'order': 4, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal'
 CO2_DRY      ==   {'order': 5, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'nmol+1 mol-1', 'conversion_type': 'regular', 'datablock': 'QCL-C'}
 H2O_DRY      ==   {'order': 6, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'nmol+1 mol-1', 'conversion_type': 'regular', 'datablock': 'QCL-C'}
 T_CELL       ==   {'order': 7, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'K', 'conversion_type': 'regular', 'datablock': 'QCL-C'}
-PRESS_CELL   ==   {'order': 8, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'Torr', 'conversion_type': 'regular', 'datablock': 'QCL-C'}
+PRESS_CELL   ==   {'order': 8, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1.33322368, 'add_offset': 0, 'units': 'hPa', 'conversion_type': 'regular', 'datablock': 'QCL-C'}
 STATUS_WORD  ==   {'order': 9, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'dimensionless', 'conversion_type': 'regular', 'datablock': 'QCL-C'}
 VICI         ==   {'order': 10, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'dimensionless', 'conversion_type': 'regular', 'datablock': 'QCL-C'}
 

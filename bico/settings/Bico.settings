@@ -1,4 +1,4 @@
-run_id=BICO-20210212-154516
+run_id=BICO-20210215-175711
 
 # INSTRUMENTS
 # ===========
@@ -16,11 +16,11 @@ instrument_3=LGR-A
 # ========
 
 # Source Folder
-dir_source=Y:/CH-INO_InnoFarm/20_sonic_ghg/2019
+dir_source=A:/FLUXES/x-TEST-FILES
 
 # Time Range
-start_date=2019-05-10 11:52
-end_date=2019-05-10 12:00
+start_date=2019-05-15 19:00
+end_date=2019-06-15 19:00
 
 # File Settings
 filename_datetime_format=yyyymmddHH.XMM
@@ -35,15 +35,15 @@ select_random_files=0
 # OUTPUT
 # ======
 dir_out=A:/FLUXES/x-TEST-OUT
-dir_out_run=A:\FLUXES\x-TEST-OUT\CH-AES_BICO-20210212-154516
-dir_out_run_log=A:\FLUXES\x-TEST-OUT\CH-AES_BICO-20210212-154516\log
-dir_out_run_plots=A:\FLUXES\x-TEST-OUT\CH-AES_BICO-20210212-154516\plots
-dir_out_run_plots_hires=A:\FLUXES\x-TEST-OUT\CH-AES_BICO-20210212-154516\plots\hires
-dir_out_run_plots_agg=A:\FLUXES\x-TEST-OUT\CH-AES_BICO-20210212-154516\plots\agg
-dir_out_run_raw_data_ascii=A:\FLUXES\x-TEST-OUT\CH-AES_BICO-20210212-154516\raw_data_ascii
+dir_out_run=A:\FLUXES\x-TEST-OUT\CH-AES_test_BICO-20210215-175711
+dir_out_run_log=A:\FLUXES\x-TEST-OUT\CH-AES_test_BICO-20210215-175711\log
+dir_out_run_plots=A:\FLUXES\x-TEST-OUT\CH-AES_test_BICO-20210215-175711\plots
+dir_out_run_plots_hires=A:\FLUXES\x-TEST-OUT\CH-AES_test_BICO-20210215-175711\plots\hires
+dir_out_run_plots_agg=A:\FLUXES\x-TEST-OUT\CH-AES_test_BICO-20210215-175711\plots\agg
+dir_out_run_raw_data_ascii=A:\FLUXES\x-TEST-OUT\CH-AES_test_BICO-20210215-175711\raw_data_ascii
 
-output_folder_name_prefix=CH-AES
-file_compression=None
+output_folder_name_prefix=CH-AES_test
+file_compression=gzip
 
 add_instr_to_varname=1
 
