@@ -29,6 +29,6 @@ CHOPPER          ==   {'order': 3.07, 'bit_pos_start': 8, 'bit_pos_end': 9, 'app
 DETECTOR         ==   {'order': 3.08, 'bit_pos_start': 9, 'bit_pos_end': 10, 'apply_gain': 1, 'add_offset': 0, 'units': '1=OK', 'output': 0, 'datablock': 'IRGA72-A'}
 PLL              ==   {'order': 3.09, 'bit_pos_start': 10, 'bit_pos_end': 11, 'apply_gain': 1, 'add_offset': 0, 'units': '1=OK', 'output': 0, 'datablock': 'IRGA72-A'}
 SYNC             ==   {'order': 3.10, 'bit_pos_start': 11, 'bit_pos_end': 12, 'apply_gain': 1, 'add_offset': 0, 'units': '1=OK', 'output': 0, 'datablock': 'IRGA72-A'}
-SIGNAL_STRENGTH  ==   {'order': 3.11, 'bit_pos_start': 12, 'bit_pos_end': 16, 'apply_gain': 6.6666666666666666, 'add_offset': 0, 'units': '%', 'output': 1, 'datablock': 'IRGA72-A'}
+SIGNAL_STRENGTH  ==   {'order': 3.11, 'bit_pos_start': 12, 'bit_pos_end': 16, 'apply_gain': 6.67, 'add_offset': 0, 'units': '%', 'output': 1, 'datablock': 'IRGA72-A'}
 
 

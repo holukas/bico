@@ -78,14 +78,16 @@ class Ui_MainWindow(object):
         # self.lbl_link_releases.setAlignment(qtc.Qt.AlignCenter | qtc.Qt.AlignVCenter)
         # grid.addWidget(self.lbl_link_releases, 5, 0)
 
+        self.lbl_link_changelog = gui_elements.add_label_link_to_grid(
+            link_txt='Changelog', link_str=info.__link_changelog__, grid=grid, row=5)
         self.lbl_link_releases = gui_elements.add_label_link_to_grid(
-            link_txt='Releases', link_str=info.__link_releases__, grid=grid, row=5)
+            link_txt='Releases', link_str=info.__link_releases__, grid=grid, row=6)
         self.lbl_link_source_code = gui_elements.add_label_link_to_grid(
-            link_txt='Source Code', link_str=info.__link_source_code__, grid=grid, row=6)
+            link_txt='Source Code', link_str=info.__link_source_code__, grid=grid, row=7)
         self.lbl_link_license = gui_elements.add_label_link_to_grid(
-            link_txt='License', link_str=info.__license__, grid=grid, row=7)
+            link_txt='License', link_str=info.__license__, grid=grid, row=8)
         self.lbl_link_help = gui_elements.add_label_link_to_grid(
-            link_txt='Help', link_str=info.__link_wiki__, grid=grid, row=8)
+            link_txt='Help', link_str=info.__link_wiki__, grid=grid, row=9)
 
         grid.addWidget(label_image, 0, 0)
         grid.addWidget(qtw.QLabel(), 1, 0)
@@ -93,7 +95,7 @@ class Ui_MainWindow(object):
         grid.addWidget(label_txt2, 3, 0)
         grid.addWidget(label_txt3, 4, 0)
 
-        grid.setRowStretch(9, 1)
+        grid.setRowStretch(10, 1)
         section.setLayout(grid)
         return section
 

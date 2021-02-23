@@ -250,6 +250,7 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
     def connections(self):
         """Connect GUI elements to functions"""
         # Logo
+        self.lbl_link_changelog.linkActivated.connect(self.link)
         self.lbl_link_releases.linkActivated.connect(self.link)
         self.lbl_link_source_code.linkActivated.connect(self.link)
         self.lbl_link_license.linkActivated.connect(self.link)

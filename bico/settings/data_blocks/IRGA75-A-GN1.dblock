@@ -15,10 +15,10 @@ COOLER_V         ==   {'order': 8, 'bytes': 3, 'format': 'B B B', 'gain_on_signa
 
 # Values extracted from GA_DIAG_CODE:
 # --------------------------------------
-AGC              ==   {'order': 3.04, 'bit_pos_start': 0, 'bit_pos_end': 3, 'apply_gain': 6.25, 'add_offset': 6.25, 'units': '%', 'output': 1, 'datablock': 'IRGA75-A-GN1'}
-SYNC             ==   {'order': 3.05, 'bit_pos_start': 4, 'bit_pos_end': 5, 'apply_gain': 1, 'add_offset': 0, 'units': '1=OK', 'output': 0, 'datablock': 'IRGA75-A-GN1'}
-PLL              ==   {'order': 3.06, 'bit_pos_start': 5, 'bit_pos_end': 6, 'apply_gain': 1, 'add_offset': 0, 'units': '1=OK', 'output': 0, 'datablock': 'IRGA75-A-GN1'}
-DETECTOR         ==   {'order': 3.07, 'bit_pos_start': 6, 'bit_pos_end': 7, 'apply_gain': 1, 'add_offset': 0, 'units': '1=OK', 'output': 0, 'datablock': 'IRGA75-A-GN1'}
-CHOPPER          ==   {'order': 3.08, 'bit_pos_start': 7, 'bit_pos_end': 8, 'apply_gain': 1, 'add_offset': 0, 'units': '1=OK', 'output': 0, 'datablock': 'IRGA75-A-GN1'}
+CHOPPER          ==   {'order': 3.01, 'bit_pos_start': 0, 'bit_pos_end': 1, 'apply_gain': 1, 'add_offset': 0, 'units': '1=OK', 'output': 0, 'datablock': 'IRGA75-A-GN1'}
+DETECTOR         ==   {'order': 3.02, 'bit_pos_start': 1, 'bit_pos_end': 2, 'apply_gain': 1, 'add_offset': 0, 'units': '1=OK', 'output': 0, 'datablock': 'IRGA75-A-GN1'}
+PLL              ==   {'order': 3.03, 'bit_pos_start': 2, 'bit_pos_end': 3, 'apply_gain': 1, 'add_offset': 0, 'units': '1=OK', 'output': 0, 'datablock': 'IRGA75-A-GN1'}
+SYNC             ==   {'order': 3.04, 'bit_pos_start': 3, 'bit_pos_end': 4, 'apply_gain': 1, 'add_offset': 0, 'units': '1=OK', 'output': 0, 'datablock': 'IRGA75-A-GN1'}
+AGC              ==   {'order': 3.05, 'bit_pos_start': 4, 'bit_pos_end': 8, 'apply_gain': 6.25, 'add_offset': 0, 'units': '%', 'output': 1, 'datablock': 'IRGA75-A-GN1'}
 
 

@@ -1,8 +1,21 @@
 # BICO Changelog
 
+## v0.5.0 - 23 Feb 2021
+- bug: wrong number of bits for SIGNAL_STRENGTH in `IRGA72-B.dblock`
+- bug: reading order for extracted variables was wrong in `IRGA72-B.dblock`
+- bug: wrong number of bits for AGC in `IRGA75-A.dblock` and `IRGA75-A-GN1.dblock` 
+- bug: reading order for extracted variables was wrong in `IRGA75-A.dblock` and `IRGA75-A-GN1.dblock` 
+- changed: the `'apply_gain'` option for `SIGNAL_STRENGTH` in IRGA72 datablocks was changed
+  from `6.6666666666666666` to `6.67` to be more in line with their manual. This means that
+  the max signal strength that can be reached is `100.05`:
+  - `IRGA72-A.dblock`
+  - `IRGA72-B.dblock`
+- added: median is now also shown in hires plots
+- added: link for CHANGELOG
+
 ## v0.4.0 - 15 Feb 2021
 - changed: For QCL and LGR instruments, PRESS_CELL in Torr is now converted to hPa.  
-  This conversion is done because EddyPro cannot handle Torr as input units for cell pressure during flux calculations. For the conversion, the parameter  
+  For the conversion, the parameter  
   `'apply_gain': 1.33322368` was used (was previously set to `1`).   
   **The following .dblock files are affected:**
     - LGR-A.dblock

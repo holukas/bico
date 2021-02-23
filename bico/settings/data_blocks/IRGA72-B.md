@@ -16,9 +16,8 @@
         - (8,7,6,5,4) currently unknown info, but most likely a part of the 2-byte GA_DIAG_CODE from the
           IRGA72-A can be found in these bits
         - (3,2,1,0) SIGNAL_STRENGTH
-          The gain 6.6666666666666666 has that many digits after the comma so that the calculated
-          max signal strength is 100%. For example, if there is one digit after the comma less,
-          then the max signal strength yields 99.99999999999999% instead of 100%.
+          100% means very good signal. However, this value cannot be *exactly* reached if the conversion
+          of `6.67` according to the manual is used. Instead, the maximum value is `100.05%`.
     - 'output': 1 means that the var is written to the output stream of this data block,
       i.e. included in the output file.
 - H2O_DRY ... H2O dry mole fraction (in dry air), mixing ratio, ppt (parts per THOUSAND)

@@ -25,9 +25,8 @@
         - (5) PLL: 1 = OK; lock bit, indicates that optical wheel is rotating at the correct rate
         - (4) SYNC: always set to 1 (OK)
         - (3,2,1,0) SIGNAL_STRENGTH
-          The gain 6.6666666666666666 has that many digits after the comma so that the calculated
-          max signal strength is 100%. For example, if there is one digit after the comma less,
-          then the max signal strength yields 99.99999999999999% instead of 100%.
+          100% means very good signal. However, this value cannot be *exactly* reached if the conversion
+          of `6.67` according to the manual is used. Instead, the maximum value is `100.05%`.
     - 'output': 1 means that the var is written to the output stream of this data block,
       i.e. included in the output file.
 - H2O_DRY ... H2O dry mole fraction (in dry air), mixing ratio, ppt (parts per THOUSAND)

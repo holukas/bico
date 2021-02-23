@@ -19,7 +19,7 @@ FLOW_VOLRATE     ==   {'order': 12, 'bytes': 2, 'format': 'B B', 'gain_on_signal
 
 # Values extracted from GA_DIAG_CODE:
 # -----------------------------------
-SIGNAL_STRENGTH  ==   {'order': 3.11, 'bit_pos_start': 0, 'bit_pos_end': 4, 'apply_gain': 6.6666666666666666, 'add_offset': 0, 'units': '%', 'output': 1, 'datablock': 'IRGA72-B'}
-UNUSED           ==   {'order': 3.01, 'bit_pos_start': 4, 'bit_pos_end': 7, 'apply_gain': 1, 'add_offset': 0, 'units': 'unused', 'output': 0, 'datablock': 'IRGA72-B'}
+UNUSED           ==   {'order': 3.01, 'bit_pos_start': 0, 'bit_pos_end': 4, 'apply_gain': 1, 'add_offset': 0, 'units': 'unused', 'output': 0, 'datablock': 'IRGA72-B'}
+SIGNAL_STRENGTH  ==   {'order': 3.02, 'bit_pos_start': 4, 'bit_pos_end': 8, 'apply_gain': 6.67, 'add_offset': 0, 'units': '%', 'output': 1, 'datablock': 'IRGA72-B'}
 
 

@@ -178,8 +178,9 @@ def high_res_histogram(df, outfile, outdir, logger):
                 _default_format(ax=ax, width=1, length=2, txt_xlabel="", txt_ylabel="Counts", fontsize=7)
                 ax.text(0.01, 0.96, f"{col[0]} {col[1]} {col[2]}", transform=ax.transAxes, horizontalalignment='left',
                         **text_args)
-                txt_info = f"mean: {dblock_df[col].mean():.3f}    vals: {dblock_df[col].count():.0f}\n" \
-                           f"min: {dblock_df[col].min():.3f}    max:{dblock_df[col].max():.3f}"
+                txt_info = f"values: {dblock_df[col].count():.0f}\n" \
+                           f"median: {dblock_df[col].median():.3f} | mean: {dblock_df[col].mean():.3f}\n" \
+                           f"min: {dblock_df[col].min():.3f} | max:{dblock_df[col].max():.3f}"
                 ax.text(0.99, 0.96, txt_info, transform=ax.transAxes, horizontalalignment='right', **text_args)
                 for tick in ax.xaxis.get_major_ticks():
                     tick.label.set_fontsize(6)
@@ -238,8 +239,9 @@ def high_res_ts(df, outfile, outdir, logger):
             if dataok:
                 # Numeric data, values available
                 ax.plot(dblock_df[col].index, dblock_df[col], 'r,', alpha=0.5, c='#5f87ae')
-                txt_info = f"mean: {dblock_df[col].mean():.3f}    vals: {dblock_df[col].count():.0f}\n" \
-                           f"min: {dblock_df[col].min():.3f}    max:{dblock_df[col].max():.3f}"
+                txt_info = f"values: {dblock_df[col].count():.0f}\n" \
+                           f"median: {dblock_df[col].median():.3f} | mean: {dblock_df[col].mean():.3f}\n" \
+                           f"min: {dblock_df[col].min():.3f} | max:{dblock_df[col].max():.3f}"
                 ax.text(0.99, 0.96, txt_info, transform=ax.transAxes, horizontalalignment='right', **text_args)
 
             _default_format(ax=ax, width=1, length=2)
