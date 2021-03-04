@@ -52,6 +52,9 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
         self.connections()
 
     def run(self):
+        self.btn_ctr_save.setDisabled(True)
+        self.btn_ctr_run.setDisabled(True)
+
         # Setup run
         self.get_settings_from_gui()
         self.settings_dict = ops.setup.make_run_outdirs(settings_dict=self.settings_dict)
@@ -120,7 +123,7 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
         self.logger.info("")
         self.logger.info("")
         self.logger.info("=" * 20)
-        self.logger.info("BICO FINISHED.")
+        self.logger.info(f"[{self.run_id}] BICO FINISHED.")
         self.logger.info("=" * 20)
 
     def make_datetime_parsing_string(self):
@@ -251,6 +254,7 @@ class Bico(qtw.QMainWindow, Ui_MainWindow):
         """Connect GUI elements to functions"""
         # Logo
         self.lbl_link_changelog.linkActivated.connect(self.link)
+        self.lbl_link_datablocks.linkActivated.connect(self.link)
         self.lbl_link_releases.linkActivated.connect(self.link)
         self.lbl_link_source_code.linkActivated.connect(self.link)
         self.lbl_link_license.linkActivated.connect(self.link)

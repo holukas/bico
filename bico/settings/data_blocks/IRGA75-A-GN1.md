@@ -1,5 +1,6 @@
 # IRGA75-A-GN1
-Based on IRGA75-A but with a different gain on CO2_CONC.
+Based on IRGA75-A but with a different gain on CO2_CONC to correct for the 
+usage of a wrong calibration gas.
 
 ## Variables
 - DATA_SIZE ...  Data size of current data block, number of bytes in Licor 7500 record
@@ -42,7 +43,10 @@ Based on IRGA75-A but with a different gain on CO2_CONC.
 - FCT Source code: --> https://gitlab.ethz.ch/holukas/fct-flux-calculation-tool
 
 ## Details
-Please see IRGA75-A.md for more info on the LI-7500.
+- Please see IRGA75-A.md for more info on the LI-7500.
+- CO2 measurement is corrected for the usage of a wrong calibration gas by applying a gain of 0.974.
+  For more information about the calibration gas issue see here:
+  https://www.swissfluxnet.ethz.ch/index.php/knowledge-base/wrong-calibration-gas-2017/
 
 ## Binary info
 - B...unsigned char, integer, 1 Byte

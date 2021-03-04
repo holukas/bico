@@ -80,14 +80,16 @@ class Ui_MainWindow(object):
 
         self.lbl_link_changelog = gui_elements.add_label_link_to_grid(
             link_txt='Changelog', link_str=info.__link_changelog__, grid=grid, row=5)
+        self.lbl_link_datablocks = gui_elements.add_label_link_to_grid(
+            link_txt='Data Blocks', link_str=info.__link_datablocks__, grid=grid, row=6)
         self.lbl_link_releases = gui_elements.add_label_link_to_grid(
-            link_txt='Releases', link_str=info.__link_releases__, grid=grid, row=6)
+            link_txt='Releases', link_str=info.__link_releases__, grid=grid, row=7)
         self.lbl_link_source_code = gui_elements.add_label_link_to_grid(
-            link_txt='Source Code', link_str=info.__link_source_code__, grid=grid, row=7)
+            link_txt='Source Code', link_str=info.__link_source_code__, grid=grid, row=8)
         self.lbl_link_license = gui_elements.add_label_link_to_grid(
-            link_txt='License', link_str=info.__license__, grid=grid, row=8)
+            link_txt='License', link_str=info.__license__, grid=grid, row=9)
         self.lbl_link_help = gui_elements.add_label_link_to_grid(
-            link_txt='Help', link_str=info.__link_wiki__, grid=grid, row=9)
+            link_txt='Help', link_str=info.__link_wiki__, grid=grid, row=10)
 
         grid.addWidget(label_image, 0, 0)
         grid.addWidget(qtw.QLabel(), 1, 0)
@@ -95,7 +97,7 @@ class Ui_MainWindow(object):
         grid.addWidget(label_txt2, 3, 0)
         grid.addWidget(label_txt3, 4, 0)
 
-        grid.setRowStretch(10, 1)
+        grid.setRowStretch(11, 1)
         section.setLayout(grid)
         return section
 
@@ -183,8 +185,8 @@ class Ui_MainWindow(object):
 
         # Data Blocks
         sonic_anemometers = ['HS50-A', 'HS50-B', 'HS100-A', 'R2-A','R350-A', '-None-']
-        gas_analyzers = ['IRGA72-A', 'IRGA72-B', 'IRGA75-A', 'IRGA75-A-GN1', 'LGR-A',
-                         'QCL-A', 'QCL-A2', 'QCL-A3', 'QCL-A4', 'QCL-C', '-None-']
+        gas_analyzers = ['IRGA72-A', 'IRGA72-B', 'IRGA72-B-GN1', 'IRGA75-A', 'IRGA75-A-GN1',
+                         'LGR-A', 'QCL-A', 'QCL-A2', 'QCL-A3', 'QCL-A4', 'QCL-C', '-None-']
 
         header_instr_data_blocks = qtw.QLabel('Data Blocks')
         header_instr_data_blocks.setProperty('labelClass', 'header_2')

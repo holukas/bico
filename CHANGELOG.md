@@ -1,5 +1,11 @@
 # BICO Changelog
 
+## v0.5.1 - 4 Mar 2021
+- added: datablock `IRGA72-B-GN1.dblock`
+- added: link to datablock descriptions
+- the BICO run id is now shown in the "BICO finished." text message
+- some minor text adjustments, clarifications in datablock descriptions
+
 ## v0.5.0 - 23 Feb 2021
 - bug: wrong number of bits for SIGNAL_STRENGTH in `IRGA72-B.dblock`
 - bug: reading order for extracted variables was wrong in `IRGA72-B.dblock`
