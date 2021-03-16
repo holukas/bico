@@ -1,5 +1,8 @@
 # BICO Changelog
 
+## v0.5.2 - 17 Mar 2021
+- added: datablock `IRGA72-A-GN1.dblock`
+
 ## v0.5.1 - 4 Mar 2021
 - added: datablock `IRGA72-B-GN1.dblock`
 - added: link to datablock descriptions

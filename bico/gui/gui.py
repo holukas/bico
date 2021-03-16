@@ -185,7 +185,7 @@ class Ui_MainWindow(object):
 
         # Data Blocks
         sonic_anemometers = ['HS50-A', 'HS50-B', 'HS100-A', 'R2-A','R350-A', '-None-']
-        gas_analyzers = ['IRGA72-A', 'IRGA72-B', 'IRGA72-B-GN1', 'IRGA75-A', 'IRGA75-A-GN1',
+        gas_analyzers = ['IRGA72-A', 'IRGA72-A-GN1', 'IRGA72-B', 'IRGA72-B-GN1', 'IRGA75-A', 'IRGA75-A-GN1',
                          'LGR-A', 'QCL-A', 'QCL-A2', 'QCL-A3', 'QCL-A4', 'QCL-C', '-None-']
 
         header_instr_data_blocks = qtw.QLabel('Data Blocks')

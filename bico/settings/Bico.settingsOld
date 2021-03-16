@@ -1,30 +1,30 @@
-run_id=BICO-20210304-095509
+run_id=BICO-20210317-002646
 
 # INSTRUMENTS
 # ===========
 
 # Site
-site=CH-LAE
+site=CH-OE2
 
 # Data Blocks
 header=WECOM3
-instrument_1=HS50-B
-instrument_2=IRGA72-B-GN1
+instrument_1=R350-A
+instrument_2=IRGA72-A-GN1
 instrument_3=-None-
 
 # RAW DATA
 # ========
 
 # Source Folder
-dir_source=Y:/CH-LAE_Laegeren/20_sonic_ghg/2018/07
+dir_source=Y:/CH-OE2_Oensingen/20_sonic_ghg/2019/05
 
 # Time Range
-start_date=2018-07-01 07:00
-end_date=2018-07-01 09:00
+start_date=2019-05-10 07:00
+end_date=2019-05-10 14:00
 
 # File Settings
-filename_datetime_format=yyyymmddHH.LMM
-file_ext=*.L*
+filename_datetime_format=yyyymmddHH.oMM
+file_ext=*.o*
 file_size_min=900
 file_limit=0
 row_limit=0
@@ -34,20 +34,20 @@ select_random_files=0
 
 # OUTPUT
 # ======
-dir_out=A:/FLUXES/x-TEST-OUT
-dir_out_run=A:\FLUXES\x-TEST-OUT\CH-LAE_test_BICO-20210304-095509
-dir_out_run_log=A:\FLUXES\x-TEST-OUT\CH-LAE_test_BICO-20210304-095509\log
-dir_out_run_plots=A:\FLUXES\x-TEST-OUT\CH-LAE_test_BICO-20210304-095509\plots
-dir_out_run_plots_hires=A:\FLUXES\x-TEST-OUT\CH-LAE_test_BICO-20210304-095509\plots\hires
-dir_out_run_plots_agg=A:\FLUXES\x-TEST-OUT\CH-LAE_test_BICO-20210304-095509\plots\agg
-dir_out_run_raw_data_ascii=A:\FLUXES\x-TEST-OUT\CH-LAE_test_BICO-20210304-095509\raw_data_ascii
+dir_out=F:/x-TESTS
+dir_out_run=F:\x-TESTS\_BICO_test_OE2_BICO-20210317-002646
+dir_out_run_log=F:\x-TESTS\_BICO_test_OE2_BICO-20210317-002646\log
+dir_out_run_plots=F:\x-TESTS\_BICO_test_OE2_BICO-20210317-002646\plots
+dir_out_run_plots_hires=F:\x-TESTS\_BICO_test_OE2_BICO-20210317-002646\plots\hires
+dir_out_run_plots_agg=F:\x-TESTS\_BICO_test_OE2_BICO-20210317-002646\plots\agg
+dir_out_run_raw_data_ascii=F:\x-TESTS\_BICO_test_OE2_BICO-20210317-002646\raw_data_ascii
 
-output_folder_name_prefix=CH-LAE_test
+output_folder_name_prefix=_BICO_test_OE2
 file_compression=gzip
 
 add_instr_to_varname=1
 
-plot_file_availability=1
+plot_file_availability=0
 plot_ts_hires=1
 plot_histogram_hires=0
 plot_ts_agg=1
