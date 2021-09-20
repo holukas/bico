@@ -3,6 +3,21 @@
   <component name="ChangeListManager">
     <list default="true" id="254ecb79-655b-4854-8af6-177bb7347e8a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-114636/Bico.settings" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-114636/plots/agg/stats_agg_BICO-20210805-114636.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-114636/raw_data_ascii/CH-OE2_202108041300.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-122053/Bico.settings" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-122053/plots/agg/stats_agg_BICO-20210805-122053.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-122053/plots/hires/CH-OE2_202108041300_hires_[IRGA75-A].png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-122053/plots/hires/CH-OE2_202108041300_hires_[LGR-A].png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-122053/plots/hires/CH-OE2_202108041300_hires_[R350-A].png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-122053/raw_data_ascii/CH-OE2_202108041300.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-122127/Bico.settings" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-122127/plots/agg/stats_agg_BICO-20210805-122127.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-122127/plots/hires/CH-OE2_202108041300_hires_[IRGA75-A].png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-122127/plots/hires/CH-OE2_202108041300_hires_[LGR-A].png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-122127/plots/hires/CH-OE2_202108041300_hires_[R350-A].png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-122127/raw_data_ascii/CH-OE2_202108041300.csv" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -379,6 +394,7 @@
       <workItem from="1628845505777" duration="15000" />
       <workItem from="1632124694749" duration="79000" />
       <workItem from="1632124886604" duration="50000" />
+      <workItem from="1632125010959" duration="162000" />
     </task>
     <servers />
   </component>
