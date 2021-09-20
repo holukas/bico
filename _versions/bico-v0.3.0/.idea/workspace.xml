@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="254ecb79-655b-4854-8af6-177bb7347e8a" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bico/bico.py" beforeDir="false" afterPath="$PROJECT_DIR$/bico/bico.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bico/ops/bin.py" beforeDir="false" afterPath="$PROJECT_DIR$/bico/ops/bin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bico/settings/Bico.settings" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/Bico.settings" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bico/settings/Bico.settingsOld" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/Bico.settingsOld" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bico/settings/_version.py" beforeDir="false" afterPath="$PROJECT_DIR$/bico/settings/_version.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Gherkin feature file" />
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="FlaskConsoleOptions" custom-start-script="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))">
+    <envs>
+      <env key="FLASK_APP" value="app" />
+    </envs>
+    <option name="myCustomStartScript" value="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))" />
+    <option name="myEnvs">
+      <map>
+        <entry key="FLASK_APP" value="app" />
+      </map>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="JupyterTrust" id="49cd8a5c-a2cb-4f58-9daf-1f56bd2bd0d2" />
+  <component name="ProjectId" id="1fansAWRz2aMa6nVjba1mICjuY0" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/bico/settings/data_blocks" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="restartRequiresConfirmation" value="false" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="L:\Dropbox\luhk_work\programming\BICO_Binary_Converter\bico\settings\data_blocks" />
+      <recent name="L:\Dropbox\luhk_work\programming\BICO_Binary_Converter\bico\settings\data_blocks\infrared_gas_analyzers" />
+      <recent name="L:\Dropbox\luhk_work\programming\BICO_Binary_Converter\bico\settings\data_blocks\sonic_anemometers" />
+      <recent name="L:\Dropbox\luhk_work\programming\BICO_Binary_Converter\bico\settings\data_blocks\laser_gas_analyzers" />
+      <recent name="L:\Dropbox\luhk_work\programming\BICO_Binary_Converter\bico\settings\data_blocks\header" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="L:\Dropbox\luhk_work\programming\BICO_Binary_Converter\bico\settings\data_blocks" />
+      <recent name="L:\Dropbox\luhk_work\programming\BICO_Binary_Converter\bico\settings\data_blocks\infrared_gas_analyzers\LICOR_LI-7500" />
+      <recent name="L:\Dropbox\luhk_work\programming\BICO_Binary_Converter\bico\settings\data_blocks\infrared_gas_analyzers\LICOR_LI-7200" />
+      <recent name="L:\Dropbox\luhk_work\programming\BICO_Binary_Converter\bico\settings\data_blocks\laser_gas_analyzers\QCL" />
+      <recent name="L:\Dropbox\luhk_work\programming\BICO_Binary_Converter\bico\settings\data_blocks\laser_gas_analyzers\LGR" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.start_bico">
+    <configuration name="_test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="BICO_Binary_Converter" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/bico" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/bico/_test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="bico" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="BICO_Binary_Converter" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\holukas\Anaconda3\envs\BICOFLUXRUN1\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/bico" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/bico/bico.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="bico" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\holukas\Anaconda3\envs\BICO1\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/bico" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/bico/bico.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="gui (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="BICO_Binary_Converter" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/bico/gui" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/bico/gui/gui.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="gui" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="BICO_Binary_Converter" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/bico" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="L:\Dropbox\luhk_work\programming\BICO_Binary_Converter\bico\gui\gui.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="start_bico" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="BICO_Binary_Converter" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\holukas\Anaconda3\envs\BICOFLUXRUN1\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/bico" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/bico/start_bico.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.bico" />
+      <item itemvalue="Python.gui" />
+      <item itemvalue="Python.gui (1)" />
+      <item itemvalue="Python.start_bico" />
+      <item itemvalue="Python._test" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.start_bico" />
+        <item itemvalue="Python._test" />
+        <item itemvalue="Python.bico" />
+        <item itemvalue="Python.gui (1)" />
+        <item itemvalue="Python.gui" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="254ecb79-655b-4854-8af6-177bb7347e8a" name="Default Changelist" comment="" />
+      <created>1596465275085</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1596465275085</updated>
+      <workItem from="1596465277516" duration="17354000" />
+      <workItem from="1596538175819" duration="15952000" />
+      <workItem from="1596750393200" duration="9819000" />
+      <workItem from="1596793094710" duration="13893000" />
+      <workItem from="1596840564365" duration="2715000" />
+      <workItem from="1596884035490" duration="7000" />
+      <workItem from="1596891569805" duration="140000" />
+      <workItem from="1596919462910" duration="1647000" />
+      <workItem from="1597618253225" duration="1270000" />
+      <workItem from="1597620079497" duration="1928000" />
+      <workItem from="1597654090220" duration="6672000" />
+      <workItem from="1597688675804" duration="29000" />
+      <workItem from="1597708049092" duration="979000" />
+      <workItem from="1597740606489" duration="8682000" />
+      <workItem from="1597755703608" duration="15448000" />
+      <workItem from="1597821179284" duration="28080000" />
+      <workItem from="1597932280881" duration="10988000" />
+      <workItem from="1597994588479" duration="7846000" />
+      <workItem from="1598037022076" duration="4316000" />
+      <workItem from="1598107895881" duration="22096000" />
+      <workItem from="1598175062836" duration="3023000" />
+      <workItem from="1598224441195" duration="3783000" />
+      <workItem from="1598228523977" duration="98000" />
+      <workItem from="1598256112613" duration="7743000" />
+      <workItem from="1599253497320" duration="1041000" />
+      <workItem from="1600213804954" duration="635000" />
+      <workItem from="1601849822508" duration="20000" />
+      <workItem from="1605999385117" duration="1290000" />
+      <workItem from="1606089913053" duration="125000" />
+      <workItem from="1606090050835" duration="1320000" />
+      <workItem from="1606119836612" duration="20000" />
+      <workItem from="1606124763113" duration="12241000" />
+      <workItem from="1606206924367" duration="26030000" />
+      <workItem from="1606292157599" duration="21525000" />
+      <workItem from="1606377752979" duration="17811000" />
+      <workItem from="1606475646406" duration="2165000" />
+      <workItem from="1606484219723" duration="14405000" />
+      <workItem from="1606610000808" duration="94000" />
+      <workItem from="1606610134971" duration="2102000" />
+      <workItem from="1606729839259" duration="11041000" />
+      <workItem from="1606780372272" duration="4677000" />
+      <workItem from="1606829932832" duration="7297000" />
+      <workItem from="1606947703523" duration="49000" />
+      <workItem from="1606947782584" duration="739000" />
+      <workItem from="1606948620652" duration="1290000" />
+      <workItem from="1606950071162" duration="4080000" />
+      <workItem from="1606988342400" duration="24880000" />
+      <workItem from="1607078540501" duration="24897000" />
+      <workItem from="1607158362876" duration="12090000" />
+      <workItem from="1607217195175" duration="358000" />
+      <workItem from="1607264706674" duration="8000" />
+      <workItem from="1607293131691" duration="7179000" />
+      <workItem from="1607354506298" duration="1858000" />
+      <workItem from="1607380059042" duration="6278000" />
+      <workItem from="1607436447683" duration="6112000" />
+      <workItem from="1607504715733" duration="6609000" />
+      <workItem from="1607594405028" duration="3277000" />
+      <workItem from="1607607175897" duration="3170000" />
+      <workItem from="1607615147949" duration="16371000" />
+      <workItem from="1607676418125" duration="18476000" />
+      <workItem from="1607812206779" duration="8920000" />
+      <workItem from="1607939225501" duration="15331000" />
+      <workItem from="1607988216099" duration="18000" />
+      <workItem from="1607988810219" duration="1298000" />
+      <workItem from="1608126300896" duration="803000" />
+      <workItem from="1608566771229" duration="18000" />
+      <workItem from="1608929398045" duration="123000" />
+      <workItem from="1608929567337" duration="2985000" />
+      <workItem from="1609065970989" duration="8000" />
+      <workItem from="1609110762183" duration="1238000" />
+      <workItem from="1609331721109" duration="6020000" />
+      <workItem from="1609370877343" duration="21000" />
+      <workItem from="1609370919139" duration="36000" />
+      <workItem from="1609372690529" duration="1334000" />
+      <workItem from="1609375009054" duration="500000" />
+      <workItem from="1609407617084" duration="8821000" />
+      <workItem from="1609420602361" duration="87000" />
+      <workItem from="1609420737495" duration="7485000" />
+      <workItem from="1609540524549" duration="3746000" />
+      <workItem from="1609624902209" duration="1284000" />
+      <workItem from="1609752869076" duration="5434000" />
+      <workItem from="1609768185696" duration="14099000" />
+      <workItem from="1609852670010" duration="24000" />
+      <workItem from="1609859126683" duration="11243000" />
+      <workItem from="1609921205302" duration="15275000" />
+      <workItem from="1609970074199" duration="1322000" />
+      <workItem from="1609972599782" duration="2676000" />
+      <workItem from="1610015969067" duration="13596000" />
+      <workItem from="1610057500140" duration="16000" />
+      <workItem from="1610058040204" duration="27000" />
+      <workItem from="1610099095747" duration="1606000" />
+      <workItem from="1610135291866" duration="1775000" />
+      <workItem from="1610145522443" duration="1445000" />
+      <workItem from="1610235475279" duration="791000" />
+      <workItem from="1610289783723" duration="12792000" />
+      <workItem from="1610363681251" duration="869000" />
+      <workItem from="1610377337549" duration="10396000" />
+      <workItem from="1610442714131" duration="7942000" />
+      <workItem from="1610466344660" duration="744000" />
+      <workItem from="1610467243727" duration="132000" />
+      <workItem from="1610468410978" duration="11871000" />
+      <workItem from="1610492571218" duration="52000" />
+      <workItem from="1610494627121" duration="3765000" />
+      <workItem from="1610499634762" duration="1562000" />
+      <workItem from="1610528020539" duration="10670000" />
+      <workItem from="1610612175310" duration="3600000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/bico/bico.py</url>
+          <line>419</line>
+          <option name="timeStamp" value="41" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/bico/ops/bin.py</url>
+          <line>94</line>
+          <option name="timeStamp" value="183" />
+        </line-breakpoint>
+      </breakpoints>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/BICO_Binary_Converter$bico.coverage" NAME="bico Coverage Results" MODIFIED="1607386154607" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bico" />
+    <SUITE FILE_PATH="coverage/BICO_Binary_Converter$_test.coverage" NAME="_test Coverage Results" MODIFIED="1610535335094" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bico" />
+    <SUITE FILE_PATH="coverage/BICO_Binary_Converter$bico__1_.coverage" NAME="bico (1) Coverage Results" MODIFIED="1606867491349" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bico" />
+    <SUITE FILE_PATH="coverage/BICO_Binary_Converter$gui__1_.coverage" NAME="gui (1) Coverage Results" MODIFIED="1607085886870" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bico/gui" />
+    <SUITE FILE_PATH="coverage/BICO$example.coverage" NAME="example Coverage Results" MODIFIED="1598268282092" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/example" />
+    <SUITE FILE_PATH="coverage/BICO$main.coverage" NAME="bico Coverage Results" MODIFIED="1598258463691" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bico" />
+    <SUITE FILE_PATH="coverage/BICO_Binary_Converter$gui.coverage" NAME="gui Coverage Results" MODIFIED="1606435918815" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bico" />
+    <SUITE FILE_PATH="coverage/BICO_Binary_Converter$main.coverage" NAME="main Coverage Results" MODIFIED="1596498134562" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bico" />
+    <SUITE FILE_PATH="coverage/BICO_Binary_Converter$start_bico.coverage" NAME="start_bico Coverage Results" MODIFIED="1610742316824" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bico" />
+    <SUITE FILE_PATH="coverage/BICO_Binary_Converter$example.coverage" NAME="example Coverage Results" MODIFIED="1606348759035" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/example" />
+  </component>
+</project>

@@ -1,0 +1,34 @@
+# =============================================
+# IRGA72-A - INFRARED GAS ANALYZER (LICOR 7200)
+# =============================================
+# Details: see IRGA72-A.md
+
+
+DATA_SIZE        ==   {'order': 1, 'bytes': 1, 'format': 'B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'Bytes', 'conversion_type': 'regular', 'datablock': 'IRGA72-A'}
+STATUS_CODE      ==   {'order': 2, 'bytes': 1, 'format': 'B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'status_code_irga', 'conversion_type': 'regular', 'datablock': 'IRGA72-A'}
+GA_DIAG_CODE     ==   {'order': 3, 'bytes': 2, 'format': '>h', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'bit_map', 'conversion_type': 'regular', 'datablock': 'IRGA72-A'}
+H2O_DRY          ==   {'order': 4, 'bytes': 3, 'format': 'B B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'mmol+1_mol-1', 'conversion_type': 'regular', 'datablock': 'IRGA72-A'}
+CO2_DRY          ==   {'order': 5, 'bytes': 3, 'format': 'B B B', 'gain_on_signal': 10000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'umol+1_mol-1', 'conversion_type': 'regular', 'datablock': 'IRGA72-A'}
+H2O_CONC         ==   {'order': 6, 'bytes': 3, 'format': 'B B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'mmol+1_m-3', 'conversion_type': 'regular', 'datablock': 'IRGA72-A'}
+CO2_CONC         ==   {'order': 7, 'bytes': 3, 'format': 'B B B', 'gain_on_signal': 10000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'mmol+1_m-3', 'conversion_type': 'regular', 'datablock': 'IRGA72-A'}
+T_CELL           ==   {'order': 8, 'bytes': 2, 'format': 'B B', 'gain_on_signal': 100, 'offset_on_signal': 100, 'apply_gain': 1, 'add_offset': 0, 'units': 'degC', 'conversion_type': 'regular', 'datablock': 'IRGA72-A'}
+PRESS_CELL       ==   {'order': 9, 'bytes': 2, 'format': 'B B', 'gain_on_signal': 10, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'hPa', 'conversion_type': 'regular', 'datablock': 'IRGA72-A'}
+PRESS_BOX        ==   {'order': 10, 'bytes': 2, 'format': 'B B', 'gain_on_signal': 10, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'hPa', 'conversion_type': 'regular', 'datablock': 'IRGA72-A'}
+COOLER_V         ==   {'order': 11, 'bytes': 2, 'format': 'B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'V', 'conversion_type': 'regular', 'datablock': 'IRGA72-A'}
+FLOW_VOLRATE     ==   {'order': 12, 'bytes': 2, 'format': 'B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'L+1 min-1', 'conversion_type': 'regular', 'datablock': 'IRGA72-A'}
+
+# Values extracted from GA_DIAG_CODE:
+# -------------------------------
+UNUSED           ==   {'order': 3.01, 'bit_pos_start': 0, 'bit_pos_end': 3, 'apply_gain': 1, 'add_offset': 0, 'units': 'unused', 'output': 0, 'datablock': 'IRGA72-A'}
+HEAD_DETECT      ==   {'order': 3.02, 'bit_pos_start': 3, 'bit_pos_end': 4, 'apply_gain': 1, 'add_offset': 0, 'units': '1=LI-7200', 'output': 0, 'datablock': 'IRGA72-A'}
+T_OUTLET         ==   {'order': 3.03, 'bit_pos_start': 4, 'bit_pos_end': 5, 'apply_gain': 1, 'add_offset': 0, 'units': '1=OK', 'output': 0, 'datablock': 'IRGA72-A'}
+T_INLET          ==   {'order': 3.04, 'bit_pos_start': 5, 'bit_pos_end': 6, 'apply_gain': 1, 'add_offset': 0, 'units': '1=OK', 'output': 0, 'datablock': 'IRGA72-A'}
+AUX_INPUT        ==   {'order': 3.05, 'bit_pos_start': 6, 'bit_pos_end': 7, 'apply_gain': 1, 'add_offset': 0, 'units': '1=OK', 'output': 0, 'datablock': 'IRGA72-A'}
+DIFF_PRESS       ==   {'order': 3.06, 'bit_pos_start': 7, 'bit_pos_end': 8, 'apply_gain': 1, 'add_offset': 0, 'units': '1=OK', 'output': 0, 'datablock': 'IRGA72-A'}
+CHOPPER          ==   {'order': 3.07, 'bit_pos_start': 8, 'bit_pos_end': 9, 'apply_gain': 1, 'add_offset': 0, 'units': '1=OK', 'output': 0, 'datablock': 'IRGA72-A'}
+DETECTOR         ==   {'order': 3.08, 'bit_pos_start': 9, 'bit_pos_end': 10, 'apply_gain': 1, 'add_offset': 0, 'units': '1=OK', 'output': 0, 'datablock': 'IRGA72-A'}
+PLL              ==   {'order': 3.09, 'bit_pos_start': 10, 'bit_pos_end': 11, 'apply_gain': 1, 'add_offset': 0, 'units': '1=OK', 'output': 0, 'datablock': 'IRGA72-A'}
+SYNC             ==   {'order': 3.10, 'bit_pos_start': 11, 'bit_pos_end': 12, 'apply_gain': 1, 'add_offset': 0, 'units': '1=OK', 'output': 0, 'datablock': 'IRGA72-A'}
+SIGNAL_STRENGTH  ==   {'order': 3.11, 'bit_pos_start': 12, 'bit_pos_end': 16, 'apply_gain': 6.6666666666666666, 'add_offset': 0, 'units': '%', 'output': 1, 'datablock': 'IRGA72-A'}
+
+

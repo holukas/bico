@@ -1,9 +1,17 @@
 # BICO Changelog
 
+## v1.0 - 20 Sep 2021
+
+- Updated version number to 1.
+- bug: removed small naming bug in `HS100-A.md` (`SA_DIAG_TYPE`, `SA_DIAG_VAL`)
+- bug: `QCL-A3` was  incorrectly labelled `QCL-A` in converted raw data files
+
 ## v0.5.2 - 17 Mar 2021
+
 - added: datablock `IRGA72-A-GN1.dblock`
 
 ## v0.5.1 - 4 Mar 2021
+
 - added: datablock `IRGA72-B-GN1.dblock`
 - added: link to datablock descriptions
 - the BICO run id is now shown in the "BICO finished." text message

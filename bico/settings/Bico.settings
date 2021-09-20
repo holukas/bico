@@ -1,30 +1,30 @@
-run_id=BICO-20210317-003142
+run_id=BICO-20210813-104940
 
 # INSTRUMENTS
 # ===========
 
 # Site
-site=CH-OE2
+site=CH-DAV
 
 # Data Blocks
 header=WECOM3
 instrument_1=R350-A
-instrument_2=IRGA72-A
-instrument_3=-None-
+instrument_2=IRGA72-B
+instrument_3=IRGA75-A
 
 # RAW DATA
 # ========
 
 # Source Folder
-dir_source=Y:/CH-OE2_Oensingen/20_sonic_ghg/2019/05
+dir_source=Y:/CH-DAV_Davos/20_sonic_ghg/2012/12/10_R3_LI75
 
 # Time Range
-start_date=2019-05-10 07:00
-end_date=2019-05-10 14:00
+start_date=2012-12-31 20:00
+end_date=2012-12-31 20:00
 
 # File Settings
-filename_datetime_format=yyyymmddHH.oMM
-file_ext=*.o*
+filename_datetime_format=yyyymmddHH.bMM
+file_ext=*.b*
 file_size_min=900
 file_limit=0
 row_limit=0
@@ -34,22 +34,22 @@ select_random_files=0
 
 # OUTPUT
 # ======
-dir_out=F:/x-TESTS
-dir_out_run=F:\x-TESTS\_BICO_test_OE2_BICO-20210317-003142
-dir_out_run_log=F:\x-TESTS\_BICO_test_OE2_BICO-20210317-003142\log
-dir_out_run_plots=F:\x-TESTS\_BICO_test_OE2_BICO-20210317-003142\plots
-dir_out_run_plots_hires=F:\x-TESTS\_BICO_test_OE2_BICO-20210317-003142\plots\hires
-dir_out_run_plots_agg=F:\x-TESTS\_BICO_test_OE2_BICO-20210317-003142\plots\agg
-dir_out_run_raw_data_ascii=F:\x-TESTS\_BICO_test_OE2_BICO-20210317-003142\raw_data_ascii
+dir_out=F:/00-IRGACOMP/DAV/2-1__IRGA75__Level-1_calcs
+dir_out_run=F:\00-IRGACOMP\DAV\2-1__IRGA75__Level-1_calcs\DAV_BICO-20210813-104940
+dir_out_run_log=F:\00-IRGACOMP\DAV\2-1__IRGA75__Level-1_calcs\DAV_BICO-20210813-104940\log
+dir_out_run_plots=F:\00-IRGACOMP\DAV\2-1__IRGA75__Level-1_calcs\DAV_BICO-20210813-104940\plots
+dir_out_run_plots_hires=F:\00-IRGACOMP\DAV\2-1__IRGA75__Level-1_calcs\DAV_BICO-20210813-104940\plots\hires
+dir_out_run_plots_agg=F:\00-IRGACOMP\DAV\2-1__IRGA75__Level-1_calcs\DAV_BICO-20210813-104940\plots\agg
+dir_out_run_raw_data_ascii=F:\00-IRGACOMP\DAV\2-1__IRGA75__Level-1_calcs\DAV_BICO-20210813-104940\raw_data_ascii
 
-output_folder_name_prefix=_BICO_test_OE2
+output_folder_name_prefix=DAV
 file_compression=gzip
 
 add_instr_to_varname=1
 
-plot_file_availability=0
+plot_file_availability=1
 plot_ts_hires=1
-plot_histogram_hires=0
+plot_histogram_hires=1
 plot_ts_agg=1
 
 # DIRECTORIES
