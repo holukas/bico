@@ -1,5 +1,5 @@
 __version__ = "1.0"
-__date__ = "XX Aug 2021"
+__date__ = "20 Sep 2021"
 __link_changelog__ = "https://gitlab.ethz.ch/holukas/bico/-/blob/master/CHANGELOG.md"
 __link_source_code__ = "https://gitlab.ethz.ch/holukas/bico"
 __link_releases__ = "https://gitlab.ethz.ch/holukas/bico/-/releases"
