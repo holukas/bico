@@ -3,21 +3,89 @@
   <component name="ChangeListManager">
     <list default="true" id="254ecb79-655b-4854-8af6-177bb7347e8a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-114636/Bico.settings" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-114636/plots/agg/stats_agg_BICO-20210805-114636.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-114636/raw_data_ascii/CH-OE2_202108041300.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-122053/Bico.settings" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-122053/plots/agg/stats_agg_BICO-20210805-122053.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-122053/plots/hires/CH-OE2_202108041300_hires_[IRGA75-A].png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-122053/plots/hires/CH-OE2_202108041300_hires_[LGR-A].png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-122053/plots/hires/CH-OE2_202108041300_hires_[R350-A].png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-122053/raw_data_ascii/CH-OE2_202108041300.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-122127/Bico.settings" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-122127/plots/agg/stats_agg_BICO-20210805-122127.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-122127/plots/hires/CH-OE2_202108041300_hires_[IRGA75-A].png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-122127/plots/hires/CH-OE2_202108041300_hires_[LGR-A].png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-122127/plots/hires/CH-OE2_202108041300_hires_[R350-A].png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/_test_out/_BICO_TEST_CHA_BICO-20210805-122127/raw_data_ascii/CH-OE2_202108041300.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/BICO_Binary_Converter.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/BICO_Binary_Converter.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/.idea/BICO_Binary_Converter.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/.gitattributes" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/bico.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/gui/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/gui/gui.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/gui/gui.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/gui/gui_elements.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/help/tooltips.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/images/logo_BICO1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/images/logo_BICO1_256px.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/images/logo_BICO1_256px_tmp31006" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/images/radio-button-on-icon.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/images/radio-button-on-icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/images/radio-button-on-icon_tmp31075" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/images/switch1_off.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/images/switch1_on.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/images/volume-icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/ops/bin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/ops/bin_conversion_exceptions.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/ops/file.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/ops/format_data.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/ops/logger.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/ops/setup.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/ops/stats.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/ops/vis.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/Bico - Kopie.settings" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/Bico.settings" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/Bico.settingsBak" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/Bico.settingsOld" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/_version.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/HS100-A.dblock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/HS100-A.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/HS50-A.dblock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/HS50-A.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/HS50-B.dblock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/HS50-B.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/IRGA72-A.dblock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/IRGA72-A.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/IRGA72-B.dblock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/IRGA72-B.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/IRGA75-A-GN1.dblock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/IRGA75-A-GN1.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/IRGA75-A.dblock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/IRGA75-A.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/LGR-A.dblock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/LGR-A.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/QCL-A.dblock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/QCL-A.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/QCL-A2.dblock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/QCL-A2.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/QCL-A3.dblock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/QCL-A3.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/QCL-A4.dblock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/QCL-A4.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/QCL-C.dblock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/QCL-C.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/R2-A.dblock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/R2-A.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/R350-A.dblock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/R350-A.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/_funcs.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/_help_bico_settings.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/header/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/settings/data_blocks/header/wecom3.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/bico/start_bico.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/images/gui_v0.0.1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/images/logo_BICO1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/setup.cfg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/_versions/bico-v0.3.0/setup.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -395,6 +463,7 @@
       <workItem from="1632124694749" duration="79000" />
       <workItem from="1632124886604" duration="50000" />
       <workItem from="1632125010959" duration="162000" />
+      <workItem from="1632125264760" duration="64000" />
     </task>
     <servers />
   </component>

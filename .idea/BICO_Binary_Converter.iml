@@ -6,6 +6,7 @@
       <excludeFolder url="file://$MODULE_DIR$/_raw_photoshop" />
       <excludeFolder url="file://$MODULE_DIR$/_tests" />
       <excludeFolder url="file://$MODULE_DIR$/_versions" />
+      <excludeFolder url="file://$MODULE_DIR$/_test_out" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.8 (BICOFLUXRUN1)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
