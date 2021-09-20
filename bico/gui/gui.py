@@ -180,14 +180,14 @@ class Ui_MainWindow(object):
         grid.addWidget(header_instr_time_range, 1, 0)
         self.cmb_instr_site_selection = \
             gui_elements.add_label_combobox_to_grid(label='Select Site', grid=grid, row=2,
-                                                    items=['CH-AES (cropland)', 'CH-AWS (grassland)',
-                                                           'CH-CHA (grassland)', 'CH-DAE (cropland)',
-                                                           'CH-DAV (forest)', 'CH-DAS (sub-canopy)',
-                                                           'CH-FRU (grassland)', 'CH-INO (cropland)',
-                                                           'CH-LAE (forest)', 'CH-LAS (sub-canopy)',
-                                                           'CH-OE2 (cropland)'])
+                                                    items=['CH-AES', 'CH-AWS',
+                                                           'CH-CHA', 'CH-DAE',
+                                                           'CH-DAV', 'CH-DAS',
+                                                           'CH-FRU', 'CH-INO',
+                                                           'CH-LAE', 'CH-LAS',
+                                                           'CH-OE2'])
 
-        # Data Blocks
+
         sonic_anemometers = ['HS50-A', 'HS50-B', 'HS100-A', 'R2-A','R350-A', '-None-']
         gas_analyzers = ['IRGA72-A', 'IRGA72-A-GN1', 'IRGA72-B', 'IRGA72-B-GN1', 'IRGA75-A', 'IRGA75-A-GN1',
                          'LGR-A', 'QCL-A', 'QCL-A2', 'QCL-A3', 'QCL-A4', 'QCL-C', '-None-']

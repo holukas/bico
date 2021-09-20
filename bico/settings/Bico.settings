@@ -1,32 +1,32 @@
-run_id=BICO-20210813-104940
+run_id=BICO-20210920-104751
 
 # INSTRUMENTS
 # ===========
 
 # Site
-site=CH-DAV
+site=CH-DAS
 
 # Data Blocks
 header=WECOM3
 instrument_1=R350-A
-instrument_2=IRGA72-B
-instrument_3=IRGA75-A
+instrument_2=IRGA75-A
+instrument_3=-None-
 
 # RAW DATA
 # ========
 
 # Source Folder
-dir_source=Y:/CH-DAV_Davos/20_sonic_ghg/2012/12/10_R3_LI75
+dir_source=Y:/CH-DAS_Dav-Subcanopy/20_sonic_ghg/2021
 
 # Time Range
-start_date=2012-12-31 20:00
-end_date=2012-12-31 20:00
+start_date=2021-07-29 14:05
+end_date=2021-12-31 23:59
 
 # File Settings
-filename_datetime_format=yyyymmddHH.bMM
-file_ext=*.b*
+filename_datetime_format=yyyymmddHH.YMM
+file_ext=*.Y*
 file_size_min=900
-file_limit=0
+file_limit=1
 row_limit=0
 
 # Special
@@ -34,22 +34,22 @@ select_random_files=0
 
 # OUTPUT
 # ======
-dir_out=F:/00-IRGACOMP/DAV/2-1__IRGA75__Level-1_calcs
-dir_out_run=F:\00-IRGACOMP\DAV\2-1__IRGA75__Level-1_calcs\DAV_BICO-20210813-104940
-dir_out_run_log=F:\00-IRGACOMP\DAV\2-1__IRGA75__Level-1_calcs\DAV_BICO-20210813-104940\log
-dir_out_run_plots=F:\00-IRGACOMP\DAV\2-1__IRGA75__Level-1_calcs\DAV_BICO-20210813-104940\plots
-dir_out_run_plots_hires=F:\00-IRGACOMP\DAV\2-1__IRGA75__Level-1_calcs\DAV_BICO-20210813-104940\plots\hires
-dir_out_run_plots_agg=F:\00-IRGACOMP\DAV\2-1__IRGA75__Level-1_calcs\DAV_BICO-20210813-104940\plots\agg
-dir_out_run_raw_data_ascii=F:\00-IRGACOMP\DAV\2-1__IRGA75__Level-1_calcs\DAV_BICO-20210813-104940\raw_data_ascii
+dir_out=L:/Dropbox/luhk_work/programming/BICO_Binary_Converter/_test_out
+dir_out_run=L:\Dropbox\luhk_work\programming\BICO_Binary_Converter\_test_out\CH-DAS_2021_1a_BICO-20210920-104751
+dir_out_run_log=L:\Dropbox\luhk_work\programming\BICO_Binary_Converter\_test_out\CH-DAS_2021_1a_BICO-20210920-104751\log
+dir_out_run_plots=L:\Dropbox\luhk_work\programming\BICO_Binary_Converter\_test_out\CH-DAS_2021_1a_BICO-20210920-104751\plots
+dir_out_run_plots_hires=L:\Dropbox\luhk_work\programming\BICO_Binary_Converter\_test_out\CH-DAS_2021_1a_BICO-20210920-104751\plots\hires
+dir_out_run_plots_agg=L:\Dropbox\luhk_work\programming\BICO_Binary_Converter\_test_out\CH-DAS_2021_1a_BICO-20210920-104751\plots\agg
+dir_out_run_raw_data_ascii=L:\Dropbox\luhk_work\programming\BICO_Binary_Converter\_test_out\CH-DAS_2021_1a_BICO-20210920-104751\raw_data_ascii
 
-output_folder_name_prefix=DAV
-file_compression=gzip
+output_folder_name_prefix=CH-DAS_2021_1a
+file_compression=None
 
 add_instr_to_varname=1
 
 plot_file_availability=1
 plot_ts_hires=1
-plot_histogram_hires=1
+plot_histogram_hires=0
 plot_ts_agg=1
 
 # DIRECTORIES

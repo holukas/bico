@@ -1,32 +1,32 @@
-run_id=BICO-20210805-122127
+run_id=BICO-20210920-104436
 
 # INSTRUMENTS
 # ===========
 
 # Site
-site=CH-OE2
+site=CH-DAS
 
 # Data Blocks
 header=WECOM3
 instrument_1=R350-A
 instrument_2=IRGA75-A
-instrument_3=LGR-A
+instrument_3=-None-
 
 # RAW DATA
 # ========
 
 # Source Folder
-dir_source=C:/Dropbox/luhk_work/programming/BICO_Binary_Converter/_tests
+dir_source=Y:/CH-DAS_Dav-Subcanopy/20_sonic_ghg/2021
 
 # Time Range
-start_date=2021-08-01 00:01
-end_date=2021-08-31 00:01
+start_date=2021-07-29 14:05
+end_date=2021-12-31 23:59
 
 # File Settings
-filename_datetime_format=yyyymmddHH.CMM
-file_ext=*.C*
+filename_datetime_format=yyyymmddHH.YMM
+file_ext=*.Y*
 file_size_min=900
-file_limit=0
+file_limit=1
 row_limit=0
 
 # Special
@@ -34,30 +34,30 @@ select_random_files=0
 
 # OUTPUT
 # ======
-dir_out=C:/Dropbox/luhk_work/programming/BICO_Binary_Converter/_test_out
-dir_out_run=C:\Dropbox\luhk_work\programming\BICO_Binary_Converter\_test_out\_BICO_TEST_CHA_BICO-20210805-122127
-dir_out_run_log=C:\Dropbox\luhk_work\programming\BICO_Binary_Converter\_test_out\_BICO_TEST_CHA_BICO-20210805-122127\log
-dir_out_run_plots=C:\Dropbox\luhk_work\programming\BICO_Binary_Converter\_test_out\_BICO_TEST_CHA_BICO-20210805-122127\plots
-dir_out_run_plots_hires=C:\Dropbox\luhk_work\programming\BICO_Binary_Converter\_test_out\_BICO_TEST_CHA_BICO-20210805-122127\plots\hires
-dir_out_run_plots_agg=C:\Dropbox\luhk_work\programming\BICO_Binary_Converter\_test_out\_BICO_TEST_CHA_BICO-20210805-122127\plots\agg
-dir_out_run_raw_data_ascii=C:\Dropbox\luhk_work\programming\BICO_Binary_Converter\_test_out\_BICO_TEST_CHA_BICO-20210805-122127\raw_data_ascii
+dir_out=L:/Dropbox/luhk_work/programming/BICO_Binary_Converter/_test_out
+dir_out_run=L:\Dropbox\luhk_work\programming\BICO_Binary_Converter\_test_out\CH-DAS_2021_1a_BICO-20210920-104436
+dir_out_run_log=L:\Dropbox\luhk_work\programming\BICO_Binary_Converter\_test_out\CH-DAS_2021_1a_BICO-20210920-104436\log
+dir_out_run_plots=L:\Dropbox\luhk_work\programming\BICO_Binary_Converter\_test_out\CH-DAS_2021_1a_BICO-20210920-104436\plots
+dir_out_run_plots_hires=L:\Dropbox\luhk_work\programming\BICO_Binary_Converter\_test_out\CH-DAS_2021_1a_BICO-20210920-104436\plots\hires
+dir_out_run_plots_agg=L:\Dropbox\luhk_work\programming\BICO_Binary_Converter\_test_out\CH-DAS_2021_1a_BICO-20210920-104436\plots\agg
+dir_out_run_raw_data_ascii=L:\Dropbox\luhk_work\programming\BICO_Binary_Converter\_test_out\CH-DAS_2021_1a_BICO-20210920-104436\raw_data_ascii
 
-output_folder_name_prefix=_BICO_TEST_CHA
+output_folder_name_prefix=CH-DAS_2021_1a
 file_compression=None
 
 add_instr_to_varname=1
 
-plot_file_availability=0
+plot_file_availability=1
 plot_ts_hires=1
 plot_histogram_hires=0
-plot_ts_agg=0
+plot_ts_agg=1
 
 # DIRECTORIES
 # ===================
-dir_bico=C:\Dropbox\luhk_work\programming\BICO_Binary_Converter
-dir_script=C:\Dropbox\luhk_work\programming\BICO_Binary_Converter\bico
-dir_settings=C:\Dropbox\luhk_work\programming\BICO_Binary_Converter\bico\settings
-dir_root=C:\Dropbox\luhk_work\programming
+dir_bico=L:\Dropbox\luhk_work\programming\BICO_Binary_Converter
+dir_script=L:\Dropbox\luhk_work\programming\BICO_Binary_Converter\bico
+dir_settings=L:\Dropbox\luhk_work\programming\BICO_Binary_Converter\bico\settings
+dir_root=L:\Dropbox\luhk_work\programming
 dir_server_CH-AES=
 dir_server_CH-AWS=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-AWS_CrapAlv\20_sonic_ghg
 dir_server_CH-CHA=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-CHA_Chamau\20_sonic_ghg
