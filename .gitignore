@@ -1,7 +1,7 @@
 # Custom
 /_raw_photoshop/
-/_tests/
 /_test_out/
+/_tests
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
