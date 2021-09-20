@@ -1,7 +1,7 @@
 # Custom
-/_raw_photoshop
-/_tests
-/_test_out
+/_raw_photoshop/
+/_tests/
+/_test_out/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -120,3 +120,4 @@ dmypy.json
 .pyre/
 /dyco/_dash_test.py
 /first_figure.html
+
