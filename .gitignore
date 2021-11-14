@@ -1,7 +1,9 @@
 # Custom
 /_raw_photoshop/
+/_test_in/
 /_test_out/
 /_tests/
+start BICO.lnk
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

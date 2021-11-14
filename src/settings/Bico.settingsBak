@@ -1,0 +1,43 @@
+run_id=FR-20181213-005305
+now_time=2018-12-13 00:53:05
+
+# INSTRUMENTS
+# ===========
+
+# Site
+site=CH-DAV
+
+# Data Blocks
+instrument_1=HS50-A
+instrument_2=IRGA72-A
+instrument_3=QCL-C
+
+# RAW DATA
+# ========
+
+# Time Range
+start_date=2001-06-30 22:00
+end_date=2018-12-31 00:00
+
+# File Settings
+file_ext=*.X*
+file_size_min=900
+file_limit=99999
+
+# OUTPUT
+# ======
+plot_file_availability=1
+plot_ts_hires=1
+plot_ts_agg=1
+
+# _SERVER DIRECTORIES
+# ===================
+dir_server_CH-AWS=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-AWS_CrapAlv\20_sonic_ghg
+dir_server_CH-CHA=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-CHA_Chamau\20_sonic_ghg
+dir_server_CH-DAV=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-DAV_Davos\20_sonic_ghg
+dir_server_CH-FRU=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-FRU_Fruebuel\20_sonic_ghg
+dir_server_CH-INO=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-INO_InnoFarm\20_sonic_ghg
+dir_server_CH-LAE=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-LAE_Laegeren\20_sonic_ghg
+dir_server_CH-LAS=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-LAS_Lae-Subcanopy\20_sonic_ghg
+dir_server_CH-OE2=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-OE2_Oensingen\20_sonic_ghg
+dir_server_CH-TWE=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\US-TWE_ToolikWetland\20_sonic_ghg

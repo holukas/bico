@@ -1,0 +1,25 @@
+# =============================================
+# IRGA72-B - INFRARED GAS ANALYZER (LICOR 7200)
+# =============================================
+# Details: see IRGA72-B.md
+
+
+DATA_SIZE        ==   {'order': 1, 'bytes': 1, 'format': 'B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'Bytes', 'conversion_type': 'regular', 'datablock': 'IRGA72-B'}
+STATUS_CODE      ==   {'order': 2, 'bytes': 1, 'format': 'B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'status_code_irga', 'conversion_type': 'regular', 'datablock': 'IRGA72-B'}
+GA_DIAG_CODE     ==   {'order': 3, 'bytes': 1, 'format': 'B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'bit_map', 'conversion_type': 'regular', 'datablock': 'IRGA72-B'}
+H2O_DRY          ==   {'order': 4, 'bytes': 3, 'format': 'B B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'mmol+1_mol-1', 'conversion_type': 'regular', 'datablock': 'IRGA72-B'}
+CO2_DRY          ==   {'order': 5, 'bytes': 3, 'format': 'B B B', 'gain_on_signal': 10000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'umol+1_mol-1', 'conversion_type': 'regular', 'datablock': 'IRGA72-B'}
+H2O_CONC         ==   {'order': 6, 'bytes': 3, 'format': 'B B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'mmol+1_m-3', 'conversion_type': 'regular', 'datablock': 'IRGA72-B'}
+CO2_CONC         ==   {'order': 7, 'bytes': 3, 'format': 'B B B', 'gain_on_signal': 10000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'mmol+1_m-3', 'conversion_type': 'regular', 'datablock': 'IRGA72-B'}
+T_CELL           ==   {'order': 8, 'bytes': 2, 'format': 'B B', 'gain_on_signal': 100, 'offset_on_signal': 100, 'apply_gain': 1, 'add_offset': 0, 'units': 'degC', 'conversion_type': 'regular', 'datablock': 'IRGA72-B'}
+PRESS_CELL       ==   {'order': 9, 'bytes': 2, 'format': 'B B', 'gain_on_signal': 10, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'hPa', 'conversion_type': 'regular', 'datablock': 'IRGA72-B'}
+PRESS_BOX        ==   {'order': 10, 'bytes': 2, 'format': 'B B', 'gain_on_signal': 10, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'hPa', 'conversion_type': 'regular', 'datablock': 'IRGA72-B'}
+COOLER_V         ==   {'order': 11, 'bytes': 2, 'format': 'B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'V', 'conversion_type': 'regular', 'datablock': 'IRGA72-B'}
+FLOW_VOLRATE     ==   {'order': 12, 'bytes': 2, 'format': 'B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'L+1 min-1', 'conversion_type': 'regular', 'datablock': 'IRGA72-B'}
+
+# Values extracted from GA_DIAG_CODE:
+# -----------------------------------
+UNUSED           ==   {'order': 3.01, 'bit_pos_start': 0, 'bit_pos_end': 4, 'apply_gain': 1, 'add_offset': 0, 'units': 'unused', 'output': 0, 'datablock': 'IRGA72-B'}
+SIGNAL_STRENGTH  ==   {'order': 3.02, 'bit_pos_start': 4, 'bit_pos_end': 8, 'apply_gain': 6.67, 'add_offset': 0, 'units': '%', 'output': 1, 'datablock': 'IRGA72-B'}
+
+

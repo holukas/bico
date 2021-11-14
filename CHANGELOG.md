@@ -1,5 +1,16 @@
 # BICO Changelog
 
+## v1.1 - 14 Nov 2021
+
+- `BICO` is now using `poetry` for dependency management and packaging 
+- The virtual env created by `poetry` is specific to `BICO` and stored alongside the source code in folder `.venv`
+- Updated Python version to 3.9.7, packages were updated to their newest versions
+- Removed `conda` env
+- Renamed source code folder to `src`
+- Adjusted folder structure
+- Added support for CLI execution
+- Solved some minor warnings
+
 ## v1.0 - 20 Sep 2021
 
 - Updated version number to 1.
@@ -50,3 +61,9 @@
 - small bug: `IRGA75-A-GN1.dblock`: `datablock` was incorrectly named `IRGA75-A`
 - added: CHANGELOG.txt
 
+## Ideas
+- TODO LATER parallelize, multiprocessing?
+`
+import multiprocessing as mp
+print("Number of processors: ", mp.cpu_count())
+`

@@ -1,0 +1,71 @@
+run_id=BICO-20211114-223848
+
+# INSTRUMENTS
+# ===========
+
+# Site
+site=CH-AWS
+
+# Data Blocks
+header=WECOM3
+instrument_1=HS50-B
+instrument_2=IRGA72-B
+instrument_3=-None-
+
+# RAW DATA
+# ========
+
+# Source Folder
+dir_source=L:/Dropbox/luhk_work/20 - PYTHON/BICO_Binary_Converter/_test_in/aws
+
+# Time Range
+start_date=2016-01-01 00:01
+end_date=2016-12-31 23:59
+
+# File Settings
+filename_datetime_format=yyyymmddHH.AMM
+file_ext=*.A*
+file_size_min=900
+file_limit=1
+row_limit=100
+
+# Special
+select_random_files=0
+
+# OUTPUT
+# ======
+dir_out=L:/Dropbox/luhk_work/20 - PYTHON/BICO_Binary_Converter/_test_out/aws
+dir_out_run=L:\Dropbox\luhk_work\20 - PYTHON\BICO_Binary_Converter\_test_out\aws\CH-AWS_test1_BICO-20211114-223848
+dir_out_run_log=L:\Dropbox\luhk_work\20 - PYTHON\BICO_Binary_Converter\_test_out\aws\CH-AWS_test1_BICO-20211114-223848\log
+dir_out_run_plots=L:\Dropbox\luhk_work\20 - PYTHON\BICO_Binary_Converter\_test_out\aws\CH-AWS_test1_BICO-20211114-223848\plots
+dir_out_run_plots_hires=L:\Dropbox\luhk_work\20 - PYTHON\BICO_Binary_Converter\_test_out\aws\CH-AWS_test1_BICO-20211114-223848\plots\hires
+dir_out_run_plots_agg=L:\Dropbox\luhk_work\20 - PYTHON\BICO_Binary_Converter\_test_out\aws\CH-AWS_test1_BICO-20211114-223848\plots\agg
+dir_out_run_raw_data_ascii=L:\Dropbox\luhk_work\20 - PYTHON\BICO_Binary_Converter\_test_out\aws\CH-AWS_test1_BICO-20211114-223848\raw_data_ascii
+
+output_folder_name_prefix=CH-AWS_test1
+file_compression=None
+
+add_instr_to_varname=1
+
+plot_file_availability=1
+plot_ts_hires=1
+plot_histogram_hires=0
+plot_ts_agg=1
+
+# DIRECTORIES
+# ===================
+dir_bico=L:\Dropbox\luhk_work\20 - PYTHON\BICO_Binary_Converter\BICO
+dir_script=L:\Dropbox\luhk_work\20 - PYTHON\BICO_Binary_Converter\BICO\src
+dir_settings=L:\Dropbox\luhk_work\20 - PYTHON\BICO_Binary_Converter\BICO\src\settings
+dir_root=L:\Dropbox\luhk_work\20 - PYTHON\BICO_Binary_Converter
+dir_server_CH-AES=
+dir_server_CH-AWS=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-AWS_CrapAlv\20_sonic_ghg
+dir_server_CH-CHA=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-CHA_Chamau\20_sonic_ghg
+dir_server_CH-DAE=
+dir_server_CH-DAV=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-DAV_Davos\20_sonic_ghg
+dir_server_CH-FRU=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-FRU_Fruebuel\20_sonic_ghg
+dir_server_CH-INO=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-INO_InnoFarm\20_sonic_ghg
+dir_server_CH-LAE=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-LAE_Laegeren\20_sonic_ghg
+dir_server_CH-LAS=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-LAS_Lae-Subcanopy\20_sonic_ghg
+dir_server_CH-OE2=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-OE2_Oensingen\20_sonic_ghg
+dir_server_CH-TWE=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\US-TWE_ToolikWetland\20_sonic_ghg

@@ -1,0 +1,24 @@
+# ====================================
+# IRGA75-A-GN1 - INFRARED GAS ANALYZER
+# ====================================
+# Details: see IRGA75-A-GN1.md
+
+
+DATA_SIZE        ==   {'order': 1, 'bytes': 1, 'format': 'B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'Bytes', 'conversion_type': 'regular', 'datablock': 'IRGA75-A-GN1'}
+STATUS_CODE      ==   {'order': 2, 'bytes': 1, 'format': 'B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'status_code_irga', 'conversion_type': 'regular', 'datablock': 'IRGA75-A-GN1'}
+GA_DIAG_CODE     ==   {'order': 3, 'bytes': 1, 'format': 'B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'bit_map', 'conversion_type': 'regular', 'datablock': 'IRGA75-A-GN1'}
+H2O_CONC         ==   {'order': 4, 'bytes': 3, 'format': 'B B B', 'gain_on_signal': 1000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'mmol+1 m-3', 'conversion_type': 'regular', 'datablock': 'IRGA75-A-GN1'}
+CO2_CONC         ==   {'order': 5, 'bytes': 3, 'format': 'B B B', 'gain_on_signal': 10000, 'offset_on_signal': 0, 'apply_gain': 0.974, 'add_offset': 0, 'units': 'mmol+1 m-3', 'conversion_type': 'regular', 'datablock': 'IRGA75-A-GN1'}
+T_BOX            ==   {'order': 6, 'bytes': 2, 'format': 'B B', 'gain_on_signal': 100, 'offset_on_signal': 100, 'apply_gain': 1, 'add_offset': 0, 'units': 'degC', 'conversion_type': 'regular', 'datablock': 'IRGA75-A-GN1'}
+PRESS_BOX        ==   {'order': 7, 'bytes': 2, 'format': 'B B', 'gain_on_signal': 10, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'hPa', 'conversion_type': 'regular', 'datablock': 'IRGA75-A-GN1'}
+COOLER_V         ==   {'order': 8, 'bytes': 3, 'format': 'B B B', 'gain_on_signal': 10000, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'V', 'conversion_type': 'regular', 'datablock': 'IRGA75-A-GN1'}
+
+# Values extracted from GA_DIAG_CODE:
+# --------------------------------------
+CHOPPER          ==   {'order': 3.01, 'bit_pos_start': 0, 'bit_pos_end': 1, 'apply_gain': 1, 'add_offset': 0, 'units': '1=OK', 'output': 0, 'datablock': 'IRGA75-A-GN1'}
+DETECTOR         ==   {'order': 3.02, 'bit_pos_start': 1, 'bit_pos_end': 2, 'apply_gain': 1, 'add_offset': 0, 'units': '1=OK', 'output': 0, 'datablock': 'IRGA75-A-GN1'}
+PLL              ==   {'order': 3.03, 'bit_pos_start': 2, 'bit_pos_end': 3, 'apply_gain': 1, 'add_offset': 0, 'units': '1=OK', 'output': 0, 'datablock': 'IRGA75-A-GN1'}
+SYNC             ==   {'order': 3.04, 'bit_pos_start': 3, 'bit_pos_end': 4, 'apply_gain': 1, 'add_offset': 0, 'units': '1=OK', 'output': 0, 'datablock': 'IRGA75-A-GN1'}
+AGC              ==   {'order': 3.05, 'bit_pos_start': 4, 'bit_pos_end': 8, 'apply_gain': 6.25, 'add_offset': 0, 'units': '%', 'output': 1, 'datablock': 'IRGA75-A-GN1'}
+
+

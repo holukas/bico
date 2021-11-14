@@ -1,9 +1,0 @@
-# ========================
-# R2-A - SONIC ANEMOMETER
-# ========================
-# Details: see R2-A.md
-
-U        ==   {'order': 1, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'm+1 s-1', 'conversion_type': 'regular', 'datablock': 'R2-A'}
-V        ==   {'order': 2, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'm+1 s-1', 'conversion_type': 'regular', 'datablock': 'R2-A'}
-W        ==   {'order': 3, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'm+1 s-1', 'conversion_type': 'regular', 'datablock': 'R2-A'}
-T_SONIC  ==   {'order': 4, 'bytes': 2, 'format': '>h', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'degC', 'conversion_type': 'exception', 'datablock': 'R2-A'}
