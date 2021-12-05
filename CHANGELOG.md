@@ -1,5 +1,9 @@
 # BICO Changelog
 
+## v1.2.1 - 5 Dec 2021
+
+- Added automatic detection of working directory
+
 ## v1.2 - 5 Dec 2021
 
 - Included CLI support for automatic script execution without GUI

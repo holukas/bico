@@ -475,9 +475,14 @@ class BicoFolder:
 
 
 def main(args):
+    abspath = Path(os.path.abspath(__file__)).parent  # directory of bico.py
+    os.chdir(abspath)
+    wd = os.getcwd()
+    print(f"Working directory: {wd}")
+    # bico.main()
+
     # Run BICO w/o GUI
     if args.folder:
-        # todo
         bicofromfolder = BicoFolder(folder=args.folder)
         bicofromfolder.run()
 
