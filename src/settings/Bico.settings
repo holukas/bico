@@ -1,63 +1,63 @@
-run_id=BICO-20211114-223848
+run_id=BICO-20211205-173833
 
 # INSTRUMENTS
 # ===========
 
 # Site
-site=CH-AWS
+site=CH-DAV
 
 # Data Blocks
 header=WECOM3
-instrument_1=HS50-B
-instrument_2=IRGA72-B
-instrument_3=-None-
+instrument_1=HS50-A
+instrument_2=IRGA72-A
+instrument_3=QCL-C2
 
 # RAW DATA
 # ========
 
 # Source Folder
-dir_source=L:/Dropbox/luhk_work/20 - PYTHON/BICO_Binary_Converter/_test_in/aws
+dir_source=Y:/CH-DAV_Davos/20_sonic_ghg/2021/12/20_HS_LI72
 
 # Time Range
-start_date=2016-01-01 00:01
-end_date=2016-12-31 23:59
+start_date=2021-12-01 00:01
+end_date=2021-12-31 23:59
 
 # File Settings
-filename_datetime_format=yyyymmddHH.AMM
-file_ext=*.A*
+filename_datetime_format=yyyymmddHH.XMM
+file_ext=*.X*
 file_size_min=900
-file_limit=1
-row_limit=100
+file_limit=0
+row_limit=10000
 
 # Special
 select_random_files=0
 
 # OUTPUT
 # ======
-dir_out=L:/Dropbox/luhk_work/20 - PYTHON/BICO_Binary_Converter/_test_out/aws
-dir_out_run=L:\Dropbox\luhk_work\20 - PYTHON\BICO_Binary_Converter\_test_out\aws\CH-AWS_test1_BICO-20211114-223848
-dir_out_run_log=L:\Dropbox\luhk_work\20 - PYTHON\BICO_Binary_Converter\_test_out\aws\CH-AWS_test1_BICO-20211114-223848\log
-dir_out_run_plots=L:\Dropbox\luhk_work\20 - PYTHON\BICO_Binary_Converter\_test_out\aws\CH-AWS_test1_BICO-20211114-223848\plots
-dir_out_run_plots_hires=L:\Dropbox\luhk_work\20 - PYTHON\BICO_Binary_Converter\_test_out\aws\CH-AWS_test1_BICO-20211114-223848\plots\hires
-dir_out_run_plots_agg=L:\Dropbox\luhk_work\20 - PYTHON\BICO_Binary_Converter\_test_out\aws\CH-AWS_test1_BICO-20211114-223848\plots\agg
-dir_out_run_raw_data_ascii=L:\Dropbox\luhk_work\20 - PYTHON\BICO_Binary_Converter\_test_out\aws\CH-AWS_test1_BICO-20211114-223848\raw_data_ascii
+dir_out=C:/Users/user/Dropbox/luhk_work/20 - CODING/23 - BICO/_test_out/dav
+dir_out_run=C:\Users\user\Dropbox\luhk_work\20 - CODING\23 - BICO\_test_out\dav\CH-DAV_test_BICO-20211205-173833
+dir_out_run_log=C:\Users\user\Dropbox\luhk_work\20 - CODING\23 - BICO\_test_out\dav\CH-DAV_test_BICO-20211205-173833\log
+dir_out_run_plots=C:\Users\user\Dropbox\luhk_work\20 - CODING\23 - BICO\_test_out\dav\CH-DAV_test_BICO-20211205-173833\plots
+dir_out_run_plots_hires=C:\Users\user\Dropbox\luhk_work\20 - CODING\23 - BICO\_test_out\dav\CH-DAV_test_BICO-20211205-173833\plots\hires
+dir_out_run_plots_agg=C:\Users\user\Dropbox\luhk_work\20 - CODING\23 - BICO\_test_out\dav\CH-DAV_test_BICO-20211205-173833\plots\agg
+dir_out_run_raw_data_ascii=C:\Users\user\Dropbox\luhk_work\20 - CODING\23 - BICO\_test_out\dav\CH-DAV_test_BICO-20211205-173833\raw_data_ascii
 
-output_folder_name_prefix=CH-AWS_test1
+output_folder_name_prefix=CH-DAV_test
 file_compression=None
 
 add_instr_to_varname=1
 
 plot_file_availability=1
-plot_ts_hires=1
+plot_ts_hires=0
 plot_histogram_hires=0
 plot_ts_agg=1
 
 # DIRECTORIES
 # ===================
-dir_bico=L:\Dropbox\luhk_work\20 - PYTHON\BICO_Binary_Converter\BICO
-dir_script=L:\Dropbox\luhk_work\20 - PYTHON\BICO_Binary_Converter\BICO\src
-dir_settings=L:\Dropbox\luhk_work\20 - PYTHON\BICO_Binary_Converter\BICO\src\settings
-dir_root=L:\Dropbox\luhk_work\20 - PYTHON\BICO_Binary_Converter
+dir_bico=C:\Users\user\Dropbox\luhk_work\20 - CODING\23 - BICO\BICO
+dir_script=C:\Users\user\Dropbox\luhk_work\20 - CODING\23 - BICO\BICO\src
+dir_settings=C:\Users\user\Dropbox\luhk_work\20 - CODING\23 - BICO\BICO\src\settings
+dir_root=C:\Users\user\Dropbox\luhk_work\20 - CODING\23 - BICO
 dir_server_CH-AES=
 dir_server_CH-AWS=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-AWS_CrapAlv\20_sonic_ghg
 dir_server_CH-CHA=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-CHA_Chamau\20_sonic_ghg

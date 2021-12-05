@@ -1,1 +1,1 @@
-from .bico import Bico as run
+from .bico import BicoGUI as run

@@ -1,5 +1,12 @@
 # BICO Changelog
 
+## v1.2 - 5 Dec 2021
+
+- Included CLI support for automatic script execution without GUI
+- Code refactoring: separated the conversion functions (`BicoEngine`) from GUI (`BicoGUI`)
+- Added: new datablock `QCL-C2` (used at CH-DAV)
+- Changed: switching back to `conda` for dependency management
+
 ## v1.1 - 14 Nov 2021
 
 - `BICO` is now using `poetry` for dependency management and packaging 

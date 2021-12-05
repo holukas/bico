@@ -4,12 +4,15 @@ import fnmatch
 import os
 import random
 from pathlib import Path
+from shutil import copyfile
+
+import pandas as pd
 
 
 def load_dblocks_props(dblocks_types, settings_dict):
     """Load data block settings from file(s)"""
 
-    dblocks_filepaths = search_dblock_files(dir=settings_dict['dir_settings'] / 'data_blocks',
+    dblocks_filepaths = search_dblock_files(dir=Path(settings_dict['dir_settings']) / 'data_blocks',
                                             dblocks=dblocks_types)
     dblocks_props = []
     for dblock_type, dblock_filepath in dblocks_filepaths.items():
@@ -205,3 +208,45 @@ def export_stats_collection_csv(df, outdir, run_id, logger):
     outpath = outdir / f"stats_agg_{run_id}"
     logger.info(f"Saving stats collection to {outpath}")
     df.to_csv(f"{outpath}.csv", index=True)
+
+
+def save_settings_to_file(settings_dict, copy_to_outdir=False):
+    """Save settings dict to settings file """
+    old_settings_file = os.path.join(settings_dict['dir_settings'], 'Bico.settings')
+    new_settings_file = os.path.join(settings_dict['dir_settings'], 'Bico.settingsTemp')
+    with open(old_settings_file) as infile, open(new_settings_file, 'w') as outfile:
+        for line in infile:  # cycle through all lines in settings file
+            if ('=' in line) and (not line.startswith('#')):  # identify lines that contain setting
+                line_id, line_setting = line.strip().split('=')
+                line = '{}={}\n'.format(line_id, settings_dict[line_id])  # insert setting from dict
+            outfile.write(line)
+    try:
+        os.remove(old_settings_file + 'Old')
+    except:
+        pass
+    os.rename(old_settings_file, old_settings_file + 'Old')
+    os.rename(new_settings_file, old_settings_file)
+
+    if copy_to_outdir:
+        # Save a copy of the settings file also in the output dir
+        run_settings_file_path = Path(settings_dict['dir_out_run']) / 'Bico.settings'
+        copyfile(old_settings_file, run_settings_file_path)
+        pass
+
+
+def read_converted_ascii(filepath, compression):
+    """Read converted file"""
+    compression = None if compression == 'None' else compression
+    file_contents_ascii_df = pd.read_csv(filepath,
+                                         skiprows=None,
+                                         header=[0, 1, 2],
+                                         na_values=-9999,
+                                         encoding='utf-8',
+                                         delimiter=',',
+                                         # keep_date_col=True,
+                                         parse_dates=False,
+                                         date_parser=None,
+                                         index_col=None,
+                                         dtype=None,
+                                         compression=compression)
+    return file_contents_ascii_df

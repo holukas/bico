@@ -32,9 +32,13 @@ def get_args():
     # parser.add_argument('settings_file', type=str,
     #                     help="soon")
 
-    # # Optional args
-    # parser.add_argument('-i', '--indir', type=Path,
-    #                     help="Path to the source folder that contains the data files, e.g. 'C:/bico/input'")
+    # Optional args
+    parser.add_argument('-g', '--gui', action='store_true',
+                        help="If set, start BICO with GUI, is ignored if FOLDER is given")
+    parser.add_argument('-f', '--folder', type=str,
+                        help="Path to folder: "
+                             "run BICO without GUI in the specified FOLDER, needs 'Bico.settings' file in FOLDER")
+
 
     args = parser.parse_args()
     return args
