@@ -48,6 +48,11 @@ class BicoEngine():
         self.logger.info(f"Run ID: {self.run_id}")
         self.logger.info(f"BICO Version: {_version.__version__} / {_version.__date__}")
 
+        # Show settings in log
+        self.logger.info("Contents of settings dictionary:")
+        for key, val in self.settings_dict.items():
+            self.logger.info(f"    {key}: {val}")
+
         # Format string to parse datetime info from filename
         self.settings_dict['filename_datetime_parsing_string'] = self.make_datetime_parsing_string()
 
@@ -521,6 +526,13 @@ class BicoFolder:
             ops.setup.read_settings_file_to_dict(dir_settings=self.folder,
                                                  file='BICO.settings',
                                                  reset_paths=False)
+
+        # Update folder settings
+        dir_script = os.path.abspath(__file__)  # Dir of this file
+        self.settings_dict['dir_script'] = os.path.join(os.path.dirname(dir_script))
+        self.settings_dict['dir_settings'] = Path(self.folder)
+        self.settings_dict['dir_bico'] = Path(self.settings_dict['dir_script']).parents[0]
+        self.settings_dict['dir_root'] = Path(self.settings_dict['dir_script']).parents[1]
 
         self.settings_dict = self._update_settings_from_args(settings_dict=self.settings_dict)
 

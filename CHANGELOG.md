@@ -1,5 +1,9 @@
 # BICO Changelog
 
+## v1.2.3 - 7 Dec 2021
+
+- Fixed: Script folder was wrong when running from CLI 
+
 ## v1.2.2 - 7 Dec 2021
 
 - Added: CLI flag `-a` to avoid duplicates when converting files. 

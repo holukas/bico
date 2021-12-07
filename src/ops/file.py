@@ -12,7 +12,7 @@ import pandas as pd
 def load_dblocks_props(dblocks_types, settings_dict):
     """Load data block settings from file(s)"""
 
-    dblocks_filepaths = search_dblock_files(dir=Path(settings_dict['dir_settings']) / 'data_blocks',
+    dblocks_filepaths = search_dblock_files(dir=Path(settings_dict['dir_script'])/'settings' / 'data_blocks',
                                             dblocks=dblocks_types)
     dblocks_props = []
     for dblock_type, dblock_filepath in dblocks_filepaths.items():
@@ -227,8 +227,8 @@ def save_settings_to_file(settings_dict, copy_to_outdir=False):
     os.rename(old_settings_file, old_settings_file + 'Old')
     os.rename(new_settings_file, old_settings_file)
 
+    # Save a copy of the settings file also in the output dir
     if copy_to_outdir:
-        # Save a copy of the settings file also in the output dir
         run_settings_file_path = Path(settings_dict['dir_out_run']) / 'BICO.settings'
         copyfile(old_settings_file, run_settings_file_path)
         pass
