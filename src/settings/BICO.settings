@@ -1,61 +1,63 @@
-run_id=BICO-20210111-023112
+run_id=BICO-20211207-161115
 
 # INSTRUMENTS
 # ===========
 
 # Site
-site=CH-DAV
+site=CH-FRU
 
 # Data Blocks
 header=WECOM3
-instrument_1=HS50-B
-instrument_2=IRGA72-B
-instrument_3=QCL-C
+instrument_1=R350-A
+instrument_2=IRGA75-A
+instrument_3=-None-
 
 # RAW DATA
 # ========
 
 # Source Folder
-dir_source=Y:/CH-DAV_Davos/20_sonic_ghg/2015/11
+dir_source=Y:/CH-FRU_Fruebuel/20_sonic_ghg/2021/12
 
 # Time Range
-start_date=2015-11-15 08:00
-end_date=2015-11-15 23:00
+start_date=2020-12-31 00:01
+end_date=2021-12-31 23:59
 
 # File Settings
 filename_datetime_format=yyyymmddHH.XMM
 file_ext=*.X*
 file_size_min=900
 file_limit=0
-row_limit=0
+row_limit=100
 
 # Special
 select_random_files=0
 
 # OUTPUT
 # ======
-dir_out=A:/FLUXES/x-TEST-OUT
-dir_out_run=A:\FLUXES\x-TEST-OUT\DAV_2015_BICO-20210111-023112
-dir_out_run_log=A:\FLUXES\x-TEST-OUT\DAV_2015_BICO-20210111-023112\log
-dir_out_run_plots=A:\FLUXES\x-TEST-OUT\DAV_2015_BICO-20210111-023112\plots
-dir_out_run_plots_hires=A:\FLUXES\x-TEST-OUT\DAV_2015_BICO-20210111-023112\plots\hires
-dir_out_run_plots_agg=A:\FLUXES\x-TEST-OUT\DAV_2015_BICO-20210111-023112\plots\agg
-dir_out_run_raw_data_ascii=A:\FLUXES\x-TEST-OUT\DAV_2015_BICO-20210111-023112\raw_data_ascii
+dir_out=Z:/CH-FRU_Fruebuel/20_ec_fluxes/2021/raw_data_ascii
+dir_out_run=Z:\CH-FRU_Fruebuel\20_ec_fluxes\2021\raw_data_ascii\CH-FRU_BICO-20211207-161115
+dir_out_run_log=Z:\CH-FRU_Fruebuel\20_ec_fluxes\2021\raw_data_ascii\CH-FRU_BICO-20211207-161115\log
+dir_out_run_plots=Z:\CH-FRU_Fruebuel\20_ec_fluxes\2021\raw_data_ascii\CH-FRU_BICO-20211207-161115\plots
+dir_out_run_plots_hires=Z:\CH-FRU_Fruebuel\20_ec_fluxes\2021\raw_data_ascii\CH-FRU_BICO-20211207-161115\plots\hires
+dir_out_run_plots_agg=Z:\CH-FRU_Fruebuel\20_ec_fluxes\2021\raw_data_ascii\CH-FRU_BICO-20211207-161115\plots\agg
+dir_out_run_raw_data_ascii=Z:\CH-FRU_Fruebuel\20_ec_fluxes\2021\raw_data_ascii\CH-FRU_BICO-20211207-161115\raw_data_ascii
 
-output_folder_name_prefix=DAV_2015
-file_compression=None
+output_folder_name_prefix=CH-FRU
+file_compression=gzip
 
-plot_file_availability=0
+add_instr_to_varname=1
+
+plot_file_availability=1
 plot_ts_hires=0
 plot_histogram_hires=0
 plot_ts_agg=0
 
 # DIRECTORIES
 # ===================
-dir_bico=L:\Dropbox\luhk_work\programming\BICO_Binary_Converter
-dir_script=L:\Dropbox\luhk_work\programming\BICO_Binary_Converter\bico
-dir_settings=L:\Dropbox\luhk_work\programming\BICO_Binary_Converter\bico\settings
-dir_root=L:\Dropbox\luhk_work\programming
+dir_bico=L:\Dropbox\luhk_work\20 - CODING\23 - BICO\BICO
+dir_script=L:\Dropbox\luhk_work\20 - CODING\23 - BICO\BICO\src
+dir_settings=L:\Dropbox\luhk_work\20 - CODING\23 - BICO\BICO\src\settings
+dir_root=L:\Dropbox\luhk_work\20 - CODING\23 - BICO
 dir_server_CH-AES=
 dir_server_CH-AWS=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-AWS_CrapAlv\20_sonic_ghg
 dir_server_CH-CHA=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-CHA_Chamau\20_sonic_ghg

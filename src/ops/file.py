@@ -55,16 +55,16 @@ class SearchAll():
         self.valid_files_dict = self.search_all(dir=self.settings_dict['dir_source'],
                                                 file_id=self.settings_dict['file_ext'],
                                                 logger=self.logger)
-        self.valid_files_dict = self.keep_files_within_timerange()
-        self.valid_files_dict = self.keep_files_with_min_filesize()
-        self.valid_files_dict = self.keep_files_up_to_filelimit()
-        self.valid_files_dict = self.keep_random_files(valid_files_dict=self.valid_files_dict)
+        self.valid_files_dict = self._keep_files_within_timerange()
+        self.valid_files_dict = self._keep_files_with_min_filesize()
+        self.valid_files_dict = self._keep_files_up_to_filelimit()
+        self.valid_files_dict = self._keep_random_files(valid_files_dict=self.valid_files_dict)
 
         # sorted(self.valid_files_dict)  # todo sort dict necessary?
 
         return self.valid_files_dict
 
-    def keep_random_files(self, valid_files_dict):
+    def _keep_random_files(self, valid_files_dict):
         """Selects random items from dict"""
         num_random_files = int(self.settings_dict['select_random_files'])
         if num_random_files != 0:
@@ -92,7 +92,7 @@ class SearchAll():
     @staticmethod
     def search_all(dir, file_id, logger):
         """Search all files in dir that match file id"""
-        logger.info("Searching for files ...")
+        logger.info(f"Searching for {file_id} files ...")
         valid_files_dict = {}
         for root, dirs, found_files in os.walk(dir):
             for idx, file in enumerate(found_files):
@@ -102,7 +102,7 @@ class SearchAll():
         logger.info(f"Found {len(valid_files_dict)} files matching {file_id} in {dir}")
         return valid_files_dict
 
-    def keep_files_within_timerange(self):
+    def _keep_files_within_timerange(self):
         """Check if file date is within selected time range"""
         suffix = "[FILE TIME RANGE CHECK]"
         run_start_date = dt.datetime.strptime(self.settings_dict['start_date'], '%Y-%m-%d %H:%M')
@@ -131,7 +131,7 @@ class SearchAll():
         self.logger.info(f"{suffix} ============================")
         return valid_files_dict
 
-    def keep_files_with_min_filesize(self):
+    def _keep_files_with_min_filesize(self):
         min_filesize_lim = int(self.settings_dict['file_size_min'])
         suffix = "[FILESIZE CHECK]"
         _invalid_files_dict = {}
@@ -156,7 +156,7 @@ class SearchAll():
         self.logger.info(f"{suffix} ============================")
         return valid_files_dict
 
-    def keep_files_up_to_filelimit(self):
+    def _keep_files_up_to_filelimit(self):
         file_limit = int(self.settings_dict['file_limit'])
         suffix = "[FILE LIMIT CHECK]"
         _invalid_files_dict = {}
@@ -212,8 +212,8 @@ def export_stats_collection_csv(df, outdir, run_id, logger):
 
 def save_settings_to_file(settings_dict, copy_to_outdir=False):
     """Save settings dict to settings file """
-    old_settings_file = os.path.join(settings_dict['dir_settings'], 'Bico.settings')
-    new_settings_file = os.path.join(settings_dict['dir_settings'], 'Bico.settingsTemp')
+    old_settings_file = os.path.join(settings_dict['dir_settings'], 'BICO.settings')
+    new_settings_file = os.path.join(settings_dict['dir_settings'], 'BICO.settingsTemp')
     with open(old_settings_file) as infile, open(new_settings_file, 'w') as outfile:
         for line in infile:  # cycle through all lines in settings file
             if ('=' in line) and (not line.startswith('#')):  # identify lines that contain setting
@@ -229,7 +229,7 @@ def save_settings_to_file(settings_dict, copy_to_outdir=False):
 
     if copy_to_outdir:
         # Save a copy of the settings file also in the output dir
-        run_settings_file_path = Path(settings_dict['dir_out_run']) / 'Bico.settings'
+        run_settings_file_path = Path(settings_dict['dir_out_run']) / 'BICO.settings'
         copyfile(old_settings_file, run_settings_file_path)
         pass
 

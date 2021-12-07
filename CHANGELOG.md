@@ -1,5 +1,13 @@
 # BICO Changelog
 
+## v1.2.2 - 7 Dec 2021
+
+- Added: CLI flag `-a` to avoid duplicates when converting files. 
+Is only considered if script is started via CLI. 
+- Added: CLI flag `-d` to convert only the most recent number of days, e.g. `-d 3` to convert files from
+the last 3 days. Is only considered if script is started via CLI. 
+- Changed: Settings file is now called `BICO.settings`
+
 ## v1.2.1 - 5 Dec 2021
 
 - Added automatic detection of working directory

@@ -37,7 +37,14 @@ def get_args():
                         help="If set, start BICO with GUI, is ignored if FOLDER is given")
     parser.add_argument('-f', '--folder', type=str,
                         help="Path to folder: "
-                             "run BICO without GUI in the specified FOLDER, needs 'Bico.settings' file in FOLDER")
+                             "run BICO without GUI in the specified FOLDER, needs 'BICO.settings' file in FOLDER")
+    parser.add_argument('-d', '--days', type=int,
+                        help="Convert data for most recent number of DAYS: "
+                             "only considered if FOLDER is defined, otherwise the date range given "
+                             "in the 'BICO.settings' file is used")
+    parser.add_argument('-a', '--avoidduplicates', action='store_true',
+                        help="Avoid duplicates: skip files that share the same filename as a file that is already "
+                             "available in FOLDER.")
 
 
     args = parser.parse_args()

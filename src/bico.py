@@ -20,11 +20,13 @@ class BicoEngine():
     def __init__(
             self,
             settings_dict: dict,
-            usedgui: bool
+            usedgui: bool,
+            avoidduplicates: bool = False
     ):
 
         self.settings_dict = settings_dict
         self.usedgui = usedgui
+        self.avoidduplicates = avoidduplicates
 
         # Setup outdirs, run ID and logger
         self.run_id = ops.setup.generate_run_id()
@@ -39,10 +41,8 @@ class BicoEngine():
 
     def run(self):
 
-        # If engine was called from GUI the selected settings need to be saved
-        # to account for adjustments made in the GUI before starting conversion.
-        if self.usedgui:
-            file.save_settings_to_file(self.settings_dict, copy_to_outdir=True)
+        # Save settings file to outdir
+        file.save_settings_to_file(self.settings_dict, copy_to_outdir=True)
 
         # Log info
         self.logger.info(f"Run ID: {self.run_id}")
@@ -59,9 +59,19 @@ class BicoEngine():
         self.dblocks_props = file.load_dblocks_props(dblocks_types=self.dblocks_seq,
                                                      settings_dict=self.settings_dict)  # Load data block settings
 
-        # Search valid files, depending on settings
+        # Search valid source binary files, depending on settings
         bin_found_files_dict = file.SearchAll(settings_dict=self.settings_dict,
                                               logger=self.logger).keep_valid_files()
+
+        # List all files (filenames only) already in dir_out (the base output dir,
+        # not the run dir). This info is later used to avoid converting a binary file
+        # that is already somewhere in dir_out (optional), i.e. to avoid duplicates.
+        if self.avoidduplicates:
+            availablefiles = file.SearchAll.search_all(dir=self.settings_dict['dir_out'], file_id='*', logger=self.logger)
+            availablefiles = list(availablefiles.keys())
+            # availablefiles = [f.stem for f in availablefiles]
+        else:
+            availablefiles = False
 
         # Plot availability heatmap
         if self.settings_dict['plot_file_availability'] == '1':
@@ -74,16 +84,24 @@ class BicoEngine():
         stats_coll_df = self.loop(bin_found_files_dict=bin_found_files_dict,
                                   dblocks_props=self.dblocks_props,
                                   stats_coll_df=self.stats_coll_df,
-                                  logger=self.logger)
+                                  logger=self.logger,
+                                  availablefiles=availablefiles)
         self._log_fileloopfinish()
 
-        # Stats collection export
-        file.export_stats_collection_csv(df=stats_coll_df, outdir=self.settings_dict['dir_out_run_plots_agg'],
-                                         run_id=self.run_id, logger=self.logger)
+        if not stats_coll_df.empty:
+            # Stats collection export
+            file.export_stats_collection_csv(df=stats_coll_df, outdir=self.settings_dict['dir_out_run_plots_agg'],
+                                             run_id=self.run_id, logger=self.logger)
 
-        # Plot aggregated stats collection from files
-        if self.settings_dict['plot_ts_agg'] == '1':
-            self._plot_stats_collection_agg()
+            # Plot aggregated stats collection from files
+            if self.settings_dict['plot_ts_agg'] == '1':
+                self._plot_stats_collection_agg()
+        else:
+            self.logger.info("(!) Aggregated plots not generated because aggregated stats are empty.")
+            self.logger.info(f"    This can happen if CLI flag `-a` to avoid"
+                             f" duplicates in {self.settings_dict['dir_out']} is set and ")
+            self.logger.info(f"    *all* files that should be converted in this run")
+            self.logger.info(f"    are already available in {self.settings_dict['dir_out']}")
 
         self._log_bicofinish()
 
@@ -133,7 +151,7 @@ class BicoEngine():
             # Generate plots for aggregated data
             vis.aggs_ts(df=df, outdir=self.settings_dict['dir_out_run_plots_agg'], logger=self.logger)
 
-    def loop(self, bin_found_files_dict, dblocks_props, stats_coll_df, logger):
+    def loop(self, bin_found_files_dict, dblocks_props, stats_coll_df, logger, availablefiles: list):
         """Process files"""
         logger.info("Processing files ...")
         num_bin_files = len(bin_found_files_dict)
@@ -164,8 +182,19 @@ class BicoEngine():
                                 f" ignoring other files.")
                     break
 
+            logger.info("")
+            logger.info("")
             logger.info(f"[{bin_file}]")
             logger.info("=" * (len(bin_file) + 2))
+
+
+            # Check for potential duplicate
+            if availablefiles:
+                if any(ascii_filename in f for f in availablefiles):
+                    logger.info(f"[DUPLICATE CHECK]    (!) Skipping file because converted file already available in "
+                                f"{self.settings_dict['dir_out']}")
+                    continue
+
             logger.info(f"    Reading binary file #{counter_bin_files} of {num_bin_files}: {bin_file}...")
             logger.info(f"    Data block sequence: {self.dblocks_seq}")
 
@@ -266,7 +295,7 @@ class BicoGUI(qtw.QMainWindow, Ui_MainWindow):
         # Read Settings: File --> Dict
         self.settings_dict = \
             ops.setup.read_settings_file_to_dict(dir_settings=dir_settings,
-                                                 file='Bico.settings',
+                                                 file='BICO.settings',
                                                  reset_paths=False)
 
         # Update dir settings in dict, for current run
@@ -446,31 +475,66 @@ class BicoFolder:
     This starts BicoEngine.
     """
 
-    def __init__(self, folder: str):
+    def __init__(self, folder: str, days: int = None, avoidduplicates: bool = False):
         self.folder = Path(folder)
+        self.days = days
+        self.avoidduplicates = avoidduplicates
 
         self.settings_dict = {}
 
+    def _update_settings_from_args(self, settings_dict: dict) -> dict:
+        """Update settings according to given args"""
+        if self.days:
+            settings_dict = self._days_from_arg(settings_dict=settings_dict)
+        return settings_dict
+
+    def _days_from_arg(self, settings_dict: dict) -> dict:
+        """Set new start and end date according to DAYS arg"""
+        # Get current time, subtract number of days
+        _currentdate = dt.datetime.now().date()
+        _newstartdate = _currentdate - dt.timedelta(days=self.days)
+
+        # Define new start date
+        _newstartdatetime = dt.datetime(year=_newstartdate.year, month=_newstartdate.month,
+                                        day=_newstartdate.day, hour=0, minute=0)
+        _newstartdatetime = _newstartdatetime.strftime('%Y-%m-%d %H:%M')  # As string
+
+        # Define new end date (now)
+        _newenddatetime = dt.datetime.now()
+        _newenddatetime = _newenddatetime.strftime('%Y-%m-%d %H:%M')
+
+        # Update dict
+        settings_dict['start_date'] = _newstartdatetime
+        settings_dict['end_date'] = _newenddatetime
+
+        return settings_dict
+
     def run(self):
         settingsfilefound = self.search_settingsfile()
-        if settingsfilefound:
-            # Read Settings: File --> Dict
-            self.settings_dict = \
-                ops.setup.read_settings_file_to_dict(dir_settings=self.folder,
-                                                     file='Bico.settings',
-                                                     reset_paths=False)
-            self.execute_in_folder()
-        else:
-            print(f"(!)ERROR: No 'Bico.settings' file found. Please make sure it is in folder '{self.folder}'")
+
+        if not settingsfilefound:
+            print(f"(!)ERROR: No 'BICO.settings' file found. Please make sure it is in folder '{self.folder}'")
+            sys.exit()
+
+        # Read Settings: File --> Dict
+        self.settings_dict = \
+            ops.setup.read_settings_file_to_dict(dir_settings=self.folder,
+                                                 file='BICO.settings',
+                                                 reset_paths=False)
+
+        self.settings_dict = self._update_settings_from_args(settings_dict=self.settings_dict)
+
+        self.execute_in_folder()
 
     def search_settingsfile(self):
         files = os.listdir(self.folder)
-        settingsfilefound = True if 'Bico.settings' in files else False
+        settingsfilefound = True if 'BICO.settings' in files else False
         return settingsfilefound
 
     def execute_in_folder(self):
         bicoengine = BicoEngine(settings_dict=self.settings_dict,
-                                usedgui=False)
+                                usedgui=False,
+                                avoidduplicates=self.avoidduplicates)
         bicoengine.run()
 
 
@@ -483,7 +547,8 @@ def main(args):
 
     # Run BICO w/o GUI
     if args.folder:
-        bicofromfolder = BicoFolder(folder=args.folder)
+        days = args.days if args.days else None
+        bicofromfolder = BicoFolder(folder=args.folder, days=days, avoidduplicates=args.avoidduplicates)
         bicofromfolder.run()
 
     # Run BICO with GUI
