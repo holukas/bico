@@ -1,30 +1,30 @@
-run_id=BICO-20211207-161115
+run_id=BICO-20220314-164740
 
 # INSTRUMENTS
 # ===========
 
 # Site
-site=CH-FRU
+site=CH-LAE
 
 # Data Blocks
 header=WECOM3
-instrument_1=R350-A
-instrument_2=IRGA75-A
+instrument_1=HS50-B
+instrument_2=IRGA72-A
 instrument_3=-None-
 
 # RAW DATA
 # ========
 
 # Source Folder
-dir_source=Y:/CH-FRU_Fruebuel/20_sonic_ghg/2021/12
+dir_source=L:/Dropbox/luhk_work/20 - CODING/23 - BICO/_test_in/lae
 
 # Time Range
 start_date=2020-12-31 00:01
-end_date=2021-12-31 23:59
+end_date=2022-12-31 23:59
 
 # File Settings
-filename_datetime_format=yyyymmddHH.XMM
-file_ext=*.X*
+filename_datetime_format=yyyymmddHH.LMM
+file_ext=*.L*
 file_size_min=900
 file_limit=0
 row_limit=100
@@ -34,23 +34,23 @@ select_random_files=0
 
 # OUTPUT
 # ======
-dir_out=Z:/CH-FRU_Fruebuel/20_ec_fluxes/2021/raw_data_ascii
-dir_out_run=Z:\CH-FRU_Fruebuel\20_ec_fluxes\2021\raw_data_ascii\CH-FRU_BICO-20211207-161115
-dir_out_run_log=Z:\CH-FRU_Fruebuel\20_ec_fluxes\2021\raw_data_ascii\CH-FRU_BICO-20211207-161115\log
-dir_out_run_plots=Z:\CH-FRU_Fruebuel\20_ec_fluxes\2021\raw_data_ascii\CH-FRU_BICO-20211207-161115\plots
-dir_out_run_plots_hires=Z:\CH-FRU_Fruebuel\20_ec_fluxes\2021\raw_data_ascii\CH-FRU_BICO-20211207-161115\plots\hires
-dir_out_run_plots_agg=Z:\CH-FRU_Fruebuel\20_ec_fluxes\2021\raw_data_ascii\CH-FRU_BICO-20211207-161115\plots\agg
-dir_out_run_raw_data_ascii=Z:\CH-FRU_Fruebuel\20_ec_fluxes\2021\raw_data_ascii\CH-FRU_BICO-20211207-161115\raw_data_ascii
+dir_out=L:/Dropbox/luhk_work/20 - CODING/23 - BICO/_test_out/lae
+dir_out_run=L:\Dropbox\luhk_work\20 - CODING\23 - BICO\_test_out\lae\CH-LAE_test_BICO-20220314-164740
+dir_out_run_log=L:\Dropbox\luhk_work\20 - CODING\23 - BICO\_test_out\lae\CH-LAE_test_BICO-20220314-164740\log
+dir_out_run_plots=L:\Dropbox\luhk_work\20 - CODING\23 - BICO\_test_out\lae\CH-LAE_test_BICO-20220314-164740\plots
+dir_out_run_plots_hires=L:\Dropbox\luhk_work\20 - CODING\23 - BICO\_test_out\lae\CH-LAE_test_BICO-20220314-164740\plots\hires
+dir_out_run_plots_agg=L:\Dropbox\luhk_work\20 - CODING\23 - BICO\_test_out\lae\CH-LAE_test_BICO-20220314-164740\plots\agg
+dir_out_run_raw_data_ascii=L:\Dropbox\luhk_work\20 - CODING\23 - BICO\_test_out\lae\CH-LAE_test_BICO-20220314-164740\raw_data_ascii
 
-output_folder_name_prefix=CH-FRU
-file_compression=gzip
+output_folder_name_prefix=CH-LAE_test
+file_compression=None
 
 add_instr_to_varname=1
 
 plot_file_availability=1
-plot_ts_hires=0
+plot_ts_hires=1
 plot_histogram_hires=0
-plot_ts_agg=0
+plot_ts_agg=1
 
 # DIRECTORIES
 # ===================
