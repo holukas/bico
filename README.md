@@ -15,3 +15,12 @@ The data blocks implemented in `bico` are listed in the folder `src/settings/dat
 The data block information that is used in code to convert binary to ASCII is given
 in `.dblock` files. Accompanying information can be found in the respective `.md` files
 in the same folder.
+
+## Installation
+- The file `environment.yml` can be used to install the conda environment that contains
+all required dependencies to run the script.
+- `bico` can be run via GUI, e.g. in the conda environment under Windows run 
+  - `python.exe .\bico.py -g` (for this you need to be in the folder `bico/src` where
+  the file `bico.py` is located)
+- or via CLI
+  - (more info coming soon)
