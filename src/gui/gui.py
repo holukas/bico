@@ -44,7 +44,6 @@ class Ui_MainWindow(object):
         with open('gui/gui.css', "r") as fh:
             mainwindow.setStyleSheet(fh.read())
 
-
         # ADD SECTIONS to LAYOUT CONTAINER
         container = qtw.QHBoxLayout()
         container.addWidget(self.add_section_logo())
@@ -88,8 +87,6 @@ class Ui_MainWindow(object):
             link_txt='Source Code', link_str=info.__link_source_code__, grid=grid, row=8)
         self.lbl_link_license = gui_elements.add_label_link_to_grid(
             link_txt='License', link_str=info.__license__, grid=grid, row=9)
-        self.lbl_link_help = gui_elements.add_label_link_to_grid(
-            link_txt='Help', link_str=info.__link_wiki__, grid=grid, row=10)
 
         grid.addWidget(label_image, 0, 0)
         grid.addWidget(qtw.QLabel(), 1, 0)
@@ -187,10 +184,10 @@ class Ui_MainWindow(object):
                                                            'CH-LAE', 'CH-LAS',
                                                            'CH-OE2'])
 
-
-        sonic_anemometers = ['HS50-A', 'HS50-B', 'HS100-A', 'R2-A','R350-A', '-None-']
+        sonic_anemometers = ['HS50-A', 'HS50-B', 'HS100-A', 'R2-A', 'R350-A', '-None-']
         gas_analyzers = ['IRGA72-A', 'IRGA72-A-GN1', 'IRGA72-B', 'IRGA72-B-GN1', 'IRGA75-A', 'IRGA75-A-GN1',
-                         'LGR-A', 'QCL-A', 'QCL-A2', 'QCL-A3', 'QCL-A4', 'QCL-C', 'QCL-C2', '-None-']
+                         'LGR-A', 'QCL-A', 'QCL-A2', 'QCL-A3', 'QCL-A4',
+                         'QCL-C', 'QCL-C2', 'QCL-C3', '-None-']
 
         header_instr_data_blocks = qtw.QLabel('Data Blocks')
         header_instr_data_blocks.setProperty('labelClass', 'header_2')
@@ -249,13 +246,13 @@ class Ui_MainWindow(object):
             gui_elements.add_label_lineedit_to_grid(label='File Extension', grid=grid,
                                                     row=9, value='*.X*')
         self.lne_rawdata_min_filesize = \
-            gui_elements.add_label_lineedit_to_grid(label='Minimum File Size', grid=grid,
+            gui_elements.add_label_lineedit_to_grid(label='Minimum File Size (Bytes)', grid=grid,
                                                     row=10, value='900', only_int=True)
         self.lne_rawdata_file_limit = \
-            gui_elements.add_label_lineedit_to_grid(label='File Limit', grid=grid,
+            gui_elements.add_label_lineedit_to_grid(label='File Limit (0 = no limit)', grid=grid,
                                                     row=11, value='0', only_int=True)
         self.lne_rawdata_row_limit = \
-            gui_elements.add_label_lineedit_to_grid(label='Row Limit Per File', grid=grid,
+            gui_elements.add_label_lineedit_to_grid(label='Row Limit Per File (0 = no limit)', grid=grid,
                                                     row=12, value='0', only_int=True)
 
         # Special

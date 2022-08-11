@@ -72,7 +72,8 @@ class BicoEngine():
         # not the run dir). This info is later used to avoid converting a binary file
         # that is already somewhere in dir_out (optional), i.e. to avoid duplicates.
         if self.avoidduplicates:
-            availablefiles = file.SearchAll.search_all(dir=self.settings_dict['dir_out'], file_id='*', logger=self.logger)
+            availablefiles = file.SearchAll.search_all(dir=self.settings_dict['dir_out'], file_id='*',
+                                                       logger=self.logger)
             availablefiles = list(availablefiles.keys())
             # availablefiles = [f.stem for f in availablefiles]
         else:
@@ -191,7 +192,6 @@ class BicoEngine():
             logger.info("")
             logger.info(f"[{bin_file}]")
             logger.info("=" * (len(bin_file) + 2))
-
 
             # Check for potential duplicate
             if availablefiles:
@@ -445,7 +445,6 @@ class BicoGUI(qtw.QMainWindow, Ui_MainWindow):
         self.lbl_link_releases.linkActivated.connect(self._call_link)
         self.lbl_link_source_code.linkActivated.connect(self._call_link)
         self.lbl_link_license.linkActivated.connect(self._call_link)
-        self.lbl_link_help.linkActivated.connect(self._call_link)
 
         # Raw Data
         self.btn_rawdata_source_folder.clicked.connect(lambda: self._select_dir(

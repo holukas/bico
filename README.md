@@ -17,10 +17,25 @@ in `.dblock` files. Accompanying information can be found in the respective `.md
 in the same folder.
 
 ## Installation
-- The file `environment.yml` can be used to install the conda environment that contains
+- The file `environment.yml` can be used to install the `conda` environment that contains
 all required dependencies to run the script.
+
+## Usage
+
+### GUI
 - `bico` can be run via GUI, e.g. in the conda environment under Windows run 
   - `python.exe .\bico.py -g` (for this you need to be in the folder `bico/src` where
   the file `bico.py` is located)
-- or via CLI
-  - (more info coming soon)
+
+### CLI
+- `bico` can also be run from the command-line interface (CLI). This can be used to  
+execute the script automatically at certain intervals. For example, `bico` is used to
+convert binary files for the site CH-OE2 once a day:
+  - `python P:\Flux\RDS_calculations\_scripts\BICO\bico-v1.2.3\src\bico.py -f Z:\CH-OE2_Oensingen\20_ec_fluxes\2022\raw_data_ascii -d 8 -a`
+  - `python` calls python
+  - `P:\Flux\RDS_calculations\_scripts\BICO\bico-v1.2.3\src\bico.py` is the location of the script `bico.py`
+  - `-f Z:\CH-OE2_Oensingen\20_ec_fluxes\2022\raw_data_ascii` specifies the folder where the `BICO.settings` file
+for this site (CH-OE2) is located. This settings file can be created via the GUI, or edited directly with a text editor.  
+  - `-d 8` converts binary files from the last 8 days to ASCII
+  - `-a` means "avoid duplicates", converts only binary files that were not converted before 
+  

@@ -128,6 +128,11 @@ def aggs_ts(df, outdir, logger):
 
         _default_format(ax=ax1, width=1, length=2, txt_ylabel=var[0], txt_ylabel_units=var[1])
         _default_format(ax=ax2, width=1, length=2, txt_ylabel='counts')
+        try:
+            ax1.ticklabel_format(useOffset=False, style='plain')
+            ax2.ticklabel_format(useOffset=False, style='plain')
+        except AttributeError:
+            pass
 
         # ahx.axhline(0, color='black', ls='-', lw=1, zorder=1)
         font = {'family': 'sans-serif', 'size': 10}
@@ -238,13 +243,14 @@ def high_res_ts(df, outfile, outdir, logger):
             dataok = check_plot_data(ax=ax, df=dblock_df, col=col)
             if dataok:
                 # Numeric data, values available
-                ax.plot(dblock_df[col].index, dblock_df[col], alpha=0.5, c='#5f87ae')
+                ax.plot(dblock_df[col].index, dblock_df[col], alpha=0.5, c='#5f87ae', marker='.', ms=1)
                 txt_info = f"values: {dblock_df[col].count():.0f}\n" \
                            f"median: {dblock_df[col].median():.3f} | mean: {dblock_df[col].mean():.3f}\n" \
                            f"min: {dblock_df[col].min():.3f} | max:{dblock_df[col].max():.3f}"
                 ax.text(0.99, 0.96, txt_info, transform=ax.transAxes, horizontalalignment='right', **text_args)
 
             _default_format(ax=ax, width=1, length=2)
+            ax.ticklabel_format(useOffset=False, style='plain')
             ax.text(0.01, 0.96, f"{col[0]} {col[1]} {col[2]}", transform=ax.transAxes, horizontalalignment='left',
                     **text_args)
 

@@ -8,8 +8,8 @@ U        ==   {'order': 1, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'o
 V        ==   {'order': 2, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'm+1_s-1', 'conversion_type': 'regular', 'datablock': 'HS50-B'}
 W        ==   {'order': 3, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'm+1_s-1', 'conversion_type': 'regular', 'datablock': 'HS50-B'}
 T_SONIC  ==   {'order': 4, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'K', 'conversion_type': 'regular', 'datablock': 'HS50-B'}
-INC_X    ==   {'order': 5, 'bytes': 2, 'format': '>h', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'deg', 'conversion_type': 'regular', 'datablock': 'HS50-B'}
-INC_Y    ==   {'order': 6, 'bytes': 2, 'format': '>h', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'deg', 'conversion_type': 'regular', 'datablock': 'HS50-B'}
+INC_X    ==   {'order': 5, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'deg', 'conversion_type': 'regular', 'datablock': 'HS50-B'}
+INC_Y    ==   {'order': 6, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'deg', 'conversion_type': 'regular', 'datablock': 'HS50-B'}
 
 
 # NOTES

@@ -151,9 +151,10 @@ class ConvertData:
             # Check if variable gives data block size info
             if 'DATA_SIZE' in var:
                 dblock_true_size = int(var_val)
-                self.check_if_dblock_size_zero(dblock_true_size=dblock_true_size)
-                if end_of_data_reached:
-                    break  # Stop for loop
+                end_of_data_reached = self.check_if_dblock_size_zero(dblock_true_size=dblock_true_size)
+
+            if end_of_data_reached:
+                break  # Stop for loop
 
             # Check for missing or erroneous data blocks
             if dblock_true_size:
@@ -200,7 +201,6 @@ class ConvertData:
                                                     dblock=dblock)
                 for bmv in bit_map_vals:
                     dblock_data.append(bmv)
-
 
         # return dblock_data
         return dblock_data, end_of_data_reached
@@ -307,6 +307,7 @@ class ConvertData:
          inconsistencies in the logging script.
         """
         bytes_notread = dblock_true_size - dblock_bytes_read
+        # bytes_notread = 0  # for testing
         _varbytes = self.open_binary.read(bytes_notread)
         return None
 

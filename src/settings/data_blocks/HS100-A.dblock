@@ -10,4 +10,4 @@ W               ==   {'order': 3, 'bytes': 2, 'format': '>h', 'gain_on_signal': 
 T_SONIC         ==   {'order': 4, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'K', 'conversion_type': 'regular', 'datablock': 'HS100-A'}
 SA_DIAG_TYPE    ==   {'order': 5, 'bytes': 1, 'format': 'B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'dimensionless', 'conversion_type': 'regular', 'datablock': 'HS100-A'}
 SA_DIAG_VAL     ==   {'order': 6, 'bytes': 1, 'format': 'B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'dimensionless', 'conversion_type': 'regular', 'datablock': 'HS100-A'}
-INC_XY          ==   {'order': 7, 'bytes': 2, 'format': '>h', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'deg', 'conversion_type': 'regular', 'datablock': 'HS100-A'}
+INC_XY          ==   {'order': 7, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'deg', 'conversion_type': 'regular', 'datablock': 'HS100-A'}
