@@ -15,7 +15,7 @@ from ops import bin, vis, file, stats, cli, format_data
 from settings import _version
 
 
-class BicoEngine():
+class BicoEngine:
 
     def __init__(
             self,
@@ -474,7 +474,8 @@ class BicoGUI(qtw.QMainWindow, Ui_MainWindow):
 
 
 class BicoFolder:
-    """Run BICO in specified folder without GUI
+    """
+    Run BICO in specified folder without GUI
 
     This starts BicoEngine.
     """
