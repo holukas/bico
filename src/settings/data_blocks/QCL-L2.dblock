@@ -1,0 +1,17 @@
+# ============================================
+# QCL-L2 - QUANTUM CASCADE LASER (AERODYNE QCL)
+# ============================================
+# Details: see QCL-L2.md
+
+
+DATA_SIZE           ==   {'order': 1, 'bytes': 1, 'format': 'B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'Bytes', 'conversion_type': 'regular', 'datablock': 'QCL-L2'}
+STATUS_CODE         ==   {'order': 2, 'bytes': 1, 'format': 'B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'bit_map', 'conversion_type': 'regular', 'datablock': 'QCL-L2'}
+_MAYBE_N2O_DRY      ==   {'order': 3, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'nmol+1 mol-1', 'conversion_type': 'regular', 'datablock': 'QCL-L2'}
+_MAYBE_CO2_DRY      ==   {'order': 4, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'nmol+1 mol-1', 'conversion_type': 'regular', 'datablock': 'QCL-L2'}
+_MAYBE_H2O_DRY      ==   {'order': 5, 'bytes': 4, 'format': 'B B B B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'nmol+1 mol-1', 'conversion_type': 'regular', 'datablock': 'QCL-L2'}
+_MAYBE_DUMMY        ==   {'order': 6, 'bytes': 2, 'format': 'B B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'none', 'conversion_type': 'regular', 'datablock': 'QCL-L2'}
+
+# Values extracted from STATUS_CODE:
+# ----------------------------------
+STATUS       ==   {'order': 2.01, 'bit_pos_start': 4, 'bit_pos_end': 8, 'apply_gain': 1, 'add_offset': 0, 'units': '0=OK', 'output': 1, 'datablock': 'QCL-L2'}
+VARIANT      ==   {'order': 2.02, 'bit_pos_start': 0, 'bit_pos_end': 4, 'apply_gain': 1, 'add_offset': 0, 'units': '#', 'output': 0, 'datablock': 'QCL-L2'}

@@ -1,5 +1,21 @@
 # BICO Changelog
 
+## v1.5.0 - 26 Jun 2023
+
+- Added: new datablock `QCL-L`, used at site CH-LAE in 2005
+- Added: new datablock `QCL-ISO`, used at site CH-LAE in 2008 (uncertain format)
+- Added: new datablock `QCL-L2`, used at site CH-LAE in 2005 (uncertain format)
+- Added pdf `sonicread_20190503.pdf` to folder `/docs`. This document describes the logging software
+  `Sonic Anemometer Data Aquisition Program` (`sonicread`) used for eddy covariance raw data since 2004 (ongoing).
+  Contains some info about data columns and their conversion to proper units.
+- Added pdf `qcldoc_20200515.pdf` to folder `/docs`. This document describes the logging software
+  `Quantum Cascade Laser (QCL) Data Aquisition Program` (`qclread`) used for Aerodyne QCL instruments and
+  contains some info about column order.
+- Added pdf `lgrdoc_20180601.pdf` to folder `/docs`. This document describes the logging software `Los Gatos
+  Research (LGR) Data Aquisition Program` (`lgrread`) used for Los Gatos LGR instruments and contains some
+  info about column order.
+- Changed: more padding/width for comboboxes to avoid text cutoffs
+
 ## v1.4.0 - 15 May 2023
 
 - Now using `poetry` for dependency management (instead of `conda`)
