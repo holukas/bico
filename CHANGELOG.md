@@ -1,5 +1,9 @@
 # BICO Changelog
 
+## v1.5.1 | 21 Oct 2023
+
+- Moved repo to GitLab: https://github.com/holukas/bico
+
 ## v1.5.0 - 26 Jun 2023
 
 - Added: new datablock `QCL-L`, used at site CH-LAE in 2005
