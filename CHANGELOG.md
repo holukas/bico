@@ -1,5 +1,16 @@
 # BICO Changelog
 
+## v1.6.0 | 14 Nov 2023
+
+- Added: new datablock `R350-B`. As it turns out, this datablock was already relevant for R3-50 data logged from
+  2017 onwards. Up to now we used the `R350-A` datablock for these data. The difference is that `R350-B` also
+  records the status address and status data, similar to `HS50-A`. The size of the datablock is 12 Byte, old data
+  that were converted using the `R350-A` datablock instead of `R350-B` still produced correct data for wind and
+  sonic temperature.
+- Added pdf `r3-50-manual_200502.pdf` to folder `/docs`. This is the manufacturer manual for R3-50 sonic anemometers
+  from Feb 2005.
+- Updated links to GitHub repo.
+
 ## v1.5.1 | 21 Oct 2023
 
 - Moved repo to GitLab: https://github.com/holukas/bico

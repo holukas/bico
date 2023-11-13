@@ -1,0 +1,13 @@
+# =========================
+# R350-B - SONIC ANEMOMETER
+# =========================
+# Details: see R350-B.md
+
+
+U               ==   {'order': 1, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'm+1_s-1', 'conversion_type': 'regular', 'datablock': 'R350-B'}
+V               ==   {'order': 2, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'm+1_s-1', 'conversion_type': 'regular', 'datablock': 'R350-B'}
+W               ==   {'order': 3, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'm+1_s-1', 'conversion_type': 'regular', 'datablock': 'R350-B'}
+T_SONIC         ==   {'order': 4, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'K', 'conversion_type': 'regular', 'datablock': 'R350-B'}
+SA_DIAG_TYPE    ==   {'order': 5, 'bytes': 1, 'format': 'B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'diag_val_r350_type', 'conversion_type': 'regular', 'datablock': 'R350-B'}
+SA_DIAG_VAL     ==   {'order': 6, 'bytes': 1, 'format': 'B', 'gain_on_signal': 1, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'diag_val_r350', 'conversion_type': 'regular', 'datablock': 'R350-B'}
+INC_XY          ==   {'order': 7, 'bytes': 2, 'format': '>h', 'gain_on_signal': 100, 'offset_on_signal': 0, 'apply_gain': 1, 'add_offset': 0, 'units': 'deg', 'conversion_type': 'regular', 'datablock': 'R350-B'}
