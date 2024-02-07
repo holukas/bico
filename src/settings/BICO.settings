@@ -1,10 +1,10 @@
-run_id=BICO-20231113-235139
+run_id=BICO-20231125-150832
 
 # INSTRUMENTS
 # ===========
 
 # Site
-site=CH-FRU
+site=CH-DAS
 
 # Data Blocks
 header=WECOM3
@@ -16,31 +16,31 @@ instrument_3=-None-
 # ========
 
 # Source Folder
-dir_source=F:/TMP/del
+dir_source=L:/Sync/luhk_work/20 - CODING/23 - FLUX/bico/_test_in
 
 # Time Range
-start_date=2023-10-20 00:00
+start_date=2023-01-01 00:00
 end_date=2023-12-31 23:59
 
 # File Settings
-filename_datetime_format=yyyymmddHH.XMM
-file_ext=*.X*
+filename_datetime_format=yyyymmddHH.YMM
+file_ext=*.Y*
 file_size_min=900
 file_limit=0
-row_limit=0
+row_limit=777
 
 # Special
 select_random_files=0
 
 # OUTPUT
 # ======
-dir_out=F:/TMP/del
-dir_out_run=F:\TMP\del\test_BICO-20231113-235139
-dir_out_run_log=F:\TMP\del\test_BICO-20231113-235139\log
-dir_out_run_plots=F:\TMP\del\test_BICO-20231113-235139\plots
-dir_out_run_plots_hires=F:\TMP\del\test_BICO-20231113-235139\plots\hires
-dir_out_run_plots_agg=F:\TMP\del\test_BICO-20231113-235139\plots\agg
-dir_out_run_raw_data_ascii=F:\TMP\del\test_BICO-20231113-235139\raw_data_ascii
+dir_out=L:/Sync/luhk_work/20 - CODING/23 - FLUX/bico/_test_out
+dir_out_run=L:\Sync\luhk_work\20 - CODING\23 - FLUX\bico\_test_out\test_BICO-20231125-150832
+dir_out_run_log=L:\Sync\luhk_work\20 - CODING\23 - FLUX\bico\_test_out\test_BICO-20231125-150832\log
+dir_out_run_plots=L:\Sync\luhk_work\20 - CODING\23 - FLUX\bico\_test_out\test_BICO-20231125-150832\plots
+dir_out_run_plots_hires=L:\Sync\luhk_work\20 - CODING\23 - FLUX\bico\_test_out\test_BICO-20231125-150832\plots\hires
+dir_out_run_plots_agg=L:\Sync\luhk_work\20 - CODING\23 - FLUX\bico\_test_out\test_BICO-20231125-150832\plots\agg
+dir_out_run_raw_data_ascii=L:\Sync\luhk_work\20 - CODING\23 - FLUX\bico\_test_out\test_BICO-20231125-150832\raw_data_ascii
 
 output_folder_name_prefix=test
 file_compression=gzip

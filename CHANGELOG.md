@@ -1,5 +1,17 @@
 # BICO Changelog
 
+## v1.6.1 | 7 Feb 2024
+
+### Addition of new datablock info files
+
+Added info about datablocks recorded by the `rECord` data logging script. These files are already logged in ASCII
+format and thus they do not need to be converted. Info about these files is stored in `bico`, to keep them close
+to where info about other datablocks are stored, all in one place. Thus, these files are informational only and are
+not used for binary conversions.
+
+- Added: new datablock info file `R350-R1.md`
+- Added: new datablock info file `IRGA75-R1.md`
+
 ## v1.6.0 | 14 Nov 2023
 
 - Added: new datablock `R350-B`. As it turns out, this datablock was already relevant for R3-50 data logged from

@@ -25,7 +25,8 @@ def validate_args(args):
 
 def get_args():
     """Get args from CLI input"""
-    parser = argparse.ArgumentParser(description="BICO - Conversion of ETH binary files to ASCII",
+    parser = argparse.ArgumentParser(description="bico - binary converter for converting "
+                                                 "ETH eddy covariance raw data binary files to ASCII CSV files",
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     # # Positional args
@@ -44,7 +45,7 @@ def get_args():
                              "in the 'BICO.settings' file is used")
     parser.add_argument('-a', '--avoidduplicates', action='store_true',
                         help="Avoid duplicates: skip files that share the same filename as a file that is already "
-                             "available in FOLDER.")
+                             "available in the output folder specified in the bico.settings file.")
 
 
     args = parser.parse_args()
