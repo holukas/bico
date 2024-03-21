@@ -41,3 +41,8 @@
 - This datablock was originally used for
   the `rECord` [test phase at the research site CH-FRU in 2023](https://www.swissfluxnet.ethz.ch/index.php/sites/site-info-ch-fru/ec-raw-binary-format/#Setup_with_rECord_data_logging_since_2023).
 - More info about `sonicread` can be found in `docs/sonicread_20190503.pdf`.
+
+## IMPORTANT
+
+- Note in case `AGC` is needed: that since these files are not converted in `bico`, the `AGC` value from the IRGA has to
+  be extracted from `GA_DIAG_VALUE` with other methods, e.g., by using a separate script.

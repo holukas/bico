@@ -180,9 +180,10 @@ class Ui_MainWindow(object):
                                                     items=['CH-AES', 'CH-AWS',
                                                            'CH-CHA', 'CH-DAE',
                                                            'CH-DAV', 'CH-DAS',
-                                                           'CH-FRU', 'CH-INO',
+                                                           'CH-FOR', 'CH-FRU',
+                                                           'CH-HON', 'CH-INO',
                                                            'CH-LAE', 'CH-LAS',
-                                                           'CH-OE2'])
+                                                           'CH-OE2', 'CH-TAN'])
 
         sonic_anemometers = ['HS50-A', 'HS50-B', 'HS100-A', 'R2-A', 'R350-A', 'R350-B', '-None-']
         gas_analyzers = ['IRGA72-A', 'IRGA72-A-GN1', 'IRGA72-B', 'IRGA72-B-GN1', 'IRGA75-A', 'IRGA75-A-GN1',

@@ -1,5 +1,10 @@
 # BICO Changelog
 
+## v1.6.2 | X Mar 2024
+
+- Added info about missing `AGC` value from IRGA to datablock info `IRGA75-R1.md`
+- Added new site `CH-FOR`, `CH-HON` and `CH-TAN` to site selection
+
 ## v1.6.1 | 7 Feb 2024
 
 ### Addition of new datablock info files
