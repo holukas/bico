@@ -1,5 +1,9 @@
 # BICO Changelog
 
+## v1.6.3 | 21 Mar 2024
+
+- Fixed version number
+
 ## v1.6.2 | 21 Mar 2024
 
 - Added info about missing `AGC` value from IRGA to datablock info `IRGA75-R1.md`
