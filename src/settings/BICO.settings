@@ -1,30 +1,30 @@
-run_id=BICO-20231125-150832
+run_id=BICO-20240321-151120
 
 # INSTRUMENTS
 # ===========
 
 # Site
-site=CH-DAS
+site=CH-TAN
 
 # Data Blocks
 header=WECOM3
 instrument_1=R350-B
-instrument_2=IRGA75-A
-instrument_3=-None-
+instrument_2=IRGA72-A
+instrument_3=LGR-A
 
 # RAW DATA
 # ========
 
 # Source Folder
-dir_source=L:/Sync/luhk_work/20 - CODING/23 - FLUX/bico/_test_in
+dir_source=Y:/CH-TAN_Taenikon/20_sonic_ghg/2024/03/10_HS_LI72
 
 # Time Range
 start_date=2023-01-01 00:00
-end_date=2023-12-31 23:59
+end_date=2024-12-31 23:59
 
 # File Settings
-filename_datetime_format=yyyymmddHH.YMM
-file_ext=*.Y*
+filename_datetime_format=yyyymmddHH.tMM
+file_ext=*.t*
 file_size_min=900
 file_limit=0
 row_limit=777
@@ -34,13 +34,13 @@ select_random_files=0
 
 # OUTPUT
 # ======
-dir_out=L:/Sync/luhk_work/20 - CODING/23 - FLUX/bico/_test_out
-dir_out_run=L:\Sync\luhk_work\20 - CODING\23 - FLUX\bico\_test_out\test_BICO-20231125-150832
-dir_out_run_log=L:\Sync\luhk_work\20 - CODING\23 - FLUX\bico\_test_out\test_BICO-20231125-150832\log
-dir_out_run_plots=L:\Sync\luhk_work\20 - CODING\23 - FLUX\bico\_test_out\test_BICO-20231125-150832\plots
-dir_out_run_plots_hires=L:\Sync\luhk_work\20 - CODING\23 - FLUX\bico\_test_out\test_BICO-20231125-150832\plots\hires
-dir_out_run_plots_agg=L:\Sync\luhk_work\20 - CODING\23 - FLUX\bico\_test_out\test_BICO-20231125-150832\plots\agg
-dir_out_run_raw_data_ascii=L:\Sync\luhk_work\20 - CODING\23 - FLUX\bico\_test_out\test_BICO-20231125-150832\raw_data_ascii
+dir_out=F:/TMP/tan
+dir_out_run=F:\TMP\tan\test_BICO-20240321-151120
+dir_out_run_log=F:\TMP\tan\test_BICO-20240321-151120\log
+dir_out_run_plots=F:\TMP\tan\test_BICO-20240321-151120\plots
+dir_out_run_plots_hires=F:\TMP\tan\test_BICO-20240321-151120\plots\hires
+dir_out_run_plots_agg=F:\TMP\tan\test_BICO-20240321-151120\plots\agg
+dir_out_run_raw_data_ascii=F:\TMP\tan\test_BICO-20240321-151120\raw_data_ascii
 
 output_folder_name_prefix=test
 file_compression=gzip
@@ -54,18 +54,21 @@ plot_ts_agg=1
 
 # DIRECTORIES
 # ===================
-dir_bico=L:\Sync\luhk_work\20 - CODING\23 - FLUX\bico
-dir_script=L:\Sync\luhk_work\20 - CODING\23 - FLUX\bico\src
-dir_settings=L:\Sync\luhk_work\20 - CODING\23 - FLUX\bico\src\settings
-dir_root=L:\Sync\luhk_work\20 - CODING\23 - FLUX
+dir_bico=F:\Sync\luhk_work\20 - CODING\23 - FLUX\bico
+dir_script=F:\Sync\luhk_work\20 - CODING\23 - FLUX\bico\src
+dir_settings=F:\Sync\luhk_work\20 - CODING\23 - FLUX\bico\src\settings
+dir_root=F:\Sync\luhk_work\20 - CODING\23 - FLUX
 dir_server_CH-AES=
 dir_server_CH-AWS=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-AWS_CrapAlv\20_sonic_ghg
 dir_server_CH-CHA=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-CHA_Chamau\20_sonic_ghg
 dir_server_CH-DAE=
 dir_server_CH-DAV=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-DAV_Davos\20_sonic_ghg
+dir_server_CH-FOR=
 dir_server_CH-FRU=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-FRU_Fruebuel\20_sonic_ghg
+dir_server_CH-HON=
 dir_server_CH-INO=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-INO_InnoFarm\20_sonic_ghg
 dir_server_CH-LAE=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-LAE_Laegeren\20_sonic_ghg
 dir_server_CH-LAS=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-LAS_Lae-Subcanopy\20_sonic_ghg
 dir_server_CH-OE2=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-OE2_Oensingen\20_sonic_ghg
+dir_server_CH-TAN=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-TAN_Taenikon\20_sonic_ghg
 dir_server_CH-TWE=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\US-TWE_ToolikWetland\20_sonic_ghg

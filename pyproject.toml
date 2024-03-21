@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bico"
-version = "v1.6.1"
+version = "v1.6.2"
 description = "Binary Converter to convert binary files to ASCII"
 authors = ["holukas <holukas@ethz.ch>"]
 
