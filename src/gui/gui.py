@@ -184,6 +184,7 @@ class Ui_MainWindow(object):
                                                            'CH-HON', 'CH-INO',
                                                            'CH-LAE', 'CH-LAS',
                                                            'CH-OE2', 'CH-TAN'])
+        self.cmb_instr_site_selection.setMaxVisibleItems(99)
 
         sonic_anemometers = ['HS50-A', 'HS50-B', 'HS100-A', 'R2-A', 'R350-A', 'R350-B', '-None-']
         gas_analyzers = ['IRGA72-A', 'IRGA72-A-GN1', 'IRGA72-B', 'IRGA72-B-GN1', 'IRGA75-A', 'IRGA75-A-GN1',
@@ -201,6 +202,11 @@ class Ui_MainWindow(object):
             gui_elements.add_label_combobox_to_grid(label='Instrument 2', grid=grid, row=6, items=gas_analyzers)
         self.cmb_instr_instrument_3 = \
             gui_elements.add_label_combobox_to_grid(label='Instrument 3', grid=grid, row=7, items=gas_analyzers)
+
+        self.cmb_instr_header.setMaxVisibleItems(99)
+        self.cmb_instr_instrument_1.setMaxVisibleItems(99)
+        self.cmb_instr_instrument_2.setMaxVisibleItems(99)
+        self.cmb_instr_instrument_3.setMaxVisibleItems(99)
 
         grid.setRowStretch(8, 1)
         section.setLayout(grid)

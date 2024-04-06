@@ -1,4 +1,4 @@
-run_id=BICO-20240321-150448
+run_id=BICO-20240321-151120
 
 # INSTRUMENTS
 # ===========
@@ -8,9 +8,9 @@ site=CH-TAN
 
 # Data Blocks
 header=WECOM3
-instrument_1=R350-B
-instrument_2=IRGA72-A
-instrument_3=LGR-A
+instrument_1=R350-A
+instrument_2=IRGA75-A
+instrument_3=-None-
 
 # RAW DATA
 # ========
@@ -35,12 +35,12 @@ select_random_files=0
 # OUTPUT
 # ======
 dir_out=F:/TMP/tan
-dir_out_run=F:\TMP\tan\test_BICO-20240321-150448
-dir_out_run_log=F:\TMP\tan\test_BICO-20240321-150448\log
-dir_out_run_plots=F:\TMP\tan\test_BICO-20240321-150448\plots
-dir_out_run_plots_hires=F:\TMP\tan\test_BICO-20240321-150448\plots\hires
-dir_out_run_plots_agg=F:\TMP\tan\test_BICO-20240321-150448\plots\agg
-dir_out_run_raw_data_ascii=F:\TMP\tan\test_BICO-20240321-150448\raw_data_ascii
+dir_out_run=F:\TMP\tan\test_BICO-20240321-151120
+dir_out_run_log=F:\TMP\tan\test_BICO-20240321-151120\log
+dir_out_run_plots=F:\TMP\tan\test_BICO-20240321-151120\plots
+dir_out_run_plots_hires=F:\TMP\tan\test_BICO-20240321-151120\plots\hires
+dir_out_run_plots_agg=F:\TMP\tan\test_BICO-20240321-151120\plots\agg
+dir_out_run_raw_data_ascii=F:\TMP\tan\test_BICO-20240321-151120\raw_data_ascii
 
 output_folder_name_prefix=test
 file_compression=gzip
@@ -54,10 +54,10 @@ plot_ts_agg=1
 
 # DIRECTORIES
 # ===================
-dir_bico=F:\Sync\luhk_work\20 - CODING\23 - FLUX\bico
-dir_script=F:\Sync\luhk_work\20 - CODING\23 - FLUX\bico\src
-dir_settings=F:\Sync\luhk_work\20 - CODING\23 - FLUX\bico\src\settings
-dir_root=F:\Sync\luhk_work\20 - CODING\23 - FLUX
+dir_bico=L:\Sync\luhk_work\20 - CODING\23 - FLUX\bico
+dir_script=L:\Sync\luhk_work\20 - CODING\23 - FLUX\bico\src
+dir_settings=L:\Sync\luhk_work\20 - CODING\23 - FLUX\bico\src\settings
+dir_root=L:\Sync\luhk_work\20 - CODING\23 - FLUX
 dir_server_CH-AES=
 dir_server_CH-AWS=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-AWS_CrapAlv\20_sonic_ghg
 dir_server_CH-CHA=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-CHA_Chamau\20_sonic_ghg

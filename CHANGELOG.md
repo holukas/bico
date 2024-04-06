@@ -1,5 +1,10 @@
 # BICO Changelog
 
+## v1.6.4 | 7 Apr 2024
+
+- Updated env: `PyQt5` needed specific declaration to work in `poetry` env
+- Now showing all members when clicking on drop-down menus
+
 ## v1.6.3 | 21 Mar 2024
 
 - Fixed version number
