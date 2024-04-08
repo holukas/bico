@@ -39,7 +39,7 @@
 
 # Details
 - Note that there is no H2O (was unintended at the time)!
-- in WE's sonicread.pdf Table 2: QCL Version 1 Variant 6, QC-TILDAS ETHZ, 
+- in WE's `sonicread.pdf` Table 2 or Table 3: QCL Version 1 Variant 6, QC-TILDAS ETHZ, 
   Columns: "CH4, N2O, H2O, TEMP, PRESS since V. 7.06 (2015-05-18)", but instead
   of H2O the ambient CH4 was logged by mistake, due to an undocumented? change 
   in the order of incoming data from the QCL

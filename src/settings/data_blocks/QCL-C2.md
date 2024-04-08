@@ -37,7 +37,7 @@
 # Details
 - Similar to QCL-C, but different order and only CH4 and H2O are recorded.
 - ICOS setup at CH-DAV, used starting 2021-11-30 or earlier (check).
-- similar to in WE's sonicread.pdf Table 2: Version 1 Variant 6, QC-TILDAS ETHZ ICOS Davos, CH4,
+- similar to in WE's `sonicread.pdf` Table 2 or Table 3: Version 1 Variant 6, QC-TILDAS ETHZ ICOS Davos, CH4,
   N2O, H2O, CO2, TEMP, PRESS, StatusW, VICI valves
 - since sonicread V. xxx (unknown)
 

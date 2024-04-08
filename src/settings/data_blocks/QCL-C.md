@@ -41,7 +41,7 @@
 
 # Details
 - ICOS setup at CH-DAV, used starting in 2015-11-14
-- in WE's sonicread.pdf Table 2: Version 1 Variant 6, QC-TILDAS ETHZ ICOS Davos, CH4,
+- in WE's `sonicread.pdf` Table 2 or Table 3: Version 1 Variant 6, QC-TILDAS ETHZ ICOS Davos, CH4,
   N2O, H2O, CO2, TEMP, PRESS, StatusW, VICI valves
 - since sonicread V. 7.07 (2015-11-13)
 
