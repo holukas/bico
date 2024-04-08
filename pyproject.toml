@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bico"
-version = "1.6.4"
+version = "1.6.5"
 description = "Binary Converter for converting ETH eddy covariance binary raw data to ASCII CSV files"
 authors = ["Lukas Hörtnagl <31772692+holukas@users.noreply.github.com>"]
 readme = "README.md"
@@ -12,6 +12,7 @@ numpy = "=1.21.2"
 pytz = "=2021.3"
 matplotlib = "=3.5.0"
 # PyQt5 has to be installed like this to work in this poetry env:
+# https://github.com/python-poetry/poetry/issues/8540#issuecomment-1968457610
 pyqt5 = "=5.15.10"
 pyqt5-qt5 = "=5.15.2"
 

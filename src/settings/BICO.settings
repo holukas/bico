@@ -1,26 +1,26 @@
-run_id=BICO-20240407-012431
+run_id=BICO-20240408-155432
 
 # INSTRUMENTS
 # ===========
 
 # Site
-site=CH-TAN
+site=CH-CHA
 
 # Data Blocks
 header=WECOM3
 instrument_1=R350-A
 instrument_2=IRGA75-A
-instrument_3=-None-
+instrument_3=QCL-B
 
 # RAW DATA
 # ========
 
 # Source Folder
-dir_source=L:/Sync/luhk_work/TMP
+dir_source=F:/CURRENT/CHA/FP2024.1/2012_2/0-BINARIES
 
 # Time Range
-start_date=2005-01-01 00:00
-end_date=2024-12-31 23:59
+start_date=2011-01-01 00:00
+end_date=2012-12-31 23:59
 
 # File Settings
 filename_datetime_format=yyyymmddHH.bMM
@@ -30,17 +30,17 @@ file_limit=0
 row_limit=777
 
 # Special
-select_random_files=0
+select_random_files=10
 
 # OUTPUT
 # ======
-dir_out=L:/Sync/luhk_work/TMP
-dir_out_run=L:\Sync\luhk_work\TMP\test_BICO-20240407-012431
-dir_out_run_log=L:\Sync\luhk_work\TMP\test_BICO-20240407-012431\log
-dir_out_run_plots=L:\Sync\luhk_work\TMP\test_BICO-20240407-012431\plots
-dir_out_run_plots_hires=L:\Sync\luhk_work\TMP\test_BICO-20240407-012431\plots\hires
-dir_out_run_plots_agg=L:\Sync\luhk_work\TMP\test_BICO-20240407-012431\plots\agg
-dir_out_run_raw_data_ascii=L:\Sync\luhk_work\TMP\test_BICO-20240407-012431\raw_data_ascii
+dir_out=F:/TMP
+dir_out_run=F:\TMP\test_BICO-20240408-155432
+dir_out_run_log=F:\TMP\test_BICO-20240408-155432\log
+dir_out_run_plots=F:\TMP\test_BICO-20240408-155432\plots
+dir_out_run_plots_hires=F:\TMP\test_BICO-20240408-155432\plots\hires
+dir_out_run_plots_agg=F:\TMP\test_BICO-20240408-155432\plots\agg
+dir_out_run_raw_data_ascii=F:\TMP\test_BICO-20240408-155432\raw_data_ascii
 
 output_folder_name_prefix=test
 file_compression=gzip
@@ -54,10 +54,10 @@ plot_ts_agg=1
 
 # DIRECTORIES
 # ===================
-dir_bico=L:\Sync\luhk_work\20 - CODING\23 - FLUX\bico
-dir_script=L:\Sync\luhk_work\20 - CODING\23 - FLUX\bico\src
-dir_settings=L:\Sync\luhk_work\20 - CODING\23 - FLUX\bico\src\settings
-dir_root=L:\Sync\luhk_work\20 - CODING\23 - FLUX
+dir_bico=F:\Sync\luhk_work\20 - CODING\23 - FLUX\bico
+dir_script=F:\Sync\luhk_work\20 - CODING\23 - FLUX\bico\src
+dir_settings=F:\Sync\luhk_work\20 - CODING\23 - FLUX\bico\src\settings
+dir_root=F:\Sync\luhk_work\20 - CODING\23 - FLUX
 dir_server_CH-AES=
 dir_server_CH-AWS=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-AWS_CrapAlv\20_sonic_ghg
 dir_server_CH-CHA=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-CHA_Chamau\20_sonic_ghg
