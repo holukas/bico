@@ -1,6 +1,6 @@
 # BICO Changelog
 
-## v1.6.5 | XX Apr 2024
+## v1.6.5 | 8 Apr 2024
 
 - Added: new datablock `QCL-B`, used at site CH-CHA in 2012 
 - Added: new datablock `QCL-D`, used at site CH-CHA in 2009 
