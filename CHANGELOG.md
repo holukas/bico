@@ -1,5 +1,10 @@
 # BICO Changelog
 
+## v1.6.5 | 8 Apr 2024
+
+- Added: new datablock `QCL-B`, used at site CH-CHA in 2012 
+- Added: new datablock `QCL-D`, used at site CH-CHA in 2009 
+
 ## v1.6.4 | 7 Apr 2024
 
 - Updated env: `PyQt5` needed specific declaration to work in `poetry` env

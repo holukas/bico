@@ -37,7 +37,7 @@
 - FCT Source code: --> https://gitlab.ethz.ch/holukas/fct-flux-calculation-tool
 
 # Details
-- in WE's sonicread.pdf Table 2: QCL Version 1 Variant 6, QC-TILDAS ETHZ, 
+- in WE's `sonicread.pdf` Table 2 or Table 3: QCL Version 1 Variant 6, QC-TILDAS ETHZ, 
   Columns: "CH4, N2O, H2O, TEMP, PRESS since V. 7.06 (2015-05-18)"
 - Note that H2O has no gain!
 - Modified data acquisition to also record QCL temperature and pressure.

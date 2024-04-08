@@ -40,7 +40,7 @@ Basically the same as QCL-A, but with gain 1000 on H2O signal instead of gain 1.
 # Details
 - Was used for 2 days at CH-CHA in 2020. By accident, the gain on the H2O signal was set to 1000 instead
   of the correct gain 1.
-- This format is similar to: in WE's sonicread.pdf Table 2: QCL Version 1 Variant 6, QC-TILDAS ETHZ, 
+- This format is similar to: in WE's `sonicread.pdf` Table 2 or Table 3: QCL Version 1 Variant 6, QC-TILDAS ETHZ, 
   Columns: "CH4, N2O, H2O, TEMP, PRESS since V. 7.06 (2015-05-18)"
 - Modified data acquisition to also record QCL temperature and pressure.
 - Now there are 5 QCL variables that are detected (there were 3 in previous versions).
