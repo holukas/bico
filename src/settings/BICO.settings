@@ -1,48 +1,48 @@
-run_id=BICO-20240408-163201
+run_id=BICO-20240422-104012
 
 # INSTRUMENTS
 # ===========
 
 # Site
-site=CH-CHA
+site=CH-HON
 
 # Data Blocks
 header=WECOM3
-instrument_1=R350-A
+instrument_1=R350-B
 instrument_2=IRGA75-A
-instrument_3=QCL-D
+instrument_3=-None-
 
 # RAW DATA
 # ========
 
 # Source Folder
-dir_source=F:/CURRENT/CHA/FP2024.1/2009_2/0-BINARIES
+dir_source=F:/CURRENT/HON/0-BINARIES
 
 # Time Range
 start_date=2005-01-01 00:00
-end_date=2012-12-31 23:59
+end_date=2099-12-31 23:59
 
 # File Settings
-filename_datetime_format=yyyymmddHH.bMM
-file_ext=*.b*
+filename_datetime_format=yyyymmddHH.hMM
+file_ext=*.h*
 file_size_min=900
 file_limit=0
-row_limit=99
+row_limit=0
 
 # Special
-select_random_files=20
+select_random_files=0
 
 # OUTPUT
 # ======
-dir_out=F:/TMP
-dir_out_run=F:\TMP\test3_BICO-20240408-163201
-dir_out_run_log=F:\TMP\test3_BICO-20240408-163201\log
-dir_out_run_plots=F:\TMP\test3_BICO-20240408-163201\plots
-dir_out_run_plots_hires=F:\TMP\test3_BICO-20240408-163201\plots\hires
-dir_out_run_plots_agg=F:\TMP\test3_BICO-20240408-163201\plots\agg
-dir_out_run_raw_data_ascii=F:\TMP\test3_BICO-20240408-163201\raw_data_ascii
+dir_out=F:/CURRENT/HON/1-BICO
+dir_out_run=F:\CURRENT\HON\1-BICO\CH-HON_BICO-20240422-104012
+dir_out_run_log=F:\CURRENT\HON\1-BICO\CH-HON_BICO-20240422-104012\log
+dir_out_run_plots=F:\CURRENT\HON\1-BICO\CH-HON_BICO-20240422-104012\plots
+dir_out_run_plots_hires=F:\CURRENT\HON\1-BICO\CH-HON_BICO-20240422-104012\plots\hires
+dir_out_run_plots_agg=F:\CURRENT\HON\1-BICO\CH-HON_BICO-20240422-104012\plots\agg
+dir_out_run_raw_data_ascii=F:\CURRENT\HON\1-BICO\CH-HON_BICO-20240422-104012\raw_data_ascii
 
-output_folder_name_prefix=test3
+output_folder_name_prefix=CH-HON
 file_compression=gzip
 
 add_instr_to_varname=1
