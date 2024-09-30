@@ -1,6 +1,6 @@
 # BICO Changelog
 
-## v1.6.6 | 30 Sep 2024
+## v1.6.7 | 30 Sep 2024
 
 - Fixed bug where the script would crash when there were inconsistencies or errors in the raw binary stream during the
   conversion of `GA_DIAG_CODE`. The crash was found in file `2021111013.X00` when extracting `SIGNAL_STRENGTH` from
