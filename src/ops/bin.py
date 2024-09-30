@@ -402,9 +402,12 @@ class ConvertData:
                 start = bit_map_props['bit_pos_start']
                 end = bit_map_props['bit_pos_end']
                 val = var_binary_string[start:end]
-                val = int(str(val), 2)  # Convert binary string to integer with base 2
-                val = val * bit_map_props['apply_gain']
-                val = val + bit_map_props['add_offset']
+                try:
+                    val = int(str(val), 2)  # Convert binary string to integer with base 2
+                    val = val * bit_map_props['apply_gain']
+                    val = val + bit_map_props['add_offset']
+                except ValueError as e:
+                    val = -9999
                 bit_map_vals.append(val)
         # print(bit_map_vals)
         return bit_map_vals

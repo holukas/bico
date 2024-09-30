@@ -1,9 +1,17 @@
 # BICO Changelog
 
+## v1.6.6 | 30 Sep 2024
+
+- Fixed bug where the script would crash when there were inconsistencies or errors in the raw binary stream during the
+  conversion of `GA_DIAG_CODE`. The crash was found in file `2021111013.X00` when extracting `SIGNAL_STRENGTH` from
+  `GA_DIAG_CODE` and occurred most likely because of an erroneous raw binary file. In case an error (`ValueError`)
+  occurs when trying to read `SIGNAL_STRENGTH`, the value is now set to `-9999`. Among many files over many years and
+  sites, `2021111013.X00` was so far the only file where this error occurred.
+
 ## v1.6.5 | 8 Apr 2024
 
-- Added: new datablock `QCL-B`, used at site CH-CHA in 2012 
-- Added: new datablock `QCL-D`, used at site CH-CHA in 2009 
+- Added: new datablock `QCL-B`, used at site CH-CHA in 2012
+- Added: new datablock `QCL-D`, used at site CH-CHA in 2009
 
 ## v1.6.4 | 7 Apr 2024
 
