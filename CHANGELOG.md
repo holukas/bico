@@ -1,5 +1,10 @@
 # BICO Changelog
 
+## v1.6.8 | 9 May 2025
+
+- Added datablock `IRGA75-R2` from the `rECord` logging script
+- Updated datablock `IRGA75-R1`
+
 ## v1.6.7 | 30 Sep 2024
 
 - Fixed bug where the script would crash when there were inconsistencies or errors in the raw binary stream during the
