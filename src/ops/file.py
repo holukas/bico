@@ -96,7 +96,7 @@ class SearchAll():
         valid_files_dict = {}
         for root, dirs, found_files in os.walk(dir):
             for idx, file in enumerate(found_files):
-                if fnmatch.fnmatch(file, file_id):
+                if fnmatch.fnmatchcase(file, file_id):
                     filepath = Path(root) / file
                     valid_files_dict[file] = filepath
         logger.info(f"Found {len(valid_files_dict)} files matching {file_id} in {dir}")

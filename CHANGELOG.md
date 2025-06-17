@@ -1,5 +1,10 @@
 # BICO Changelog
 
+## v1.6.9 | 17 Jun 2025
+
+- File searches are now case-sensitive, utilizing `.fnmatchcase()` for all file extension searches (
+  `ops.file.SearchAll.search_all`)
+
 ## v1.6.8 | 9 May 2025
 
 - Added datablock `IRGA75-R2` from the `rECord` logging script

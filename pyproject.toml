@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bico"
-version = "1.6.8"
+version = "1.6.9"
 description = "Binary Converter for converting ETH eddy covariance binary raw data to ASCII CSV files"
 authors = ["Lukas Hörtnagl <31772692+holukas@users.noreply.github.com>"]
 readme = "README.md"
