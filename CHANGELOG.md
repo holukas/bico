@@ -1,5 +1,9 @@
 # BICO Changelog
 
+## v1.6.10 | XX XXX 2025 
+
+- Fixed logo and icon
+
 ## v1.6.9 | 17 Jun 2025
 
 - File searches are now case-sensitive, utilizing `.fnmatchcase()` for all file extension searches (
