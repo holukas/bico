@@ -1,5 +1,11 @@
 # BICO Changelog
 
+## v1.6.10 | 13 Aug 2025 
+
+- Added: new datablock `IRGA72-R1` from the `rECord` logging script, used at site CH-CHA in 2025
+- Updated datablock `IRGA75-R2` with additional variable naming variants
+- Fixed logo and icon
+
 ## v1.6.9 | 17 Jun 2025
 
 - File searches are now case-sensitive, utilizing `.fnmatchcase()` for all file extension searches (

@@ -16,8 +16,8 @@ class Ui_MainWindow(object):
 
     def setupUi(self, mainwindow):
         # Main window
-        mainwindow.setWindowTitle(f"BICO")
-        mainwindow.setWindowIcon(qtg.QIcon('images/logo_BICO1.png'))
+        mainwindow.setWindowTitle(f"bico")
+        mainwindow.setWindowIcon(qtg.QIcon('images/logo_bico2_icon.png'))
         # mainwindow.resize(250, 150)
 
         # # todo Center mainwindow on screen
@@ -60,9 +60,9 @@ class Ui_MainWindow(object):
         section.setProperty('labelClass', 'section_bg_output')
         grid = qtw.QGridLayout()
         label_image = qtw.QLabel()
-        label_image.setPixmap(QPixmap('images/logo_BICO1_256px.png'))
+        label_image.setPixmap(QPixmap('images/logo_bico2_256px.png'))
 
-        label_txt = qtw.QLabel("BICO - Binary Conversion")
+        label_txt = qtw.QLabel("bico - binary converter")
         label_txt.setProperty('labelClass', 'header_3')
         label_txt.setAlignment(qtc.Qt.AlignCenter | qtc.Qt.AlignVCenter)
 
