@@ -1,8 +1,9 @@
 # BICO Changelog
 
-## v1.6.10 | XX XXX 2025 
+## v1.6.10 | 13 Aug 2025 
 
 - Fixed logo and icon
+- Updated datablock `IRGA75-R2` with additional variable naming variants
 
 ## v1.6.9 | 17 Jun 2025
 

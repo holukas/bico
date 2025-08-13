@@ -2,12 +2,12 @@
 
 ## Variables
 
-- CO2_CONC ... CO2 concentration density, molar density (mmol m-3)
-- H2O_CONC ... H2O concentration density, molar density (mmol m-3)
-- TEMP_BOX ... Ambient temperature measured in the control box (degC)
-- PRESS_BOX ... Atmospheric pressure measured in the control box (kPa)
-- COOLER_V ... Cooler voltage (V)
-- GA_DIAG_CODE ... IRGA diagnostic value
+- CO2_CONC / LI75_CO2_CONC ... CO2 concentration density, molar density (mmol m-3)
+- H2O_CONC / LI75_H2O_CONC ... H2O concentration density, molar density (mmol m-3)
+- TEMP_BOX / LI75_TEMP_BOX ... Ambient temperature measured in the control box (degC)
+- PRESS_BOX / LI75_PRESS_BOX ... Atmospheric pressure measured in the control box (kPa)
+- COOLER_V / LI75_COOLER_V ... Cooler voltage (V)
+- GA_DIAG_CODE / LI75_DIAG_CODE ... IRGA diagnostic value
   - same as GA_DIAG_VALUE found in other datablocks
   - Originally, the cell diagnostic value is a 1 byte unsigned integer (value between 0 and 255, or in binary
     notation e.g. `00111001`) with the following bit map (in order of how the code reads it,
@@ -21,10 +21,10 @@
         according to the binary notation, because AGC corresponds to the 4 right-most digits of the byte,
         and if these are e.g. `1111` than that corresponds to decimal `15`, which is multiplied
         by `6.25` to yield AGC = `93.75%`.
-- AGC ... Automatic gain control from the LI-7500 (%)
+- AGC / LI75_AGC ... Automatic gain control from the LI-7500 (%)
   - low values close to 50 mean good signal
   - extracted from GA_DIAG_CODE
-- STATUS_CODE ... Status of IRGA data aquisition, see Table 7 in WE's sonicread.pdf
+- STATUS_CODE / LI75_STATUS_CODE ... Status of IRGA data aquisition, see Table 7 in WE's sonicread.pdf
     - same as STATUS_CODE found in other datablocks
     - octal value converted to integer yields:
     - 0 .. Status OK, no problems (octal 0000)
