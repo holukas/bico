@@ -1,8 +1,8 @@
 # from single_source import get_version
 # __version__ = get_version(__name__, Path(__file__).parent.parent.parent)  # Single source of truth for version
 
-__version__ = "1.6.10"
-__date__ = "13 Aug 2025"
+__version__ = "1.6.11"
+__date__ = "20 Nov 2025"
 __link_changelog__ = "https://github.com/holukas/bico/blob/master/CHANGELOG.md"
 __link_source_code__ = "https://github.com/holukas/bico"
 __link_releases__ = "https://github.com/holukas/bico/releases"

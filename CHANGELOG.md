@@ -1,6 +1,12 @@
 # BICO Changelog
 
-## v1.6.10 | 13 Aug 2025 
+## v1.6.11 | 20 Nov 2025
+
+- Added: new datablock `HS50-R1` from the `rECord` logging script, used at site CH-AWS in 2025, and at CH-CHA since Aug
+  2025
+- Added: new datablock `IRGA72-R2` from the `rECord` logging script, used at site CH-AWS in 2025
+
+## v1.6.10 | 13 Aug 2025
 
 - Added: new datablock `IRGA72-R1` from the `rECord` logging script, used at site CH-CHA in 2025
 - Updated datablock `IRGA75-R2` with additional variable naming variants
