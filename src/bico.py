@@ -147,7 +147,6 @@ class BicoEngine:
                 na_values=-9999,
                 encoding='utf-8',
                 delimiter=',',
-                keep_date_col=True,
                 parse_dates=True,
                 index_col=0,
                 dtype=None

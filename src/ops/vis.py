@@ -34,7 +34,8 @@ def availability_heatmap(bin_found_files_dict, bin_file_datefrmt, root_outdir, l
     agg_plot_df['month'] = agg_plot_df.index.month
     agg_plot_df['year'] = agg_plot_df.index.year
     agg_plot_df['year-month'] = agg_plot_df.index.strftime('%Y-%m')
-    agg_plot_df = agg_plot_df.pivot("year-month", "day", "filesize")
+    # pandas 2.0 made DataFrame.pivot arguments keyword-only
+    agg_plot_df = agg_plot_df.pivot(index="year-month", columns="day", values="filesize")
     days = [str(xx) for xx in agg_plot_df.columns]
     months = [str(yy) for yy in agg_plot_df.index]
 
@@ -107,7 +108,7 @@ def aggs_ts(df, outdir, logger):
         ax2 = fig.add_subplot(gs[1, 0])
 
         if ishires:
-            ax1.plot_date(var_df.index, var_df['median'], alpha=.5, c='#455A64', label='median')
+            ax1.plot(var_df.index, var_df['median'], 'o', alpha=.5, c='#455A64', label='median')
             ax1.fill_between(x=var_df.index, y1=var_df['q95'], y2=var_df['q05'],
                              alpha=.2, color='#5f87ae', label='5-95th percentile')
             ax1.errorbar(var_df.index, var_df['mean'], var_df['std'],
@@ -117,9 +118,9 @@ def aggs_ts(df, outdir, logger):
                 ax1.set_ylim(var_df['q01'].min(), var_df['q99'].max())
             except ValueError:
                 pass
-            ax2.plot_date(var_df.index, var_df['count'], alpha=1, c='#37474F', label='count')
+            ax2.plot(var_df.index, var_df['count'], 'o', alpha=1, c='#37474F', label='count')
         else:
-            ax1.plot_date(var_df.index, var_df['total'], alpha=1, c='#455A64', label='total')
+            ax1.plot(var_df.index, var_df['total'], 'o', alpha=1, c='#455A64', label='total')
 
         text_args = dict(verticalalignment='top',
                          size=14, color='black', backgroundcolor='none', zorder=100)
@@ -187,10 +188,8 @@ def high_res_histogram(df, outfile, outdir, logger):
                            f"median: {dblock_df[col].median():.3f} | mean: {dblock_df[col].mean():.3f}\n" \
                            f"min: {dblock_df[col].min():.3f} | max:{dblock_df[col].max():.3f}"
                 ax.text(0.99, 0.96, txt_info, transform=ax.transAxes, horizontalalignment='right', **text_args)
-                for tick in ax.xaxis.get_major_ticks():
-                    tick.label.set_fontsize(6)
-                for tick in ax.yaxis.get_major_ticks():
-                    tick.label.set_fontsize(6)
+                # tick.label was removed in newer matplotlib, use tick_params instead
+                ax.tick_params(axis='both', which='major', labelsize=6)
             else:
                 # If data for col is empty
                 ax.set_facecolor('xkcd:salmon')
@@ -260,10 +259,8 @@ def high_res_ts(df, outfile, outdir, logger):
             else:
                 ax.tick_params(labelbottom=False)
 
-            for tick in ax.xaxis.get_major_ticks():
-                tick.label.set_fontsize(6)
-            for tick in ax.yaxis.get_major_ticks():
-                tick.label.set_fontsize(6)
+            # tick.label was removed in newer matplotlib, use tick_params instead
+            ax.tick_params(axis='both', which='major', labelsize=6)
 
         dblock_outfile = outdir / f"{outfile}_hires_{dblock}"
         fig.savefig(f"{dblock_outfile}.png", format='png', bbox_inches='tight', facecolor='w',

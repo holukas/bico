@@ -10,9 +10,15 @@
 - Changed: minimum Python version is now 3.12 (was 3.9). Dependencies were updated to versions that support
   Python 3.12: `pandas` (1.3.4 -> 2.x), `numpy` (1.21.2 -> 1.26.x), `matplotlib` (3.5.0 -> 3.8+),
   `pytz` (2021.3 -> 2024+).
-- Fixed: `pandas` 2.0 compatibility. `DataFrame.append()` (removed in pandas 2.0) was replaced with `pd.concat()`
-  in `ops.stats.calc`. Removed the now-deprecated `date_parser=None` argument from `pd.read_csv` calls in `bico.py`
-  and `ops.file.read_converted_ascii`.
+- Fixed: `pandas` 2.x compatibility. `DataFrame.append()` (removed in pandas 2.0) was replaced with `pd.concat()`
+  in `ops.stats.calc`. `DataFrame.pivot()` in `ops.vis.availability_heatmap` now uses keyword arguments
+  (`index=`/`columns=`/`values=`), which became mandatory in pandas 2.0. Removed the now-deprecated
+  `date_parser=None` and `keep_date_col=True` arguments from `pd.read_csv` calls in `bico.py` and
+  `ops.file.read_converted_ascii`.
+- Fixed: `matplotlib` compatibility. Replaced the removed `Axes.plot_date()` with `Axes.plot()` and the removed
+  `Tick.label` attribute with `Axes.tick_params(labelsize=...)` in `ops.vis`.
+- Verified: converting the test files (site CH-DAV, `HS50-A` + `IRGA72-A` + `QCL-C3`) on the new stack produces
+  output identical to the previous `poetry` / Python 3.9 version.
 
 ## v1.6.11 | 20 Nov 2025
 
