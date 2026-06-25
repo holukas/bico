@@ -1,5 +1,19 @@
 # BICO Changelog
 
+## v2.0 | XX XXX 2026
+
+### Migration to `uv` and Python 3.12
+
+- Changed: dependency management moved from `poetry` to [`uv`](https://docs.astral.sh/uv/). The `pyproject.toml`
+  now uses the standard PEP 621 `[project]` table, `poetry.lock` was removed and replaced by `uv.lock`. Create the
+  environment with `uv sync` and run the script with `uv run python src\bico.py` (see `README.md`).
+- Changed: minimum Python version is now 3.12 (was 3.9). Dependencies were updated to versions that support
+  Python 3.12: `pandas` (1.3.4 -> 2.x), `numpy` (1.21.2 -> 1.26.x), `matplotlib` (3.5.0 -> 3.8+),
+  `pytz` (2021.3 -> 2024+).
+- Fixed: `pandas` 2.0 compatibility. `DataFrame.append()` (removed in pandas 2.0) was replaced with `pd.concat()`
+  in `ops.stats.calc`. Removed the now-deprecated `date_parser=None` argument from `pd.read_csv` calls in `bico.py`
+  and `ops.file.read_converted_ascii`.
+
 ## v1.6.11 | 20 Nov 2025
 
 - Added: new datablock `HS50-R1` from the `rECord` logging script, used at site CH-AWS in 2025, and at CH-CHA since Aug

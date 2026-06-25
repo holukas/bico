@@ -22,16 +22,16 @@ in the same folder.
 - Latest release: https://github.com/holukas/bico/releases/latest
 - `bico` can be installed directly from source by specifying the desired version number
   via `pip install https://github.com/holukas/bico/archive/refs/tags/v1.6.0.tar.gz`
-- Using `poetry`, the file `pyproject.toml` can be used to install the environment that contains
-  all required dependencies to run the script.
+- Using [`uv`](https://docs.astral.sh/uv/), the file `pyproject.toml` can be used to install the environment that
+  contains all required dependencies to run the script. From the repository root, run `uv sync` to create the
+  virtual environment (`.venv`) with all pinned dependencies.
 
 ## Usage
 
 ### GUI
 
-- `bico` can be run via GUI, e.g. in the `poetry` environment under Windows run
-    - `python.exe .\bico.py -g` (for this you need to be in the folder `bico/src` where
-      the file `bico.py` is located)
+- `bico` can be run via GUI, e.g. in the `uv` environment under Windows run
+    - `uv run python src\bico.py -g` (run this from the repository root)
 
 ### CLI
 

@@ -245,7 +245,6 @@ def read_converted_ascii(filepath, compression):
                                          delimiter=',',
                                          # keep_date_col=True,
                                          parse_dates=False,
-                                         date_parser=None,
                                          index_col=None,
                                          dtype=None,
                                          compression=compression)

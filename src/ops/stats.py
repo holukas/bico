@@ -32,7 +32,8 @@ def calc(stats_df, stats_coll_df, bin_filedate, counter_bin_files, logger):
     if counter_bin_files == 1:
         stats_coll_df = stats_df.copy()
     else:
-        stats_coll_df = stats_coll_df.append(stats_df)
+        # DataFrame.append was removed in pandas 2.0, use pd.concat instead
+        stats_coll_df = pd.concat([stats_coll_df, stats_df])
 
     return stats_coll_df
 

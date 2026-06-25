@@ -149,7 +149,6 @@ class BicoEngine:
                 delimiter=',',
                 keep_date_col=True,
                 parse_dates=True,
-                date_parser=None,
                 index_col=0,
                 dtype=None
             )
