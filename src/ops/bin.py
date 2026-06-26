@@ -62,6 +62,10 @@ class ConvertData:
         self.dblock_headers = []
         self.cur_file_number = cur_file_number
 
+        # Precompute per-datablock conversion plans once (structs, sizes, flags),
+        # so the hot per-row loop does not recompute constant metadata.
+        self.dblock_plans = self._prepare_plans(dblocks)
+
         self.logger.info(f"    File size: {self.binary_filesize} Bytes")
 
     def run(self):
@@ -90,7 +94,7 @@ class ConvertData:
             file_newrow_records = []
             _end_of_data_reached = []
 
-            onerow_records = [self.read_instr_dblock(dblock=d) for d in self.dblocks]
+            onerow_records = [self.read_instr_dblock(plan=p) for p in self.dblock_plans]
             for dblock_records in onerow_records:
                 file_newrow_records.extend(dblock_records[0])
                 _end_of_data_reached.append(dblock_records[1])
@@ -112,49 +116,133 @@ class ConvertData:
         self.logger.info(f"    Finished conversion to ASCII.")
         self.file_speedstats()
 
-    def read_instr_dblock(self, dblock):
-        """Cycle through vars in data block"""
-        dblock_nominal_size, dblock_numvars = self.block_info(dblock=dblock)
+    def _prepare_plans(self, dblocks):
+        """Precompute a conversion plan per data block.
+
+        The per-row conversion loop is the performance bottleneck, so anything
+        constant per data block is computed once here instead of on every row:
+        compiled `struct.Struct` objects, the nominal block size and variable
+        count, base-256 recombination factors for multi-byte values, the bit map
+        dict, and the per-variable conversion flags. Produces results identical
+        to the original per-row logic, just without the repeated work.
+        """
+        plans = []
+        for dblock in dblocks:
+            var_plans = []
+            nominal_size = 0
+            numvars = 0
+            for name, props in dblock.items():
+                if 'bit_pos_start' in props:  # Bit map var, extracted later, not read from stream
+                    continue
+                nbytes = props['bytes']
+                nominal_size += nbytes
+                numvars += 1
+                # The .dblock formats are big-endian byte values: unsigned bytes (`B`,
+                # combined big-endian) except the signed short `>h`. convert_bytes_to_value
+                # recombined them as a base-256 integer, which is exactly int.from_bytes(.., 'big').
+                signed = 'h' in props['format']
+                units = props['units']
+                conversion_type = props['conversion_type']
+                convert_kind = units if units in ('diag_val_hs', 'status_code_irga',
+                                                   'status_code_lgr') else None
+                var_plans.append({
+                    'name': name,
+                    'nbytes': nbytes,
+                    'signed': signed,
+                    'conversion_type': conversion_type,
+                    'gain_on_signal': props['gain_on_signal'],
+                    'offset_on_signal': props['offset_on_signal'],
+                    'apply_gain': props['apply_gain'],
+                    'add_offset': props['add_offset'],
+                    'units': units,
+                    'is_data_size': 'DATA_SIZE' in name,
+                    'is_bit_map': units == 'bit_map',
+                    'convert_kind': convert_kind,
+                    'is_exception_r2a_tsonic': (conversion_type == 'exception'
+                                                and props['datablock'] == 'R2-A'
+                                                and name == 'T_SONIC'),
+                })
+            bit_map_dict = self.bit_map_get_vars(dblock=dblock)
+            bitmap_output_count = sum(1 for p in bit_map_dict.values() if p['output'] == 1)
+            plans.append({
+                'nominal_size': nominal_size,
+                'numvars': numvars,
+                'var_plans': var_plans,
+                'bit_map_dict': bit_map_dict,
+                'bitmap_output_count': bitmap_output_count,
+            })
+        return plans
+
+    @staticmethod
+    def _get_var_val_fast(vp, varbytes):
+        """get_var_val using int.from_bytes (C-level big-endian decode)"""
+        var_val = int.from_bytes(varbytes, 'big', signed=vp['signed'])
+
+        conversion_type = vp['conversion_type']
+        if conversion_type == 'regular':
+            var_val = (var_val / vp['gain_on_signal']) - vp['offset_on_signal']
+            var_val = (var_val * vp['apply_gain']) + vp['add_offset']
+        elif conversion_type == 'exception':
+            if vp['is_exception_r2a_tsonic']:
+                var_val = bce.dblock_r2a_t_sonic(var_val=var_val)
+        else:
+            var_val = '-conversion-type-not-defined-'
+        return var_val
+
+    @staticmethod
+    def _convert_val_fast(vp, var_val):
+        """convert_val branch selected once per variable via precomputed flag"""
+        convert_kind = vp['convert_kind']
+        if convert_kind is None:
+            return var_val
+        if convert_kind == 'diag_val_hs':
+            return int(var_val)
+        if convert_kind == 'status_code_irga':
+            return int(oct(int(var_val))[2:])  # octal without '0o' prefix
+        # status_code_lgr: relevant info is in last 4 bits
+        return int(bin(int(var_val))[-4:], 2)
+
+    def _extract_bit_map_fast(self, var_val, num_bytes, bit_map_dict):
+        """extract_bit_map using the precomputed bit map dict"""
+        var_binary_string = self.bit_map_var_to_bin(var_val=var_val, num_bytes=num_bytes)
+        return self.bit_map_extract_vals(bit_map_dict=bit_map_dict, var_binary_string=var_binary_string)
+
+    def read_instr_dblock(self, plan):
+        """Cycle through vars in data block (optimized, uses a precomputed plan)"""
+        dblock_nominal_size = plan['nominal_size']
+        dblock_numvars = plan['numvars']
+        bit_map_dict = plan['bit_map_dict']
         dblock_true_size = False  # Reset to False for each datablock
         dblock_data = []
         dblock_bytes_read = 0
         dblock_vars_read = 0
         end_of_data_reached = False
+        read = self.open_binary.read
 
-        for var, props in dblock.items():
+        for vp in plan['var_plans']:
+            nbytes = vp['nbytes']
+            varbytes = read(nbytes)  # Read Bytes for current var
+            nread = len(varbytes)
 
-            if 'bit_pos_start' in props.keys():  # Skip variables from bit map, will be extracted later
-                continue
-            varbytes = self.open_binary.read(props['bytes'])  # Read Bytes for current var
-
-            # Check if end of data
-            end_of_data_reached = self.check_if_end_of_data(varbytes=varbytes,
-                                                            required_varbytes=props['bytes'])
-            if end_of_data_reached:
+            # Check if end of data (no bytes, or not enough bytes for this var)
+            if nread < nbytes:
+                end_of_data_reached = True
                 break  # Stop for loop
 
             # Continue if bytes are available
-            self.file_total_bytes_read += len(varbytes)  # Total bytes of data file
-            dblock_bytes_read += len(varbytes)  # Bytes read for current instrument data block
+            self.file_total_bytes_read += nread  # Total bytes of data file
+            dblock_bytes_read += nread  # Bytes read for current instrument data block
             dblock_vars_read += 1
 
             # Get var value
-            var_val = self.get_var_val(var=var, varbytes=varbytes,
-                                       gain_on_signal=props['gain_on_signal'],
-                                       offset_on_signal=props['offset_on_signal'],
-                                       apply_gain=props['apply_gain'],
-                                       add_offset=props['add_offset'],
-                                       conversion_type=props['conversion_type'],
-                                       datablock=props['datablock'],
-                                       format=props['format'])
+            var_val = self._get_var_val_fast(vp, varbytes)
 
             # Check if variable gives data block size info
-            if 'DATA_SIZE' in var:
+            if vp['is_data_size']:
                 dblock_true_size = int(var_val)
-                end_of_data_reached = self.check_if_dblock_size_zero(dblock_true_size=dblock_true_size)
-
-            if end_of_data_reached:
-                break  # Stop for loop
+                if dblock_true_size == 0:  # Immediately stop if data block is zero bytes
+                    end_of_data_reached = True
+                    break  # Stop for loop
 
             # Check for missing or erroneous data blocks
             if dblock_true_size:
@@ -169,19 +257,18 @@ class ConvertData:
                     # then stop this data block and return.
 
                     # Convert to hex or octal if needed
-                    var_val = self.convert_val(units=props['units'], var_val=var_val)
+                    var_val = self._convert_val_fast(vp, var_val)
 
                     # Add value to data
                     dblock_data.append(var_val)
 
                     # Missing values for missing main vars
-                    dblock_data = self.set_vars_notread_to_missing(dblock_data_so_far=dblock_data,
-                                                                   dblock_numvars=dblock_numvars,
-                                                                   dblock_vars_read=dblock_vars_read)
+                    for _ in range(dblock_numvars - dblock_vars_read):
+                        dblock_data.append(-9999)
 
                     # Add missing value -9999 for each of the bit map vars that was selected for output
-                    dblock_data = self.set_extracted_vars_to_missing(dblock=dblock,
-                                                                     dblock_data_so_far=dblock_data)
+                    for _ in range(plan['bitmap_output_count']):
+                        dblock_data.append(-9999)
 
                     if dblock_true_size != 2:
                         self.read_rest_of_bytes(dblock_true_size=dblock_true_size,
@@ -189,18 +276,14 @@ class ConvertData:
                     break
 
             # Convert if needed
-            var_val = self.convert_val(units=props['units'], var_val=var_val)
+            var_val = self._convert_val_fast(vp, var_val)
 
             # Add value to data
             dblock_data.append(var_val)
 
             # Extract variables from bit map
-            if props['units'] == 'bit_map':
-                bit_map_vals = self.extract_bit_map(var_val=var_val,
-                                                    num_bytes=props['bytes'],
-                                                    dblock=dblock)
-                for bmv in bit_map_vals:
-                    dblock_data.append(bmv)
+            if vp['is_bit_map']:
+                dblock_data.extend(self._extract_bit_map_fast(var_val, nbytes, bit_map_dict))
 
         # return dblock_data
         return dblock_data, end_of_data_reached

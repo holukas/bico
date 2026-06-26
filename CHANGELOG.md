@@ -19,6 +19,10 @@
   `Tick.label` attribute with `Axes.tick_params(labelsize=...)` in `ops.vis`.
 - Verified: converting the test files (site CH-DAV, `HS50-A` + `IRGA72-A` + `QCL-C3`) on the new stack produces
   output identical to the previous `poetry` / Python 3.9 version.
+- Improved: binary-to-ASCII conversion is ~2.7x faster (test file: 432k rows in ~7.6s instead of ~20.8s). The
+  per-row loop in `ops.bin` now uses a precomputed per-datablock plan (block size, variable count and bit map dict
+  are computed once instead of every row) and decodes values with `int.from_bytes` instead of recombining bytes in
+  Python. Output is byte-for-byte identical to before.
 
 ## v1.6.11 | 20 Nov 2025
 
