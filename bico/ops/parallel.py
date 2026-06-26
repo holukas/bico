@@ -15,8 +15,7 @@ import traceback
 import pandas as pd
 
 from bico.ops import bin as bbin, file as bfile, format_data, stats as bstats, vis
-
-LOG_FORMAT = '%(asctime)s:%(name)s:  %(message)s'
+from bico.ops.logger import get_formatter
 
 
 def _capture_logger(name):
@@ -27,7 +26,7 @@ def _capture_logger(name):
     logger.propagate = False
     buf = io.StringIO()
     handler = logging.StreamHandler(buf)
-    handler.setFormatter(logging.Formatter(LOG_FORMAT))
+    handler.setFormatter(get_formatter())
     logger.addHandler(handler)
     return logger, buf
 

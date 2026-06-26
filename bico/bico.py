@@ -6,11 +6,7 @@ from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 import pandas as pd
-from PyQt5 import QtCore as qtc
-from PyQt5 import QtGui as qtg
-from PyQt5 import QtWidgets as qtw
 
-from bico.gui.gui import Ui_MainWindow
 from bico.ops import bin, vis, file, cli, parallel
 from bico.ops import logger as ops_logger, setup as ops_setup
 from bico.settings import _version
@@ -290,198 +286,6 @@ class BicoEngine:
         return dblocks_seq
 
 
-class BicoGUI(qtw.QMainWindow, Ui_MainWindow):
-    """Run BICO from GUI"""
-
-    def __init__(self, parent=None):
-        super(BicoGUI, self).__init__(parent)
-        self.setupUi(self)
-
-        self.dblocks_seq = []  # Data block sequence, order of instruments
-
-        # Detect Folders
-        dir_script = os.path.abspath(__file__)  # Dir of this file
-        dir_settings = Path(
-            os.path.join(os.path.dirname(dir_script))) / 'settings'  # Preload settings dir to load settings file
-
-        # Read Settings: File --> Dict
-        self.settings_dict = \
-            ops_setup.read_settings_file_to_dict(dir_settings=dir_settings,
-                                                 file='BICO.settings',
-                                                 reset_paths=False)
-
-        # Update dir settings in dict, for current run
-        self.update_dict_dir_settings(dir_script=dir_script, dir_settings=dir_settings)
-
-        # Fill-In Settings: Dict --> GUI
-        self._show_settings_in_gui()
-
-        # Connect GUI elements
-        self._connections()
-
-    def run(self):
-        self.btn_ctr_save.setDisabled(True)
-        self.btn_ctr_run.setDisabled(True)
-
-        # Setup
-        self._get_settings_from_gui()
-
-        bicoengine = BicoEngine(settings_dict=self.settings_dict,
-                                usedgui=True)
-        bicoengine.run()
-
-    def update_dict_key(self, key, new_val):
-        """ Updates key in Dict with new_val """
-        self.settings_dict[key] = new_val
-        ('{}: {}'.format(key, self.settings_dict[key]))
-
-    def _get_settings_from_gui(self):
-        """Read settings from GUI and store in dict"""
-        # Instruments
-        self.update_dict_key(key='site', new_val=self.cmb_instr_site_selection.currentText())
-        self.update_dict_key(key='header', new_val=self.cmb_instr_header.currentText())
-        self.update_dict_key(key='instrument_1', new_val=self.cmb_instr_instrument_1.currentText())
-        self.update_dict_key(key='instrument_2', new_val=self.cmb_instr_instrument_2.currentText())
-        self.update_dict_key(key='instrument_3', new_val=self.cmb_instr_instrument_3.currentText())
-
-        # Raw Data
-        self.update_dict_key(key='dir_source', new_val=self.lbl_rawdata_selected_source_folder.text())
-        self.update_dict_key(key='start_date',
-                             new_val=self.dtp_rawdata_time_range_start.dateTime().toString('yyyy-MM-dd hh:mm'))
-        self.update_dict_key(key='end_date',
-                             new_val=self.dtp_rawdata_time_range_end.dateTime().toString('yyyy-MM-dd hh:mm'))
-        self.update_dict_key(key='filename_datetime_format',
-                             new_val=self.lne_rawdata_datetime_format_in_filename.text())
-        self.update_dict_key(key='file_ext', new_val=self.lne_rawdata_file_extension.text())
-        self.update_dict_key(key='file_size_min', new_val=self.lne_rawdata_min_filesize.text())
-        self.update_dict_key(key='file_limit', new_val=self.lne_rawdata_file_limit.text())
-        self.update_dict_key(key='row_limit', new_val=self.lne_rawdata_row_limit.text())
-        self.update_dict_key(key='select_random_files', new_val=self.lne_rawdata_randomfiles.text())
-
-        # Output
-        self.update_dict_key(key='dir_out', new_val=self.lbl_output_folder.text())
-        self.update_dict_key(key='output_folder_name_prefix', new_val=self.lne_output_folder_name_prefix.text())
-        self.update_dict_key(key='add_instr_to_varname',
-                             new_val='1' if self.chk_output_variables_add_instr_to_varname.isChecked() else '0')
-        self.update_dict_key(key='file_compression', new_val=self.cmb_output_compression.currentText())
-        self.update_dict_key(key='plot_file_availability',
-                             new_val='1' if self.chk_output_plots_file_availability.isChecked() else '0')
-        self.update_dict_key(key='plot_ts_hires',
-                             new_val='1' if self.chk_output_plots_ts_hires.isChecked() else '0')
-        self.update_dict_key(key='plot_histogram_hires',
-                             new_val='1' if self.chk_output_plots_histogram_hires.isChecked() else '0')
-        self.update_dict_key(key='plot_ts_agg',
-                             new_val='1' if self.chk_output_plots_ts_agg.isChecked() else '0')
-
-    def update_dict_dir_settings(self, dir_script, dir_settings):
-        """Update dir info for current run"""
-        self.settings_dict['dir_script'] = os.path.join(os.path.dirname(dir_script))
-        self.settings_dict['dir_settings'] = dir_settings
-        self.settings_dict['dir_bico'] = Path(self.settings_dict['dir_script']).parents[0]
-        self.settings_dict['dir_root'] = Path(self.settings_dict['dir_script']).parents[1]
-
-        # Update dirs that can be changed in the gui; default empty paths to dir_bico
-        self.settings_dict['dir_source'] = \
-            self.settings_dict['dir_bico'] if not self.settings_dict['dir_source'] \
-            else self.settings_dict['dir_source']
-        self.settings_dict['dir_out'] = \
-            self.settings_dict['dir_bico'] if not self.settings_dict['dir_out'] \
-            else self.settings_dict['dir_out']
-
-    def _set_gui_combobox(self, combobox, find_text):
-        idx = combobox.findText(find_text, qtc.Qt.MatchContains)
-        if idx >= 0:
-            combobox.setCurrentIndex(idx)
-
-    def _set_gui_datetimepicker(self, datetimepicker, date_str):
-        qtDate = qtc.QDateTime.fromString(date_str, 'yyyy-MM-dd hh:mm')
-        datetimepicker.setDateTime(qtDate)
-
-    def _set_gui_lineedit(self, lineedit, string):
-        lineedit.setText(string)
-
-    def _set_gui_checkbox(self, checkbox, state):
-        checkbox.setChecked(True if state == '1' else False)
-
-    def _show_settings_in_gui(self):
-        """Update GUI from dict"""
-        # Instruments
-        self._set_gui_combobox(combobox=self.cmb_instr_site_selection, find_text=self.settings_dict['site'])
-        self._set_gui_combobox(combobox=self.cmb_instr_header, find_text=self.settings_dict['header'])
-        self._set_gui_combobox(combobox=self.cmb_instr_instrument_1, find_text=self.settings_dict['instrument_1'])
-        self._set_gui_combobox(combobox=self.cmb_instr_instrument_2, find_text=self.settings_dict['instrument_2'])
-        self._set_gui_combobox(combobox=self.cmb_instr_instrument_3, find_text=self.settings_dict['instrument_3'])
-
-        # Raw Data
-        self.lbl_rawdata_selected_source_folder.setText(str(self.settings_dict['dir_source']))
-        self._set_gui_datetimepicker(datetimepicker=self.dtp_rawdata_time_range_start,
-                                     date_str=self.settings_dict['start_date'])
-        self._set_gui_datetimepicker(datetimepicker=self.dtp_rawdata_time_range_end,
-                                     date_str=self.settings_dict['end_date'])
-        self._set_gui_lineedit(lineedit=self.lne_rawdata_datetime_format_in_filename,
-                               string=self.settings_dict['filename_datetime_format'])
-        self._set_gui_lineedit(lineedit=self.lne_rawdata_file_extension, string=self.settings_dict['file_ext'])
-        self._set_gui_lineedit(lineedit=self.lne_rawdata_min_filesize, string=self.settings_dict['file_size_min'])
-        self._set_gui_lineedit(lineedit=self.lne_rawdata_file_limit, string=self.settings_dict['file_limit'])
-        self._set_gui_lineedit(lineedit=self.lne_rawdata_row_limit, string=self.settings_dict['row_limit'])
-        self._set_gui_lineedit(lineedit=self.lne_rawdata_randomfiles, string=self.settings_dict['select_random_files'])
-
-        # Output
-        self.lbl_output_folder.setText(str(self.settings_dict['dir_out']))
-        self._set_gui_lineedit(lineedit=self.lne_output_folder_name_prefix,
-                               string=self.settings_dict['output_folder_name_prefix'])
-        self._set_gui_checkbox(checkbox=self.chk_output_variables_add_instr_to_varname,
-                               state=self.settings_dict['add_instr_to_varname'])
-        self._set_gui_combobox(combobox=self.cmb_output_compression, find_text=self.settings_dict['file_compression'])
-        self._set_gui_checkbox(checkbox=self.chk_output_plots_file_availability,
-                               state=self.settings_dict['plot_file_availability'])
-        self._set_gui_checkbox(checkbox=self.chk_output_plots_ts_hires,
-                               state=self.settings_dict['plot_ts_hires'])
-        self._set_gui_checkbox(checkbox=self.chk_output_plots_histogram_hires,
-                               state=self.settings_dict['plot_histogram_hires'])
-        self._set_gui_checkbox(checkbox=self.chk_output_plots_ts_agg,
-                               state=self.settings_dict['plot_ts_agg'])
-
-    def _call_link(self, link_str):
-        """Call hyperlink from label, opens in browser"""
-        qtg.QDesktopServices.openUrl(qtc.QUrl(link_str))
-
-    def _connections(self):
-        """Connect GUI elements to functions"""
-        # Logo
-        self.lbl_link_changelog.linkActivated.connect(self._call_link)
-        self.lbl_link_datablocks.linkActivated.connect(self._call_link)
-        self.lbl_link_releases.linkActivated.connect(self._call_link)
-        self.lbl_link_source_code.linkActivated.connect(self._call_link)
-        self.lbl_link_license.linkActivated.connect(self._call_link)
-
-        # Raw Data
-        self.btn_rawdata_source_folder.clicked.connect(lambda: self._select_dir(
-            start_dir=self.settings_dict['dir_source'], dir_setting='dir_source',
-            update_label=self.lbl_rawdata_selected_source_folder, dialog_txt='Select Source Folder For Raw Data Files'))
-
-        # Output
-        self.btn_output_folder.clicked.connect(lambda: self._select_dir(
-            start_dir=self.settings_dict['dir_out'], dir_setting='dir_out',
-            update_label=self.lbl_output_folder, dialog_txt='Select Output Folder'))
-
-        # Controls
-        self.btn_ctr_save.clicked.connect(lambda: self._save_settings())
-        self.btn_ctr_run.clicked.connect(lambda: self.run())
-
-    def _save_settings(self):
-        """Get selected settings from GUI elements, store in dict and save to file"""
-        self._get_settings_from_gui()
-        file.save_settings_to_file(self.settings_dict)
-
-    def _select_dir(self, start_dir, dir_setting, update_label, dialog_txt):
-        """ Select directory, update dict and label"""
-        selected_dir = qtw.QFileDialog.getExistingDirectory(None, dialog_txt, str(start_dir))  # Open dialog
-        self.settings_dict[dir_setting] = selected_dir  # Update settings dict
-        update_label.setText(self.settings_dict[dir_setting])  # Update gui
-        # ops_setup.settings_dict_to_file(settings_dict=self.settings_dict)  # Save to file
-
-
 class BicoFolder:
     """
     Run BICO in specified folder without GUI
@@ -560,21 +364,16 @@ class BicoFolder:
 
 
 def main(args):
-    # Run BICO w/o GUI
+    # Run BICO headless in a folder
     if args.folder:
         days = args.days if args.days else None
         bicofromfolder = BicoFolder(folder=args.folder, days=days, avoidduplicates=args.avoidduplicates)
         bicofromfolder.run()
 
-    # Run BICO with GUI
-    elif args.gui:
-        app = qtw.QApplication(sys.argv)
-        bicofromgui = BicoGUI()
-        bicofromgui.show()
-        app.exec_()
-
+    # Run BICO with the terminal UI (explicitly via -t, or by default when no FOLDER given)
     else:
-        print("Please add arg how BICO should be executed. Add '-h' for help.")
+        from bico.tui.app import run_tui  # imported lazily so headless runs never need Textual
+        run_tui()
 
 
 def main_cli():

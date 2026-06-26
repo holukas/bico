@@ -36,6 +36,7 @@ dir_out=
 
 output_folder_name_prefix=test
 file_compression=gzip
+num_processes=0
 
 add_instr_to_varname=1
 

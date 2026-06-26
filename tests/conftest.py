@@ -8,6 +8,6 @@ from pathlib import Path
 
 import bico
 
-# Location of the installed `bico` package (holds settings/data_blocks, images).
+# Location of the installed `bico` package (holds settings/data_blocks).
 PACKAGE_DIR = Path(bico.__file__).resolve().parent
 DATA_DIR = Path(__file__).resolve().parent / "data"

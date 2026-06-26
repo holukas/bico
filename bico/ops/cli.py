@@ -34,8 +34,9 @@ def get_args():
     #                     help="soon")
 
     # Optional args
-    parser.add_argument('-g', '--gui', action='store_true',
-                        help="If set, start BICO with GUI, is ignored if FOLDER is given")
+    parser.add_argument('-t', '--tui', action='store_true',
+                        help="Start BICO with the terminal UI (TUI); ignored if FOLDER is given. "
+                             "The TUI is also launched when no arguments are given.")
     parser.add_argument('-f', '--folder', type=str,
                         help="Path to folder: "
                              "run BICO without GUI in the specified FOLDER, needs 'BICO.settings' file in FOLDER")

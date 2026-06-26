@@ -2,55 +2,79 @@ import logging
 import sys
 from pathlib import Path
 
+# Shared log formatting, used by the main logger and by the per-file workers
+# (bico.ops.parallel) so that worker logs replayed into the main log are
+# byte-consistent with lines written directly by the main logger.
+LOG_FORMAT = '%(asctime)s | %(levelname)-7s | %(message)s'
+DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 
-def setup_logger(settings_dict):
-    logfile_name = f"{settings_dict['run_id']}.log"
-    logfile_path = settings_dict['dir_out_run_log'] / logfile_name
-    logger = create_logger(logfile_path=logfile_path, name='main_logger')
-    return logger
+
+def get_formatter():
+    """The shared log formatter (file output and replayed worker output)."""
+    return logging.Formatter(LOG_FORMAT, datefmt=DATE_FORMAT)
 
 
-def create_logger(name: str, logfile_path: Path = None):
-    """
-    Create name logger and log outputs to file
-
-    A new logger is only created if name does not exist.
+def setup_logger(settings_dict, console: bool = True):
+    """Create the main run logger writing to this run's log file.
 
     Parameters
     ----------
-    logfile_path: Path
+    settings_dict : dict
+        Run settings; must contain 'run_id' and 'dir_out_run_log'.
+    console : bool
+        If True, also stream log output to stdout. The TUI sets this False
+        (it routes the logger into an on-screen console widget instead, so a
+        stdout stream would corrupt the terminal UI).
+    """
+    logfile_name = f"{settings_dict['run_id']}.log"
+    logfile_path = settings_dict['dir_out_run_log'] / logfile_name
+    logger = create_logger(logfile_path=logfile_path, name='main_logger', console=console)
+    return logger
+
+
+def create_logger(name: str, logfile_path: Path = None, console: bool = True):
+    """
+    Create a named logger that logs to a file (and optionally to stdout).
+
+    Handlers are reset on every call so that each run gets a fresh file handler
+    pointing at that run's log file. (The logger name is reused across runs in a
+    long-lived process such as the TUI, so without a reset the first run's
+    handlers would persist and keep writing to the first run's log file.)
+
+    Parameters
+    ----------
+    name : str
+        Logger name.
+    logfile_path : Path
         Path to the log file to which the log output is saved.
-    name:
-        Corresponds to the __name__ of the calling file.
+    console : bool
+        If True, attach a stdout stream handler in addition to the file handler.
 
     Returns
     -------
-    logger class
-
-    References
-    ----------
-    https://www.youtube.com/watch?v=jxmzY9soFXg
-    https://stackoverflow.com/questions/53129716/how-to-check-if-a-logger-exists
+    logging.Logger
     """
 
     logger = logging.getLogger(name)
 
-    # Only create new logger if it does not exist already for the respective module,
-    # otherwise the log output would be printed x times because a new logger is
-    # created everytime the respective module is called.
-    if not logger.hasHandlers():
-        logger.setLevel(logging.DEBUG)
+    # Reset any handlers from a previous run before attaching fresh ones (see
+    # docstring): close file handlers so the previous run's log file is released.
+    for handler in list(logger.handlers):
+        handler.close()
+        logger.removeHandler(handler)
 
-        formatter = logging.Formatter('%(asctime)s:%(name)s:  %(message)s')
+    logger.setLevel(logging.DEBUG)
 
-        file_handler = logging.FileHandler(logfile_path)
-        file_handler.setLevel(logging.DEBUG)
-        file_handler.setFormatter(formatter)
+    formatter = get_formatter()
 
+    file_handler = logging.FileHandler(logfile_path, encoding='utf-8')
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+
+    if console:
         stream_handler = logging.StreamHandler(stream=sys.stdout)
         stream_handler.setFormatter(formatter)
-
-        logger.addHandler(file_handler)
         logger.addHandler(stream_handler)
 
     return logger
