@@ -19,6 +19,16 @@ Guidance for working in the `bico` repository.
 - Set up the environment: `uv sync`
 - Run the GUI: `uv run python src\bico.py -g`
 - Run headless: `uv run python src\bico.py -f <folder> -d <days> -a`
+- Run the tests: `uv run pytest`
+
+## Testing
+
+- Tests live in `tests/` and use `pytest` (a dev dependency, in the `dev` group of `pyproject.toml`).
+- `tests/conftest.py` puts `src/` on `sys.path` so tests import the conversion modules directly
+  (`from ops import bin`) without importing the PyQt5 GUI.
+- The main test is a golden-file test: it converts a small truncated real binary
+  (`tests/data/*.X00`) and asserts the output matches a committed expected CSV (`tests/data/*.golden.csv`).
+  The conversion output must stay byte-for-byte stable, so this guards against regressions in converted values.
 
 ## Architecture notes
 

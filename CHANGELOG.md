@@ -23,6 +23,9 @@
   per-row loop in `ops.bin` now uses a precomputed per-datablock plan (block size, variable count and bit map dict
   are computed once instead of every row) and decodes values with `int.from_bytes` instead of recombining bytes in
   Python. Output is byte-for-byte identical to before.
+- Added: a `pytest` test suite (`tests/`) with a golden-file test for the conversion. It converts a small truncated
+  real binary file and compares the result against a committed expected output, guarding against unintended changes
+  to converted values or formatting. Run with `uv run pytest`.
 
 ## v1.6.11 | 20 Nov 2025
 
