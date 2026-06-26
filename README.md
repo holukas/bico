@@ -10,7 +10,7 @@ flux calculations in EddyPro.
 
 Instruments send their data in data blocks. One data block contains all data
 from the respective instrument at the time of measurement. For example, the
-data blocks sent by sonic anemometers comprises the wind variables, sonic temperature
+data blocks sent by sonic anemometers comprise the wind variables, sonic temperature
 and other variables. Data blocks from gas analyzers comprise concentrations (e.g., CO2,
 H2O), instrument metrics (e.g., signal strength), among others.
 
@@ -32,6 +32,26 @@ linked to its spec and documentation.
 - As a package: `bico` can also be installed directly from a release tag, e.g.
   `pip install https://github.com/holukas/bico/archive/refs/tags/v2.0.tar.gz`, which provides the `bico` command.
 
+### From scratch on a new machine
+
+These steps take a clean machine from nothing to a running `bico`. `uv` handles both the dependencies
+and the Python 3.12 interpreter, so you do not need to install Python yourself first.
+
+1. **Install `uv`.** Pick the command for your system:
+    - Windows (PowerShell): `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`
+    - macOS / Linux: `curl -LsSf https://astral.sh/uv/install.sh | sh`
+
+   Then open a new terminal so `uv` is on your `PATH`. Check it with `uv --version`.
+2. **Get the source.** Clone the repository (or download a release zip and unpack it):
+    - `git clone https://github.com/holukas/bico.git`
+    - `cd bico`
+3. **Create the environment.** From the repository root, run `uv sync`. This downloads Python 3.12 if it
+   is missing, creates the `.venv` virtual environment, and installs every pinned dependency from
+   `pyproject.toml` / `uv.lock`. No separate `pip install` or manual `venv` activation is needed.
+4. **Run it.** Start the terminal UI with `uv run bico` (see Usage for the TUI and the headless CLI).
+
+To update later, run `git pull` and then `uv sync` again to pick up any changed dependencies.
+
 ## Usage
 
 `bico` is installed as a package and exposes a `bico` command (run `uv sync` once to set up the environment).
@@ -45,50 +65,50 @@ by hand, or a **headless CLI** for automated/scheduled runs.
 - Start the TUI with either of:
     - `uv run bico -t`
     - `uv run bico` (the TUI is the default when no other action is given)
-- The TUI runs in your terminal — full-screen, but it also adapts to smaller window sizes. Settings are on the
+- The TUI runs full-screen in your terminal but also adapts to smaller window sizes. Settings are on the
   left, and a live console showing the run log is on the right. It needs no display server, so it also works
   over SSH.
 - Layout and controls:
-    - **Instruments** — site, logger header, and up to three instrument data blocks (sonic + gas analyzers).
-    - **Raw data** — source folder; start/end date (`YYYY-MM-DD HH:MM`, both ends inclusive); the filename
+    - **Instruments**: site, logger header, and up to three instrument data blocks (sonic and gas analyzers).
+    - **Raw data**: source folder; start/end date (`YYYY-MM-DD HH:MM`, both ends inclusive); the filename
       datetime format (which includes the extension and also determines which files are searched, so there is no
       separate file-extension setting); and file-selection settings (`0` = no limit for the file/row limits).
-    - **Output** — output folder, folder-name prefix, compression, worker processes (`0` = auto), and which plots
+    - **Output**: output folder, folder-name prefix, compression, worker processes (`0` = auto), and which plots
       to produce.
-    - **Stop** — press while a conversion is running to end it early: the file currently being converted finishes,
+    - **Stop**: press while a conversion is running to end it early. The file currently being converted finishes,
       then no further files are started and the run winds down. Already-converted files are kept.
-    - **Run options** — convert only the most recent *N* days (`0` = use the date range), and skip files already
+    - **Run options**: convert only the most recent *N* days (`0` = use the date range), and skip files already
       present in the output folder.
     - **Source folder** and **Output folder** have a **Browse…** button that opens a folder picker; in the picker
       you can browse the tree, go **Up**, or type/paste a path and press Enter to jump to it. You can also type the
       path directly into the field.
 - Workflow: configure the settings, press **Validate** (`v`), then **Run** (`r`). **Validate** checks every field,
   prints the exact settings the run will use (with a short note on each), and counts the matching files in the
-  source folder. **Run is disabled until validation passes**, and editing any field disables it again — so you
+  source folder. **Run is disabled until validation passes**, and editing any field disables it again, so you
   always run exactly what you validated. **Test run** (`t`) does a quick dry conversion of the first rows of the
   first matching file (writing nothing), to confirm the settings produce a valid result before a full run. While a
   run is in progress, a progress bar shows files done/total with an estimated remaining time, and below it each
   file currently being converted gets its own line with a per-file percentage and the current step (Reading,
-  Converting, Saving, …) — so with several worker processes you see every in-flight file at once. Each file's
-  detailed, colour-coded log appears in the console as soon as that file finishes.
+  Converting, Saving, and so on), so with several worker processes you see every in-flight file at once. Each
+  file's detailed, colour-coded log appears in the console as soon as that file finishes.
 - Key bindings (also shown in the footer):
-    - `v` — validate settings (enables Run when everything is OK)
-    - `d` — detect the time range from the source files (fills Start/End date)
-    - `t` — test run (dry conversion of the first file, nothing written)
-    - `r` — run the conversion
-    - `s` — save the current settings to `bico.settings`
-    - `f` — show / hide the settings panel (console fills the width)
-    - `Ctrl+L` — clear the console
-    - `h` — open the in-app help
-    - `q` — quit
+    - `v`: validate settings (enables Run when everything is OK)
+    - `d`: detect the time range from the source files (fills Start/End date)
+    - `t`: test run (dry conversion of the first file, nothing written)
+    - `r`: run the conversion
+    - `s`: save the current settings to `bico.settings`
+    - `f`: show / hide the settings panel (console fills the width)
+    - `Ctrl+L`: clear the console
+    - `h`: open the in-app help
+    - `q`: quit
 - The TUI opens with the settings you last saved to `bico/settings/bico.settings`, so it always starts where you
   left off. Saving writes only the user-editable settings back to that file (run-only options such as "recent days"
   and "avoid duplicates" are not persisted). Each run also writes a `bico.settings` snapshot of its effective
   settings and a log file into that run's output folder; the source `bico.settings` is never modified by a run.
-- To reuse a previous run's settings, **drag and drop its `bico.settings` file anywhere onto the TUI** — the form is
-  filled from it. (Most terminals deliver a dropped file as its pasted path, which the TUI recognises.)
+- To reuse a previous run's settings, **drag and drop its `bico.settings` file anywhere onto the TUI**, and the form
+  is filled from it. (Most terminals deliver a dropped file as its pasted path, which the TUI recognises.)
 - To set the **source** or **output** folder without browsing, **click the field to focus it, then drag and drop a
-  file or folder onto the TUI** — the field is filled with the folder path (a dropped file uses the folder that
+  file or folder onto the TUI**. The field is filled with the folder path (a dropped file uses the folder that
   contains it). The terminal sends the dropped path to the focused field, so make sure the field you want is focused.
 - To copy from the **console**, drag with the mouse to select text and press **Ctrl+C** (double-click selects a line).
 - **Detect dates from source files** (`d`) scans the source folder, parses every file's date with the filename
@@ -114,14 +134,14 @@ by hand, or a **headless CLI** for automated/scheduled runs.
 
 ## Documentation
 
-- [Data blocks overview](bico/settings/data_blocks/README.md) — all supported
+- [Data blocks overview](bico/settings/data_blocks/README.md): all supported
   instruments and logging variants, each linked to its `.dblock` spec and `.md` notes.
-- [Settings reference](bico/settings/data_blocks/_help_bico_settings.md) — explains
+- [Settings reference](bico/settings/data_blocks/_help_bico_settings.md): explains
   every variable property used inside a `.dblock` file.
-- [Reference comparisons](tests/reference_comparisons.md) — regression tests that
+- [Reference comparisons](tests/reference_comparisons.md): regression tests that
   assert byte-identical converted output against a known-good (bico-1.6.0) reference
   across several sites.
-- [Changelog](CHANGELOG.md) — release history and notable changes.
+- [Changelog](CHANGELOG.md): release history and notable changes.
 
 ## Testing
 

@@ -128,22 +128,26 @@ Screen {
 
 /* Pinned to the bottom of the settings pane so it always reserves its own row
    and never overlaps the scrollable fields (which otherwise hid the lower
-   fields, e.g. the output folder, on short terminals). */
+   fields, e.g. the output folder, on short terminals). A 4-column grid so the
+   seven buttons wrap onto two rows and all stay visible even on a narrow pane
+   (a single row clipped the last button, "Stop"). */
 #actions {
     dock: bottom;
     height: auto;
     padding: 1 0 0 0;
-    align: center middle;
+    layout: grid;
+    grid-size: 4;
+    grid-gutter: 0 1;
     background: $surface;
 }
 
 #actions Button {
-    width: auto;
+    width: 1fr;
     height: 1;
     min-width: 0;
     border: none;
-    padding: 0 2;
-    margin: 0 1;
+    padding: 0;
+    margin: 0;
 }
 
 /* ---- console (right) ---- */
@@ -159,10 +163,22 @@ Screen {
     padding: 0 0 1 1;
 }
 
+/* Top row of the console pane: progress bars (left) and the live plot (right),
+   side by side at the same height. */
+#top-row {
+    height: auto;
+    margin: 0 0 1 0;
+}
+
+#progress-area {
+    width: 1fr;
+    height: auto;
+}
+
 #run-status {
     height: auto;          /* one line per in-progress file (parallel runs) */
     padding: 0 1;
-    margin: 0 0 1 0;
+    margin: 0;
     color: $text;
 }
 
@@ -172,6 +188,27 @@ Screen {
     border: round $primary 50%;
     padding: 0 1;
     scrollbar-gutter: stable;
+}
+
+/* ---- live plot (top-right, beside the progress bars) ---- */
+
+#plot-pane {
+    width: 60;
+    height: auto;
+    margin: 0 0 0 2;
+}
+
+.plot-title {
+    height: 1;
+    color: $text;
+    padding: 0 0 0 1;
+}
+
+/* minimal: transparent background, no border — just the points and the axes */
+#plot-canvas {
+    height: auto;
+    padding: 0 1;
+    background: transparent;
 }
 
 /* ---- help modal ---- */

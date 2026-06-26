@@ -28,6 +28,7 @@ from bico.bico import BicoEngine
 from bico.ops import bin as bbin, file as bfile, setup as ops_setup
 from bico.settings import _version as info
 from bico.tui.log_handler import make_tui_handler
+from bico.tui.plot import render_braille_plot, PLOT_COLORS
 
 # Rows converted for a test run (a quick dry conversion of the first file).
 TEST_RUN_ROWS = 20
@@ -250,12 +251,19 @@ validation results and the live run log.
    will use, and counts the matching files in the source folder.
 3. Press **Run** (`r`). Run stays off until Validate passes, and editing any
    field switches it off again, so you always run exactly what you validated.
+   The live plot (top-right) fills in automatically as files convert.
 
 ## Settings files
-The TUI opens with the settings you last saved (`s`) to `bico.settings`. Each run
-also drops a `bico.settings` snapshot into its output folder. To reuse a previous
-run's settings, **drag and drop its `bico.settings` file anywhere onto the TUI**
-and the form is filled from it.
+The TUI opens with the settings you last saved (`s`) to the source `bico.settings`.
+Each run also drops a `bico.settings` snapshot into its output folder. Three
+buttons manage settings files (none of them changes the source file until you
+Save):
+- **Save** (`s`): write the current form back to the source `bico.settings`.
+- **Load…** (`l`): read a `bico.settings` you pick — e.g. a previous run's
+  snapshot — into the form. (To *reuse* an earlier run's settings, Load its
+  snapshot; dragging a file onto the TUI only fills folder fields, see below.)
+- **Export…** (`e`): write the current form as a `bico.settings` into a folder
+  you choose, e.g. to seed a headless run folder.
 
 ## Drag and drop folders
 Instead of browsing, click the **Source folder** or **Output folder** field to
@@ -275,6 +283,15 @@ Press **Stop** to end a running conversion early. The file being converted
 finishes (so its output is complete), then no further files are started and the
 run winds down normally. Files already converted are kept.
 
+## Live plot
+Top-right, beside the progress bars, bico plots the **first 100 values of the
+first three variables** (for a sonic that is U, V, W) as each file finishes
+converting. The three are overlaid on a shared min/max y-axis, each in its own
+colour, matching the variable names shown in the plot title (the legend). It
+starts automatically on Run — nothing to pick — and redraws for every file in
+completion order. Missing values (-9999) are skipped. Press **`p`** to show or
+hide the plot pane.
+
 ## Copy from the log
 Drag with the mouse to select text in the console, then press **Ctrl+C** to copy
 it. Double-click selects a line.
@@ -285,9 +302,11 @@ it. Double-click selects a line.
 - `t`: test run, converting the first rows of the first file and writing nothing
 - `r`: run the conversion
 - `s`: save settings to the source `bico.settings`
+- `l`: load settings from a `bico.settings` file you pick into the form
 - `e`: export the current settings as a `bico.settings` into a folder you choose
   (e.g. a headless run folder); the source `bico.settings` is left unchanged
 - `f`: show or hide the settings panel
+- `p`: show or hide the live plot pane
 - `ctrl+l`: clear the console
 - `h`: this help
 - `q`: quit
@@ -544,6 +563,7 @@ class BicoApp(App):
         ('l', 'load_settings', 'Load'),
         ('e', 'export_settings', 'Export'),
         ('f', 'toggle_settings', 'Show/hide settings'),
+        ('p', 'toggle_plot', 'Show/hide plot'),
         ('ctrl+l', 'clear_console', 'Clear log'),
         # Override the App's default ctrl+c (which only shows a "press q to quit"
         # hint for non-Input widgets) so it copies the console selection instead.
@@ -608,12 +628,20 @@ class BicoApp(App):
                     yield Button('Stop', id='btn-stop', variant='error', disabled=True)
             with Vertical(id='console-pane'):
                 yield Static('Console', classes='pane-title')
-                progress = ProgressBar(id='progress', show_eta=True)
-                progress.display = False  # shown only while a conversion runs
-                yield progress
-                status = Static('', id='run-status')
-                status.display = False  # shows the current file / step / % live
-                yield status
+                # Top row: progress bars on the left, the live plot to their right
+                # at the same height. The console fills the rest below.
+                with Horizontal(id='top-row'):
+                    with Vertical(id='progress-area'):
+                        progress = ProgressBar(id='progress', show_eta=True)
+                        progress.display = False  # shown only while a conversion runs
+                        yield progress
+                        status = Static('', id='run-status')
+                        status.display = False  # shows the current file / step / % live
+                        yield status
+                    with Vertical(id='plot-pane'):
+                        yield Static('Live plot: first 3 variables, per file (starts on Run).',
+                                     id='plot-title', classes='plot-title')
+                        yield Static('', id='plot-canvas')
                 yield SelectableRichLog(id='console', highlight=False, markup=False, wrap=True)
         yield Footer()
 
@@ -739,6 +767,11 @@ class BicoApp(App):
         """Hide/show the left settings pane; the console fills the freed width."""
         settings = self.query_one('#settings')
         settings.display = not settings.display
+
+    def action_toggle_plot(self) -> None:
+        """Hide/show the live plot pane (top-right, beside the progress bars)."""
+        pane = self.query_one('#plot-pane')
+        pane.display = not pane.display
 
     def action_save_settings(self) -> None:
         settings = self._collect_form()
@@ -1245,6 +1278,12 @@ class BicoApp(App):
         console = self.query_one('#console', RichLog)
         console.write(Text('─' * 40, style='dim'))
         console.write(Text('Starting conversion…', style='bold cyan'))
+        # The live plot always shows the first 3 variables, redrawn per file.
+        self.query_one('#plot-pane').display = True
+        self.query_one('#plot-title', Static).update(
+            Text('Live plot: first 3 variables, per file…', style='dim'))
+        console.write(Text('Live plot: first 3 variables (first 100 values, updated per file).',
+                           style='green'))
         self._run_engine(settings, avoid)
 
     def action_stop_conversion(self) -> None:
@@ -1287,7 +1326,8 @@ class BicoApp(App):
                                 avoidduplicates=avoidduplicates,
                                 progress_callback=self._on_progress,
                                 file_progress_callback=self._on_file_progress,
-                                should_stop=self._stop_event.is_set)
+                                should_stop=self._stop_event.is_set,
+                                plot_callback=self._on_plot_series)
             # Route the engine's logger into the console; drop the stdout stream
             # handler the engine added (it would otherwise fight the TUI).
             for handler in list(engine.logger.handlers):
@@ -1315,6 +1355,27 @@ class BicoApp(App):
     def _on_file_progress(self, idx: int, total: int, filename: str, step: str, frac: float) -> None:
         """Engine per-file progress (worker thread) → update the live status lines."""
         self.call_from_thread(self._update_file_status, idx, total, filename, step, frac)
+
+    def _on_plot_series(self, idx: int, filename: str, series: list) -> None:
+        """Engine per-file plot data (worker thread) → redraw the live plot."""
+        self.call_from_thread(self._update_plot, filename, series)
+
+    def _update_plot(self, filename: str, series: list) -> None:
+        """Draw one file's first values of the leading variables, overlaid in colour.
+
+        ``series`` is the worker's list of per-variable dicts. The title doubles as
+        a legend: each variable name is shown in the colour used for its points.
+        """
+        self.query_one('#plot-pane').display = True
+        title = Text('▦ ', style='bold green')
+        for i, s in enumerate(series):
+            if i:
+                title.append('  ')
+            title.append(s.get('var', ''), style=PLOT_COLORS[i % len(PLOT_COLORS)])
+        n = max((len(s.get('y', [])) for s in series), default=0)
+        title.append(f'  · first {n} · {filename}', style='dim')
+        self.query_one('#plot-title', Static).update(title)
+        self.query_one('#plot-canvas', Static).update(render_braille_plot(series))
 
     @staticmethod
     def _status_line(idx: int, total: int, filename: str, step: str, frac: float) -> Text:

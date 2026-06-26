@@ -31,6 +31,29 @@ def _capture_logger(name):
     return logger, buf
 
 
+def _extract_plot_series(df, n_vars, n):
+    """First ``n`` values of the first ``n_vars`` numeric columns.
+
+    Returns a list of small picklable dicts ``{'var', 'units', 'y'}`` (``y`` a
+    plain list of floats, missing values left as -9999 for the renderer to drop),
+    one per variable, in column order. Non-numeric columns (e.g. text status
+    fields) are skipped, so the list holds the first ``n_vars`` *plottable*
+    variables. May be shorter than ``n_vars`` if the frame has fewer.
+    """
+    out = []
+    for col in df.columns:
+        if len(out) >= n_vars:
+            break
+        try:
+            y = [float(v) for v in df[col].head(n).tolist()]
+        except (TypeError, ValueError):
+            continue  # skip non-numeric columns
+        name = col[0] if isinstance(col, tuple) else col
+        units = str(col[1]) if isinstance(col, tuple) and len(col) > 1 else ''
+        out.append({'var': str(name), 'units': units, 'y': y})
+    return out
+
+
 def _make_reporter(task):
     """Build a ``report(step, fraction)`` callback for live per-file progress.
 
@@ -59,6 +82,39 @@ def _make_reporter(task):
     return report
 
 
+def _make_plot_reporter(task):
+    """Build a ``report_plot(series)`` callback for the live plot.
+
+    Emits one file's plot series as soon as it is available (right after the
+    table is built, before the slower save/stats/plots tail), so the plot updates
+    during conversion rather than only when the file's future completes. Like
+    ``_make_reporter``: sequential runs use an in-process callable
+    (``task['plot_cb']``), parallel runs push onto the shared
+    ``task['progress_queue']`` (drained live by the main process). A no-op when
+    neither is set. Failures never disturb conversion.
+    """
+    cb = task.get('plot_cb')
+    queue = task.get('progress_queue')
+    if cb is None and queue is None:
+        return lambda series: None
+
+    idx = task.get('task_index', task['counter'])
+    bin_file = task['bin_file']
+
+    def report_plot(series):
+        if not series:
+            return
+        try:
+            if cb is not None:
+                cb(idx, bin_file, series)
+            else:
+                queue.put_nowait({'idx': idx, 'file': bin_file, 'plot': series})
+        except Exception:
+            pass
+
+    return report_plot
+
+
 def process_file(task):
     """Convert a single binary file and produce its outputs.
 
@@ -75,12 +131,14 @@ def process_file(task):
     """
     logger, buf = _capture_logger(f"bico_worker_{task['counter']}")
     report = _make_reporter(task)
+    report_plot = _make_plot_reporter(task)
     result = {
         'counter': task['counter'],
         'bin_filedate': task['bin_filedate'],
         'status': 'ok',
         'error': None,
         'stats_row': None,
+        'plot_series': None,
         'log': '',
     }
     try:
@@ -102,6 +160,18 @@ def process_file(task):
 
         report('Building table', 0.85)
         ascii_df = obj.get_dataframe(dblock_headers)
+
+        # Optional live plot: emit the first N values of the first few variables
+        # as soon as the table exists (before the save/stats/plots tail), so the
+        # plot updates live during conversion. Never let it disturb conversion.
+        plot_vars = task.get('plot_vars', 0)
+        if plot_vars:
+            try:
+                result['plot_series'] = _extract_plot_series(
+                    ascii_df, plot_vars, task.get('plot_rows', 100))
+                report_plot(result['plot_series'])
+            except Exception:
+                result['plot_series'] = None
 
         report('Saving CSV', 0.90)
         ascii_filepath = bfile.export_raw_data_ascii(

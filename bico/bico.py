@@ -16,6 +16,9 @@ from bico.settings.model import UserSettings, RunContext
 
 class BicoEngine:
 
+    # Number of leading variables drawn in the TUI's live plot (overlaid).
+    PLOT_N_VARS = 3
+
     def __init__(
             self,
             settings_dict: dict,
@@ -23,7 +26,8 @@ class BicoEngine:
             avoidduplicates: bool = False,
             progress_callback=None,
             file_progress_callback=None,
-            should_stop=None
+            should_stop=None,
+            plot_callback=None
     ):
 
         self.settings_dict = settings_dict
@@ -45,6 +49,12 @@ class BicoEngine:
         # file is converting, so a UI can show which file is in progress, the
         # current step, and a per-file percentage.
         self.file_progress_callback = file_progress_callback
+        # Optional live plot: when a callback is given, each worker emits the
+        # first PLOT_N_VARS variables' first values and the callback is invoked
+        # as each file's data is built with (idx, filename, series) where series
+        # is the picklable list of per-variable dicts built by the worker.
+        self.plot_callback = plot_callback
+        self.plot_n_vars = self.PLOT_N_VARS if plot_callback is not None else 0
 
         # Setup outdirs, run ID and logger. RunContext is the single source of
         # truth for this run's derived paths and strptime pattern; its values are
@@ -243,6 +253,8 @@ class BicoEngine:
                     self._log_stopped(logger, done, total)
                     break
                 task['progress_cb'] = self._make_seq_progress_cb(task, total)
+                if self.plot_callback is not None:
+                    task['plot_cb'] = self._emit_plot_data
                 result = parallel.process_file(task)
                 done += 1
                 self._consume_result(task, result, logger, stats_rows)
@@ -258,10 +270,11 @@ class BicoEngine:
     def _run_pool(self, tasks, n_workers, total, logger, stats_rows):
         """Convert files across a process pool, draining live progress events and
         replaying each file's log as it completes."""
-        # Workers report live progress through a picklable manager queue (only set
-        # up when a UI asked for per-file progress, to avoid the manager overhead).
+        # Workers report live progress (and live plot data) through a picklable
+        # manager queue, set up only when a UI asked for per-file progress or a
+        # live plot, to avoid the manager overhead otherwise.
         manager = progress_queue = None
-        if self.file_progress_callback is not None:
+        if self.file_progress_callback is not None or self.plot_callback is not None:
             manager = multiprocessing.Manager()
             progress_queue = manager.Queue()
             for task in tasks:
@@ -311,6 +324,17 @@ class BicoEngine:
         if result['stats_row'] is not None:
             stats_rows.append(result['stats_row'])
 
+    def _emit_plot_data(self, idx, filename, series):
+        """Notify the optional live-plot callback with one file's series; never
+        let a UI error break the run. Called live (during conversion) from the
+        sequential plot callback or the drained parallel queue."""
+        if self.plot_callback is None or not series:
+            return
+        try:
+            self.plot_callback(idx, filename, series)
+        except Exception:
+            pass
+
     def _make_seq_progress_cb(self, task, total):
         """A (step, fraction) callback for the sequential path that forwards to the
         engine's file-progress callback."""
@@ -327,7 +351,10 @@ class BicoEngine:
                 ev = progress_queue.get_nowait()
             except _queue.Empty:
                 break
-            self._emit_file_progress(ev['idx'], total, ev['file'], ev['step'], ev['frac'])
+            if 'plot' in ev:
+                self._emit_plot_data(ev['idx'], ev['file'], ev['plot'])
+            else:
+                self._emit_file_progress(ev['idx'], total, ev['file'], ev['step'], ev['frac'])
 
     def _stop_requested(self):
         """True if the caller asked to stop the run (never raises)."""
@@ -390,6 +417,7 @@ class BicoEngine:
                 'dir_plots_hires': ctx.dir_out_run_plots_hires,
                 'plot_ts_hires': s.plot_ts_hires,
                 'plot_histogram_hires': s.plot_histogram_hires,
+                'plot_vars': self.plot_n_vars,
             })
         return tasks
 
