@@ -25,7 +25,7 @@ from textual.widgets import (Button, DirectoryTree, Footer, Header, Input, Label
 
 import bico
 from bico.bico import BicoEngine
-from bico.ops import bin as bbin, file as bfile, format_data, setup as ops_setup
+from bico.ops import bin as bbin, file as bfile, setup as ops_setup
 from bico.settings import _version as info
 from bico.tui.log_handler import make_tui_handler
 
@@ -1068,10 +1068,10 @@ class BicoApp(App):
                                    dblocks=dblocks_props, limit_read_lines=TEST_RUN_ROWS,
                                    logger=qlog, cur_file_number=1)
             obj.run()
-            headers, rows = obj.get_data()
+            headers, _ = obj.get_data()
             if settings.get('add_instr_to_varname') == '1':
                 headers = [(f"{h[0]}_{h[2]}", h[1], h[2]) for h in headers]
-            df = format_data.make_df(rows, headers, qlog)
+            df = obj.get_dataframe(headers)
 
             write(Text(f'✓ Converted OK: {df.shape[0]} row(s) × {df.shape[1]} column(s)',
                        style='bold green'))

@@ -20,7 +20,7 @@ import pytest
 
 from conftest import PACKAGE_DIR, DATA_DIR
 
-from bico.ops import bin as bbin, file as bfile, format_data
+from bico.ops import bin as bbin, file as bfile
 
 HEADER_SIZE = 29  # WECOM3 header
 N_HEADER_ROWS = 3  # variable name / units / data block
@@ -73,10 +73,10 @@ def _convert(case: Case, logger) -> list:
         cur_file_number=1,
     )
     obj.run()
-    headers, rows = obj.get_data()
+    headers, _ = obj.get_data()
     # add_instr_to_varname=1, as used to generate the golden / reference output
     headers = [(f"{h[0]}_{h[2]}", h[1], h[2]) for h in headers]
-    df = format_data.make_df(rows, headers, logger)
+    df = obj.get_dataframe(headers)
     buf = io.StringIO()
     df.to_csv(buf, index=False)
     return buf.getvalue().splitlines()

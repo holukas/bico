@@ -2,10 +2,10 @@
 
 Converting binary files is independent per file, so a run can process several
 files concurrently. ``process_file`` does the whole per-file pipeline for one
-file (convert -> write -> read back -> stats -> plots) and returns a small,
-picklable result (a one-row stats frame, captured log text, and a status), so it
-is safe to run in a separate process. It never returns the large converted
-DataFrame.
+file (convert -> write -> stats -> plots) and returns a small, picklable result
+(a one-row stats frame, captured log text, and a status), so it is safe to run in
+a separate process. Stats and plots are computed from the in-memory frame (no CSV
+re-read). It never returns the large converted DataFrame.
 """
 import io
 import logging
@@ -14,7 +14,7 @@ import traceback
 
 import pandas as pd
 
-from bico.ops import bin as bbin, file as bfile, format_data, stats as bstats, vis
+from bico.ops import bin as bbin, file as bfile, stats as bstats, vis
 from bico.ops.logger import get_formatter
 
 
@@ -95,13 +95,13 @@ def process_file(task):
             progress_cb=lambda frac: report('Converting', frac),
         )
         obj.run()
-        dblock_headers, file_data_rows = obj.get_data()
+        dblock_headers, _ = obj.get_data()
 
         if task['add_instr_to_varname']:
             dblock_headers = [(f"{h[0]}_{h[2]}", h[1], h[2]) for h in dblock_headers]
 
         report('Building table', 0.85)
-        ascii_df = format_data.make_df(data_lines=file_data_rows, header=dblock_headers, logger=logger)
+        ascii_df = obj.get_dataframe(dblock_headers)
 
         report('Saving CSV', 0.90)
         ascii_filepath = bfile.export_raw_data_ascii(
@@ -109,28 +109,30 @@ def process_file(task):
             logger=logger, compression=task['compression'],
         )
 
-        report('Verifying', 0.93)
-        file_contents_ascii_df = bfile.read_converted_ascii(ascii_filepath, task['compression'])
+        # Stats and plots run on the in-memory frame we just wrote, so there is no
+        # need to re-read (and gzip-decompress + reparse) the CSV. Both consumers
+        # coerce -9999 -> NaN themselves, so this is equivalent to reading the file
+        # back, minus a full serialize/parse round trip per file.
 
         # Per-file stats as a single-row frame (the main process concatenates them)
         report('Stats', 0.96)
         stats_row = bstats.calc(
-            stats_df=file_contents_ascii_df.copy(), stats_coll_df=pd.DataFrame(),
+            stats_df=ascii_df.copy(), stats_coll_df=pd.DataFrame(),
             bin_filedate=task['bin_filedate'], counter_bin_files=1, logger=logger,
         )
         bfd = task['bin_filedate']
         stats_row.loc[bfd, ('_filesize', '[Bytes]', '[FILE]', 'total')] = os.path.getsize(task['bin_filepath'])
-        stats_row.loc[bfd, ('_columns', '[#]', '[FILE]', 'total')] = len(file_contents_ascii_df.columns)
-        stats_row.loc[bfd, ('_total_values', '[#]', '[FILE]', 'total')] = file_contents_ascii_df.size
+        stats_row.loc[bfd, ('_columns', '[#]', '[FILE]', 'total')] = len(ascii_df.columns)
+        stats_row.loc[bfd, ('_total_values', '[#]', '[FILE]', 'total')] = ascii_df.size
         result['stats_row'] = stats_row
 
         if task['plot_ts_hires'] or task['plot_histogram_hires']:
             report('Plotting', 0.98)
         if task['plot_ts_hires']:
-            vis.high_res_ts(df=file_contents_ascii_df.copy(), outfile=task['ascii_filename'],
+            vis.high_res_ts(df=ascii_df.copy(), outfile=task['ascii_filename'],
                             outdir=task['dir_plots_hires'], logger=logger)
         if task['plot_histogram_hires']:
-            vis.high_res_histogram(df=file_contents_ascii_df.copy(), outfile=task['ascii_filename'],
+            vis.high_res_histogram(df=ascii_df.copy(), outfile=task['ascii_filename'],
                                    outdir=task['dir_plots_hires'], logger=logger)
         report('Done', 1.0)
     except Exception as exc:  # isolate failures: one bad file must not kill the batch

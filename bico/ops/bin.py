@@ -2,6 +2,7 @@ import mmap
 import os
 import time
 
+import numpy as np
 import pandas as pd
 
 from bico.settings.data_blocks.header import wecom3
@@ -70,20 +71,50 @@ class ConvertData:
         # so the hot per-row loop does not recompute constant metadata.
         self.dblock_plans = self._prepare_plans(dblocks)
 
+        # A flat, fixed-offset plan for the vectorized fast path (or None when the
+        # format is not fast-eligible). When usable, the whole file is decoded with
+        # numpy in a handful of array ops instead of the per-field Python loop.
+        self._fast_plan = self._build_fast_plan()
+        # Column arrays produced by the fast path; None means the slow path ran.
+        self._fast_columns = None
+
         self.logger.info(f"    File size: {self.binary_filesize} Bytes")
 
     def run(self):
         self.open_binary = self.read_bin_file_to_mem(binary_filename=self.binary_filename, logger=self.logger)
 
-        # First read binary header at top of file, but don't write to output file
+        # First read binary header at top of file, but don't write to output file.
+        # This advances the mmap read position to the start of the data region; the
+        # fast path reads via the buffer protocol and does not disturb that position,
+        # so a failed fast attempt can fall back to the sequential reader cleanly.
         wecom3.data_block_header(open_file_object=self.open_binary,
                                  size_header=self.size_header)
 
-        self.convert_to_ascii()
+        if not self._try_fast_convert():
+            self.convert_to_ascii()
 
     def get_data(self):
         # return self.data_df
         return self.dblock_headers, self.file_data_rows
+
+    def get_dataframe(self, header):
+        """Build the converted DataFrame with the given (possibly renamed) header.
+
+        Uses the vectorized column arrays when the fast path ran, otherwise builds
+        from the per-row records collected by the sequential reader. The header
+        tuples must match the column order/count of either source (they do, since
+        both follow ``make_file_header``).
+        """
+        self.logger.info("    Converting to dataframe ...")
+        columns = pd.MultiIndex.from_tuples(header)
+        if self._fast_columns is not None:
+            # dict of {position: 1-D array} preserves each column's own dtype
+            # (ints stay int, floats stay float), unlike a single 2-D block.
+            data = {i: arr for i, arr in enumerate(self._fast_columns)}
+            df = pd.DataFrame(data)
+            df.columns = columns
+            return df
+        return pd.DataFrame(self.file_data_rows, columns=columns)
 
     def convert_to_ascii(self):
         self.logger.info(f"    Reading file data, converting to ASCII ...")
@@ -183,6 +214,180 @@ class ConvertData:
                 'bitmap_output_count': bitmap_output_count,
             })
         return plans
+
+    def _build_fast_plan(self):
+        """Flatten the per-datablock plans into a fixed-offset plan for numpy decode.
+
+        Returns a dict describing every output column as a byte slice + conversion,
+        plus the record stride and the DATA_SIZE fields used to confirm that all
+        records are nominal-sized. Returns None when the format is not fast-eligible
+        (an unknown conversion type, or the status_code_lgr quirk), in which case
+        the sequential reader is used.
+        """
+        fields = []
+        data_size_fields = []
+        offset = 0
+        for plan in self.dblock_plans:
+            for vp in plan['var_plans']:
+                ct = vp['conversion_type']
+                if ct not in ('regular', 'exception'):
+                    return None  # would yield a string sentinel; let slow path handle
+                if vp['convert_kind'] == 'status_code_lgr':
+                    return None  # fragile bin()[-4:] edge; not worth vectorizing
+                field = {
+                    'offset': offset,
+                    'nbytes': vp['nbytes'],
+                    'signed': vp['signed'],
+                    'conversion_type': ct,
+                    'gain_on_signal': vp['gain_on_signal'],
+                    'offset_on_signal': vp['offset_on_signal'],
+                    'apply_gain': vp['apply_gain'],
+                    'add_offset': vp['add_offset'],
+                    'convert_kind': vp['convert_kind'],
+                    'is_exception_r2a_tsonic': vp['is_exception_r2a_tsonic'],
+                    'is_bit_map': vp['is_bit_map'],
+                    'bitmaps': [],
+                }
+                if vp['is_data_size']:
+                    data_size_fields.append({'offset': offset, 'nbytes': vp['nbytes'],
+                                             'nominal': plan['nominal_size']})
+                if vp['is_bit_map']:
+                    # Only output==1 bit-map vars become columns, in file order
+                    # (same order make_header appends them).
+                    for bp in plan['bit_map_dict'].values():
+                        if bp['output'] == 1:
+                            field['bitmaps'].append({
+                                'bit_pos_start': bp['bit_pos_start'],
+                                'bit_pos_end': bp['bit_pos_end'],
+                                'apply_gain': bp['apply_gain'],
+                                'add_offset': bp['add_offset'],
+                            })
+                fields.append(field)
+                offset += vp['nbytes']
+        return {'fields': fields, 'data_size_fields': data_size_fields, 'record_size': offset}
+
+    @staticmethod
+    def _decode_be(mat, offset, nbytes, signed):
+        """Decode a big-endian integer column from the (nrows, record) byte matrix.
+
+        Equivalent to ``int.from_bytes(bytes, 'big', signed=signed)`` applied per
+        row, vectorized over all rows at once.
+        """
+        acc = np.zeros(mat.shape[0], dtype=np.int64)
+        for k in range(nbytes):
+            acc = (acc << 8) | mat[:, offset + k].astype(np.int64)
+        if signed:
+            bits = nbytes * 8
+            acc = np.where(acc >= (1 << (bits - 1)), acc - (1 << bits), acc)
+        return acc
+
+    @staticmethod
+    def _octal_as_decimal(arr):
+        """Vectorized int(oct(n)[2:]): read n's octal digits as a base-10 number."""
+        res = np.zeros_like(arr)
+        mult = np.ones_like(arr)
+        m = arr.copy()
+        while np.any(m > 0):
+            res = res + (m % 8) * mult
+            mult = mult * 10
+            m = m // 8
+        return res
+
+    def _try_fast_convert(self):
+        """Decode the whole file with numpy when the format and data allow it.
+
+        Returns True on success (``self._fast_columns`` is filled), or False to
+        signal the caller to fall back to the sequential reader. Falls back when the
+        format is not fast-eligible, the data region is not a whole number of
+        nominal records, or any DATA_SIZE field shows a short/missing data block
+        (which breaks the fixed-stride assumption).
+        """
+        fast = self._fast_plan
+        if fast is None:
+            return False
+        rec = fast['record_size']
+        if rec <= 0:
+            return False
+
+        data_bytes = self.binary_filesize - self.size_header
+        if data_bytes < rec:
+            return False
+        nrows = data_bytes // rec
+        if self.limit_read_lines > 0:
+            nrows = min(nrows, self.limit_read_lines)
+        if nrows <= 0:
+            return False
+
+        buf = np.frombuffer(self.open_binary, dtype=np.uint8,
+                            count=nrows * rec, offset=self.size_header)
+        mat = buf.reshape(nrows, rec)
+
+        # Confirm every record is nominal-sized; a short block would shift all
+        # following fields, so we bail to the sequential reader instead.
+        for ds in fast['data_size_fields']:
+            raw = self._decode_be(mat, ds['offset'], ds['nbytes'], signed=False)
+            if not np.all(raw == ds['nominal']):
+                return False
+
+        columns = []
+        for f in fast['fields']:
+            raw = self._decode_be(mat, f['offset'], f['nbytes'], f['signed'])
+            ct = f['conversion_type']
+            if ct == 'regular':
+                val = (raw / f['gain_on_signal']) - f['offset_on_signal']
+                val = (val * f['apply_gain']) + f['add_offset']
+            else:  # 'exception'
+                if f['is_exception_r2a_tsonic']:
+                    v = raw * 0.02
+                    v = v * v
+                    v = v / 403
+                    v = v - 273.15
+                    val = v
+                else:
+                    val = raw  # identity exception keeps the raw integer
+
+            convert_kind = f['convert_kind']
+            if convert_kind == 'diag_val_hs':
+                col = val.astype(np.int64)
+            elif convert_kind == 'status_code_irga':
+                col = self._octal_as_decimal(val.astype(np.int64))
+            else:
+                col = val
+            columns.append(col)
+
+            if f['is_bit_map']:
+                src = val.astype(np.int64)  # int(var_val), as the slow path does
+                width = f['nbytes'] * 8
+                for bm in f['bitmaps']:
+                    shift = width - bm['bit_pos_end']
+                    mask = (1 << (bm['bit_pos_end'] - bm['bit_pos_start'])) - 1
+                    ext = (src >> shift) & mask
+                    # Scalars carry the dtype: int gain/offset -> int column,
+                    # float gain/offset -> float column, matching the slow path.
+                    ext = ext * bm['apply_gain'] + bm['add_offset']
+                    columns.append(ext)
+
+        self.dblock_headers = self.make_file_header()
+        if len(columns) != len(self.dblock_headers):
+            # Defensive: header/column mismatch means our offset model is wrong.
+            return False
+
+        self._fast_columns = columns
+        self.file_counter_lines = nrows
+        self.file_total_bytes_read = nrows * rec
+        if self._progress_cb is not None:
+            try:
+                self._progress_cb(1.0)
+            except Exception:
+                pass
+        # The decoded columns are independent arrays, but ``buf``/``mat`` are views
+        # into the mmap; drop them so the mmap has no exported pointers and can close.
+        del mat, buf
+        self.open_binary.close()
+        self.logger.info("    Reading file data, converting to ASCII (vectorized) ...")
+        self.logger.info("    Finished conversion to ASCII.")
+        self.file_speedstats()
+        return True
 
     @staticmethod
     def _get_var_val_fast(vp, varbytes):
