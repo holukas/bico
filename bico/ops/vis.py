@@ -60,9 +60,8 @@ def availability_heatmap(bin_found_files_dict, bin_file_datefrmt, root_outdir, l
     fig, ax = plt.subplots(1, 1, figsize=(16, 9))
     ax.set_title("Filesizes of binary raw data per day")
 
-    # Colormap: sequential + perceptually uniform, since filesize is a magnitude
-    # (0..max), not a diverging quantity.
-    cmap = plt.get_cmap('viridis').copy()  # Make copy of cmap b/c it will be modified
+    # Colormap
+    cmap = plt.get_cmap('RdYlBu').copy()  # Make copy of cmap b/c it will be modified
     agg_plot_df = np.ma.masked_invalid(agg_plot_df)  # Mask NaN as missing
     cmap.set_bad(color='#EEEEEE', alpha=1.)  # Set missing data to specific color
 
