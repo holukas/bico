@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bico log viewer</title>
+<style>
+  :root {
+    --bg:#11151c; --bg2:#161b24; --panel:#1b2230; --panel2:#212a3a;
+    --border:#2a3445; --border2:#36425a;
+    --fg:#cdd6e4; --muted:#7c8aa3; --faint:#5b677d;
+    --accent:#5f87ae; --accent-bright:#7fb0e0;
+    --ts:#6b7890; --sep:#3a4456;
+    --lv-debug:#7c8aa3; --lv-info:#56c8d8; --lv-warn:#e8c360; --lv-error:#ef6b73; --lv-crit:#ffffff; --lv-crit-bg:#b5273a;
+    --m-rule:#5f87ae; --m-error:#ef6b73; --m-warn:#e8c360; --m-filebanner:#c98bdb;
+    --m-bracket:#8b97ad; --m-path:#56c8d8; --m-number:#7fd6e6;
+    --kw-green:#7cc47c; --kw-greenb:#8fe08f; --kw-cyan:#7fb0e0; --kw-red:#ef6b73; --kw-yellow:#e8c360;
+    --match:#5a4a12; --match-fg:#ffe9a8; --match-cur:#b8860b; --match-cur-fg:#1a1205;
+    --row-h:22px;
+  }
+  * { box-sizing:border-box; }
+  html,body { height:100%; margin:0; }
+  body {
+    background:var(--bg); color:var(--fg);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    display:flex; flex-direction:column; overflow:hidden;
+  }
+  .mono { font-family:"SFMono-Regular",ui-monospace,"Cascadia Code","JetBrains Mono",Consolas,"Liberation Mono",monospace; }
+
+  /* ---- Header ---- */
+  header {
+    background:linear-gradient(180deg,var(--bg2),var(--bg));
+    border-bottom:1px solid var(--border);
+    padding:10px 14px 12px; flex:0 0 auto;
+  }
+  .titlebar { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .brand { display:flex; align-items:baseline; gap:8px; }
+  .brand b { font-size:16px; letter-spacing:.5px; }
+  .brand .sub { color:var(--muted); font-size:12px; }
+  .fileinfo { color:var(--muted); font-size:12px; margin-left:auto; text-align:right; line-height:1.5; }
+  .fileinfo b { color:var(--fg); font-weight:600; }
+
+  .toolbar { display:flex; align-items:center; gap:10px; margin-top:10px; flex-wrap:wrap; }
+  .search-wrap { position:relative; flex:1 1 320px; min-width:220px; }
+  .search-wrap svg { position:absolute; left:10px; top:50%; transform:translateY(-50%); width:15px; height:15px; fill:var(--muted); pointer-events:none; }
+  #search {
+    width:100%; padding:9px 12px 9px 32px; border-radius:8px;
+    background:var(--panel); border:1px solid var(--border2); color:var(--fg);
+    font-size:13px; outline:none;
+  }
+  #search:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(95,135,174,.18); }
+  #search.bad { border-color:var(--lv-error); box-shadow:0 0 0 3px rgba(239,107,115,.18); }
+  #search::placeholder { color:var(--faint); }
+
+  .nav { display:flex; align-items:center; gap:4px; }
+  .matchcount { color:var(--muted); font-size:12px; min-width:96px; text-align:right; font-variant-numeric:tabular-nums; }
+
+  button, .btn, label.toggle {
+    background:var(--panel); color:var(--fg); border:1px solid var(--border2);
+    border-radius:8px; padding:8px 11px; font-size:12.5px; cursor:pointer;
+    display:inline-flex; align-items:center; gap:6px; user-select:none; white-space:nowrap;
+  }
+  button:hover, .btn:hover, label.toggle:hover { background:var(--panel2); border-color:var(--accent); }
+  button:active { transform:translateY(1px); }
+  .iconbtn { padding:8px 9px; }
+  .iconbtn svg { width:14px; height:14px; fill:var(--fg); display:block; }
+
+  label.toggle input { display:none; }
+  label.toggle.on { background:rgba(95,135,174,.18); border-color:var(--accent); color:var(--accent-bright); }
+
+  /* ---- Level chips / stats ---- */
+  .chips { display:flex; align-items:center; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .chip {
+    display:inline-flex; align-items:center; gap:7px; cursor:pointer; user-select:none;
+    padding:5px 10px; border-radius:999px; font-size:12px; border:1px solid var(--border2);
+    background:var(--panel); color:var(--muted); transition:opacity .12s;
+  }
+  .chip .dot { width:8px; height:8px; border-radius:50%; }
+  .chip .n { font-variant-numeric:tabular-nums; color:var(--fg); font-weight:600; }
+  .chip.off { opacity:.38; text-decoration:line-through; }
+  .chip[data-level="DEBUG"]    .dot { background:var(--lv-debug); }
+  .chip[data-level="INFO"]     .dot { background:var(--lv-info); }
+  .chip[data-level="WARNING"]  .dot { background:var(--lv-warn); }
+  .chip[data-level="ERROR"]    .dot { background:var(--lv-error); }
+  .chip[data-level="CRITICAL"] .dot { background:var(--lv-crit-bg); }
+  .spacer { flex:1 1 auto; }
+  .timespan { color:var(--muted); font-size:12px; }
+  .timespan b { color:var(--fg); }
+
+  /* ---- Log body (virtualized) ---- */
+  .log-body { position:relative; flex:1 1 auto; overflow:auto; background:var(--bg); }
+  .log-spacer { position:absolute; top:0; left:0; width:1px; }
+  .log-rows { position:absolute; top:0; left:0; min-width:100%; will-change:transform; }
+  .row {
+    display:flex; height:var(--row-h); line-height:var(--row-h);
+    font-size:12.5px; white-space:pre; align-items:stretch;
+  }
+  .row:hover { background:rgba(255,255,255,.035); }
+  .row .gutter {
+    position:sticky; left:0; flex:0 0 auto; min-width:56px; padding:0 10px 0 12px;
+    text-align:right; color:var(--faint); background:var(--bg);
+    border-right:1px solid var(--border); user-select:none; font-variant-numeric:tabular-nums;
+  }
+  .row:hover .gutter { color:var(--muted); background:#141923; }
+  .row .code { padding:0 14px 0 12px; }
+
+  .t-ts { color:var(--ts); }
+  .t-sep { color:var(--sep); }
+  .lv { font-weight:600; }
+  .lv-DEBUG{color:var(--lv-debug);font-weight:400;} .lv-INFO{color:var(--lv-info);}
+  .lv-WARNING{color:var(--lv-warn);} .lv-ERROR{color:var(--lv-error);}
+  .lv-CRITICAL{color:var(--lv-crit);background:var(--lv-crit-bg);padding:0 4px;border-radius:3px;}
+
+  .m-rule{color:var(--m-rule);} .m-error{color:var(--m-error);font-weight:600;}
+  .m-warn{color:var(--m-warn);} .m-filebanner{color:var(--m-filebanner);font-weight:700;}
+  .m-varname{font-weight:700;color:#e6ecf5;}
+  .m-bracket{color:var(--m-bracket);} .m-path{color:var(--m-path);} .m-number{color:var(--m-number);}
+  .m-kwg{color:var(--kw-green);} .m-kwgb{color:var(--kw-greenb);font-weight:700;}
+  .m-kwc{color:var(--kw-cyan);font-weight:700;} .m-kwr{color:var(--kw-red);font-weight:700;} .m-kwy{color:var(--kw-yellow);}
+  .m-bang{color:var(--kw-yellow);font-weight:700;}
+
+  .match{ background:var(--match); color:var(--match-fg); border-radius:2px; }
+  .match.current{ background:var(--match-cur); color:var(--match-cur-fg); font-weight:700; }
+
+  /* ---- Empty / drop state ---- */
+  .empty {
+    position:absolute; inset:0; display:flex; flex-direction:column; gap:14px;
+    align-items:center; justify-content:center; text-align:center; padding:30px;
+    color:var(--muted); pointer-events:none;
+  }
+  .empty .ring {
+    width:84px; height:84px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    border:2px dashed var(--border2); background:rgba(95,135,174,.06);
+  }
+  .empty .ring svg { width:36px; height:36px; fill:var(--accent); }
+  .empty h2 { color:var(--fg); margin:0; font-weight:600; font-size:18px; }
+  .empty p { margin:0; max-width:460px; line-height:1.6; }
+  .empty .actions { pointer-events:auto; display:flex; gap:10px; margin-top:4px; }
+  .empty kbd {
+    background:var(--panel2); border:1px solid var(--border2); border-bottom-width:2px;
+    border-radius:5px; padding:1px 6px; font-size:11px; color:var(--fg);
+  }
+  .drag-over::after {
+    content:""; position:absolute; inset:8px; border:2px dashed var(--accent);
+    border-radius:14px; background:rgba(95,135,174,.10); pointer-events:none; z-index:5;
+  }
+
+  footer {
+    flex:0 0 auto; border-top:1px solid var(--border); background:var(--bg2);
+    padding:6px 14px; color:var(--muted); font-size:11.5px;
+    display:flex; gap:16px; align-items:center; flex-wrap:wrap;
+  }
+  footer kbd {
+    background:var(--panel2); border:1px solid var(--border2); border-radius:4px;
+    padding:0 5px; font-size:11px; color:var(--fg);
+  }
+  footer .spacer { flex:1; }
+  ::-webkit-scrollbar { width:13px; height:13px; }
+  ::-webkit-scrollbar-thumb { background:#2d3850; border-radius:7px; border:3px solid var(--bg); }
+  ::-webkit-scrollbar-thumb:hover { background:#3a4760; }
+  ::-webkit-scrollbar-corner { background:var(--bg); }
+</style>
+</head>
+<body>
+<header>
+  <div class="titlebar">
+    <div class="brand">
+      <b>bico</b><span class="sub">log viewer</span>
+    </div>
+    <div class="fileinfo" id="fileinfo"></div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg viewBox="0 0 16 16"><path d="M11.7 10.3a6 6 0 1 0-1.4 1.4l3 3a1 1 0 0 0 1.4-1.4l-3-3ZM3 7a4 4 0 1 1 8 0 4 4 0 0 1-8 0Z"/></svg>
+      <input id="search" class="mono" type="text" placeholder="Search logs…  (regex supported when .* is on)" spellcheck="false" autocomplete="off">
+    </div>
+    <div class="nav">
+      <button class="iconbtn" id="prev" title="Previous match (Shift+Enter)"><svg viewBox="0 0 16 16"><path d="M8 4l-5 5h10z"/></svg></button>
+      <button class="iconbtn" id="next" title="Next match (Enter)"><svg viewBox="0 0 16 16"><path d="M8 12l5-5H3z"/></svg></button>
+    </div>
+    <span class="matchcount" id="matchcount"></span>
+    <label class="toggle" id="t-case" title="Case sensitive"><b>Aa</b></label>
+    <label class="toggle" id="t-regex" title="Regular expression"><b>.*</b></label>
+    <label class="toggle" id="t-only" title="Show only matching lines">Only matches</label>
+    <button class="btn" id="open">Open log…</button>
+    <button class="btn" id="sample" title="Load a demo log">Sample</button>
+    <input type="file" id="file" accept=".log,.txt,text/plain" hidden>
+  </div>
+
+  <div class="chips" id="chips">
+    <span class="chip" data-level="DEBUG"><span class="dot"></span>DEBUG <span class="n">0</span></span>
+    <span class="chip" data-level="INFO"><span class="dot"></span>INFO <span class="n">0</span></span>
+    <span class="chip" data-level="WARNING"><span class="dot"></span>WARNING <span class="n">0</span></span>
+    <span class="chip" data-level="ERROR"><span class="dot"></span>ERROR <span class="n">0</span></span>
+    <span class="chip" data-level="CRITICAL"><span class="dot"></span>CRITICAL <span class="n">0</span></span>
+    <span class="spacer"></span>
+    <span class="timespan" id="timespan"></span>
+  </div>
+</header>
+
+<div class="log-body" id="body">
+  <div class="log-spacer" id="spacer"></div>
+  <div class="log-rows mono" id="rows"></div>
+  <div class="empty" id="empty">
+    <div class="ring"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Zm0 2 4 4h-4V4ZM8 13h8v1.5H8V13Zm0 3h8v1.5H8V16Zm0-6h4v1.5H8V10Z"/></svg></div>
+    <h2>Drop a bico log file here</h2>
+    <p>Or <b>Open log…</b>, or just paste log text with <kbd>Ctrl</kbd>+<kbd>V</kbd>.
+       Everything runs locally in your browser — nothing is uploaded.</p>
+    <div class="actions">
+      <button class="btn" id="open2">Open log…</button>
+      <button class="btn" id="sample2">Load sample</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span><kbd>Ctrl</kbd>+<kbd>F</kbd> search</span>
+  <span><kbd>Enter</kbd> next match</span>
+  <span><kbd>Shift</kbd>+<kbd>Enter</kbd> previous</span>
+  <span><kbd>Esc</kbd> clear search</span>
+  <span class="spacer"></span>
+  <span id="status"></span>
+</footer>
+
+<!-- Per-run builds replace the marker below with the embedded log; left as a
+     no-op comment in the standalone template (then it opens as a drop zone). -->
+<script id="bico-embed">/*BICO_EMBED*/</script>
+<script>
+"use strict";
+const ROW_H = 22;
+const LEVELS = ["DEBUG","INFO","WARNING","ERROR","CRITICAL"];
+const LINE_RE = /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) \| ([A-Z]+)\s*\| (.*)$/;
+
+// Keyword -> css class, mirrors bico/tui/log_handler.py LEVEL/keyword styling.
+const KEYWORDS = [
+  ["FINISHED","m-kwgb"],["finished","m-kwg"],["Finished","m-kwg"],
+  ["Saving","m-kwg"],["Saved","m-kwg"],["converted","m-kwg"],["Done","m-kwg"],
+  ["Converting","m-kwc"],["Processing","m-kwc"],["Found","m-kwc"],
+  ["Run ID","m-kwc"],["BICO Version","m-kwc"],
+  ["ERROR","m-kwr"],["skipped","m-kwy"],["DUPLICATE","m-kwy"],
+];
+const BRACKET_RE = /\[[^\]]*\]/g;
+const PATH_RE    = /(?:[A-Za-z]:\\|\.{0,2}\/)[^\s]+/g;
+const NUMBER_RE  = /(?<![\w.])-?\d[\d_,]*(?:\.\d+)?/g;
+const FILEBANNER_RE = /^\s*\[[^\]]+\]\s*$/;
+const VARLINE_RE = /^(\s*#\d+\s+)(\S+)/;
+
+let lines = [];           // {raw, ts, level, msg, lvl} ; lvl='' for unstructured
+let filtered = [];        // indices into `lines`
+let matchRows = [];       // positions within `filtered` that match the search
+let curMatch = -1;        // index into matchRows
+let searchRe = null;      // RegExp or null
+const levelOn = Object.fromEntries(LEVELS.map(l => [l, true]));
+const opts = { case:false, regex:false, only:false };
+
+const $ = id => document.getElementById(id);
+const body=$("body"), spacer=$("spacer"), rows=$("rows"), empty=$("empty");
+
+function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+// ---- parsing ----
+function parse(text){
+  const out=[];
+  const arr = text.split(/\r?\n/);
+  if(arr.length && arr[arr.length-1]==="") arr.pop();
+  for(const raw of arr){
+    const m = LINE_RE.exec(raw);
+    if(m) out.push({raw, ts:m[1], level:m[2], lvl:m[2], msg:m[3]});
+    else  out.push({raw, ts:"", level:"", lvl:"", msg:raw});
+  }
+  return out;
+}
+
+// ---- message styling -> per-char class array (later rules win) ----
+function classify(msg, lvl){
+  const n=msg.length, cls=new Array(n).fill(null);
+  const fill=k=>{ for(let i=0;i<n;i++) cls[i]=k; };
+  const set=(s,e,k)=>{ for(let i=s;i<e&&i<n;i++) cls[i]=k; };
+  const stripped=msg.trim();
+  if(stripped.length && /^[=_-]+$/.test(stripped)){ fill("m-rule"); return cls; }
+  if(lvl==="ERROR"||lvl==="CRITICAL"){ fill("m-error"); return cls; }
+  if(lvl==="WARNING") fill("m-warn");
+  if(FILEBANNER_RE.test(msg)){ fill("m-filebanner"); return cls; }
+  const vm=VARLINE_RE.exec(msg);
+  if(vm){ const s=vm[1].length; set(s, s+vm[2].length, "m-varname"); }
+  let m;
+  BRACKET_RE.lastIndex=0; while((m=BRACKET_RE.exec(msg))) set(m.index, m.index+m[0].length, "m-bracket");
+  PATH_RE.lastIndex=0;    while((m=PATH_RE.exec(msg)))    set(m.index, m.index+m[0].length, "m-path");
+  NUMBER_RE.lastIndex=0;  while((m=NUMBER_RE.exec(msg)))  set(m.index, m.index+m[0].length, "m-number");
+  for(const [word,k] of KEYWORDS){
+    let i=msg.indexOf(word);
+    while(i!==-1){ set(i, i+word.length, k); i=msg.indexOf(word, i+word.length); }
+  }
+  let i=msg.indexOf("(!)");
+  while(i!==-1){ set(i, i+3, "m-bang"); i=msg.indexOf("(!)", i+3); }
+  return cls;
+}
+
+// match ranges of searchRe inside a string -> boolean array
+function matchMask(text){
+  const mask=new Array(text.length).fill(false);
+  if(!searchRe) return mask;
+  for(const m of text.matchAll(searchRe)){
+    if(!m[0].length) continue;
+    for(let i=m.index;i<m.index+m[0].length;i++) mask[i]=true;
+  }
+  return mask;
+}
+
+// coalesce text + class-array + match-mask into html spans
+function spans(text, cls, mask){
+  let html="", i=0, n=text.length;
+  while(i<n){
+    const c=cls?cls[i]:null, mt=mask[i];
+    let j=i+1;
+    while(j<n && (cls?cls[j]:null)===c && mask[j]===mt) j++;
+    const seg=esc(text.slice(i,j));
+    const klass=[]; if(c) klass.push(c); if(mt) klass.push("match");
+    html += klass.length ? `<span class="${klass.join(" ")}">${seg}</span>` : seg;
+    i=j;
+  }
+  return html;
+}
+
+function renderLineHTML(L){
+  if(L.lvl===""){
+    const t=L.msg;
+    return `<span class="code">${spans(t, classify(t,""), matchMask(t))}</span>`;
+  }
+  const tsMask=matchMask(L.ts), lvMask=matchMask(L.level), msgCls=classify(L.msg,L.lvl), msgMask=matchMask(L.msg);
+  const ts = spans(L.ts, null, tsMask);
+  const lv = `<span class="lv lv-${L.lvl}">${spans(L.level, null, lvMask)}</span>`;
+  const msg = spans(L.msg, msgCls, msgMask);
+  return `<span class="code"><span class="t-ts">${ts}</span><span class="t-sep"> | </span>${lv}<span class="t-sep"> | </span>${msg}</span>`;
+}
+
+// ---- search regex ----
+function buildSearch(){
+  const q=$("search").value;
+  $("search").classList.remove("bad");
+  if(!q){ searchRe=null; return; }
+  let flags="g"; if(!opts.case) flags+="i";
+  try{
+    searchRe = new RegExp(opts.regex ? q : q.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"), flags);
+  }catch(e){ searchRe=null; $("search").classList.add("bad"); }
+}
+function lineHasMatch(L){
+  if(!searchRe) return false;
+  searchRe.lastIndex=0;
+  return searchRe.test(L.raw);
+}
+
+// ---- filtering ----
+function recompute(){
+  buildSearch();
+  filtered=[]; matchRows=[];
+  for(let i=0;i<lines.length;i++){
+    const L=lines[i];
+    if(L.lvl!=="" && !levelOn[L.lvl]) continue;
+    const hit = lineHasMatch(L);
+    if(opts.only && searchRe && !hit) continue;
+    if(hit) matchRows.push(filtered.length);
+    filtered.push(i);
+  }
+  curMatch = matchRows.length ? 0 : -1;
+  spacer.style.height = (filtered.length*ROW_H) + "px";
+  updateCounts();
+  render();
+  if(curMatch>=0) scrollToMatch(false);
+}
+
+function updateCounts(){
+  const mc=$("matchcount");
+  if(searchRe){
+    mc.textContent = matchRows.length ? `${curMatch+1} / ${matchRows.length} matches` : "no matches";
+  } else mc.textContent="";
+  $("status").textContent = lines.length
+    ? `${filtered.length.toLocaleString()} of ${lines.length.toLocaleString()} lines shown`
+    : "";
+}
+
+// ---- virtualized rendering ----
+function render(){
+  const top=body.scrollTop, h=body.clientHeight;
+  const buf=8;
+  let start=Math.max(0, Math.floor(top/ROW_H)-buf);
+  let end=Math.min(filtered.length, Math.ceil((top+h)/ROW_H)+buf);
+  rows.style.transform=`translateY(${start*ROW_H}px)`;
+  let html="";
+  for(let p=start;p<end;p++){
+    const li=filtered[p], L=lines[li];
+    const cur = (curMatch>=0 && matchRows[curMatch]===p) ? " data-cur='1'" : "";
+    html += `<div class="row" data-p="${p}"${cur}><span class="gutter">${li+1}</span>${renderLineHTML(L)}</div>`;
+  }
+  rows.innerHTML=html;
+  // mark current match span inside the current row
+  if(curMatch>=0){
+    const r=rows.querySelector('.row[data-cur="1"]');
+    if(r){ const mk=r.querySelector(".match"); if(mk) mk.classList.add("current"); }
+  }
+  empty.style.display = lines.length ? "none" : "flex";
+}
+body.addEventListener("scroll", render, {passive:true});
+window.addEventListener("resize", render);
+
+// ---- match navigation ----
+function scrollToMatch(center=true){
+  if(curMatch<0) return;
+  const p=matchRows[curMatch];
+  const y=p*ROW_H;
+  const top=body.scrollTop, h=body.clientHeight;
+  if(center || y<top || y+ROW_H>top+h){
+    body.scrollTop = Math.max(0, y - (center ? h/2 - ROW_H : 0));
+  }
+  render();
+  updateCounts();
+}
+function gotoMatch(d){
+  if(!matchRows.length) return;
+  curMatch=(curMatch+d+matchRows.length)%matchRows.length;
+  scrollToMatch(true);
+}
+
+// ---- loading ----
+function load(text, name){
+  lines=parse(text);
+  const counts=Object.fromEntries(LEVELS.map(l=>[l,0]));
+  let first="",last="";
+  for(const L of lines){
+    if(L.lvl && counts[L.lvl]!==undefined) counts[L.lvl]++;
+    if(L.ts){ if(!first) first=L.ts; last=L.ts; }
+  }
+  document.querySelectorAll(".chip").forEach(c=>{
+    c.querySelector(".n").textContent = (counts[c.dataset.level]||0).toLocaleString();
+  });
+  $("timespan").innerHTML = first ? `<b>${first}</b> → <b>${last}</b>` : "";
+  $("fileinfo").innerHTML = name
+    ? `<b>${esc(name)}</b><br>${lines.length.toLocaleString()} lines · ${(text.length/1024).toFixed(0)} KB`
+    : "";
+  body.scrollTop=0;
+  recompute();
+}
+function loadFile(file){
+  const rd=new FileReader();
+  rd.onload=()=>load(rd.result, file.name);
+  rd.readAsText(file);
+}
+
+// ---- events ----
+$("search").addEventListener("input", ()=>{ recompute(); });
+$("search").addEventListener("keydown", e=>{
+  if(e.key==="Enter"){ e.preventDefault(); gotoMatch(e.shiftKey?-1:1); }
+  else if(e.key==="Escape"){ $("search").value=""; recompute(); }
+});
+$("next").onclick=()=>gotoMatch(1);
+$("prev").onclick=()=>gotoMatch(-1);
+
+function bindToggle(id,key){
+  const el=$(id);
+  el.onclick=()=>{ opts[key]=!opts[key]; el.classList.toggle("on",opts[key]); recompute(); };
+}
+bindToggle("t-case","case"); bindToggle("t-regex","regex"); bindToggle("t-only","only");
+
+document.querySelectorAll(".chip").forEach(c=>{
+  c.onclick=()=>{ const lv=c.dataset.level; levelOn[lv]=!levelOn[lv]; c.classList.toggle("off",!levelOn[lv]); recompute(); };
+});
+
+$("file").addEventListener("change", e=>{ if(e.target.files[0]) loadFile(e.target.files[0]); });
+$("open").onclick=$("open2").onclick=()=>$("file").click();
+$("sample").onclick=$("sample2").onclick=()=>load(SAMPLE,"sample-run.log");
+
+// drag & drop
+["dragenter","dragover"].forEach(ev=>body.addEventListener(ev,e=>{e.preventDefault();body.classList.add("drag-over");}));
+["dragleave","drop"].forEach(ev=>body.addEventListener(ev,e=>{e.preventDefault();if(ev!=="dragleave"||e.target===body)body.classList.remove("drag-over");}));
+body.addEventListener("drop",e=>{ const f=e.dataTransfer.files[0]; if(f) loadFile(f); });
+
+// global keys: Ctrl/Cmd+F focus search ; paste log text anywhere
+document.addEventListener("keydown", e=>{
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==="f"){ e.preventDefault(); $("search").focus(); $("search").select(); }
+});
+document.addEventListener("paste", e=>{
+  if(document.activeElement===$("search")) return;
+  const t=e.clipboardData.getData("text");
+  if(t && t.length){ load(t,"(pasted)"); }
+});
+
+// ---- demo log (showcases the styling) ----
+const SAMPLE = [
+"2026-06-26 13:40:02 | INFO    | Run ID: 20260626-134002-CHDAV",
+"2026-06-26 13:40:02 | INFO    | BICO Version: 2.0 / 2026-06-26",
+"2026-06-26 13:40:02 | INFO    | ====================",
+"2026-06-26 13:40:02 | INFO    | Contents of settings dictionary:",
+"2026-06-26 13:40:02 | INFO    |     site: CH-DAV",
+"2026-06-26 13:40:02 | INFO    |     dir_source: F:\\data\\raw\\CH-DAV",
+"2026-06-26 13:40:02 | DEBUG   |     num_processes: 7",
+"2026-06-26 13:40:02 | INFO    | Found variables:",
+"2026-06-26 13:40:02 | INFO    |     #1    U [m+1_s-1] [HS50-A]",
+"2026-06-26 13:40:02 | INFO    |     #2    V [m+1_s-1] [HS50-A]",
+"2026-06-26 13:40:02 | INFO    |     #25   SIGNAL_STRENGTH [%] [IRGA72-A]",
+"2026-06-26 13:40:03 | INFO    | Searching for *.X* files ...",
+"2026-06-26 13:40:03 | INFO    | Found 48 files matching *.X* in F:\\data\\raw\\CH-DAV",
+"2026-06-26 13:40:03 | INFO    | [FILE TIME RANGE CHECK] + Found file 2021111013.X00 (2021-11-10 13:00:00), is within the selected time range",
+"2026-06-26 13:40:03 | WARNING | [FILESIZE CHECK] Filesize 1024 of file 2021111099.X00 is smaller than selected limit (5000), skipping file.",
+"2026-06-26 13:40:03 | INFO    | Converting 47 file(s) of 48 found, using 7 process(es) ...",
+"2026-06-26 13:40:03 | INFO    | ",
+"2026-06-26 13:40:03 | INFO    | [2021111013.X00]",
+"2026-06-26 13:40:03 | INFO    | ================",
+"2026-06-26 13:40:04 | INFO    |     File size: 19979 Bytes",
+"2026-06-26 13:40:04 | INFO    |     Reading file data, converting to ASCII (vectorized) ...",
+"2026-06-26 13:40:04 | INFO    |     36000 data rows converted in 0.28s, speed: 128571 rows s-1",
+"2026-06-26 13:40:04 | INFO    |     Saving raw data csv ...",
+"2026-06-26 13:40:05 | INFO    |     Finished conversion to ASCII.",
+"2026-06-26 13:40:06 | ERROR   | (!) ERROR converting 2021111014.X00, file skipped: unexpected end of data block",
+"2026-06-26 13:40:09 | INFO    | [2021111015.X00] [DUPLICATE CHECK] (!) Skipping, converted file already available in F:\\out",
+"2026-06-26 13:41:12 | INFO    | ====================",
+"2026-06-26 13:41:12 | INFO    | [20260626-134002-CHDAV] BICO FINISHED.",
+"2026-06-26 13:41:12 | INFO    | ====================",
+].join("\n");
+
+// Auto-load the embedded log when this file was built for a specific run.
+// In the standalone template __BICO_LOG__ is undefined, so the drop zone shows.
+if (typeof window.__BICO_LOG__ === "string") {
+  load(window.__BICO_LOG__, window.__BICO_NAME__ || "(embedded log)");
+}
+</script>
+</body>
+</html>

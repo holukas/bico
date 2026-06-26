@@ -9,7 +9,7 @@ from pathlib import Path
 import pandas as pd
 
 from bico.ops import bin, vis, file, cli, parallel
-from bico.ops import logger as ops_logger, setup as ops_setup
+from bico.ops import logger as ops_logger, setup as ops_setup, log_report
 from bico.settings import _version
 from bico.settings.model import UserSettings, RunContext
 
@@ -134,6 +134,29 @@ class BicoEngine:
             self.logger.info(f"    are already available in {self.settings_dict['dir_out']}")
 
         self._log_bicofinish()
+        self._write_log_html_viewer()
+
+    def _write_log_html_viewer(self):
+        """Render an HTML viewer for this run's log file, next to the .log.
+
+        Done once at the very end (not during logging) so it never slows the run.
+        Any failure here is non-fatal — the plain .log is the source of truth.
+        """
+        try:
+            logfile = self.run_context.dir_out_run_log / f"{self.run_id}.log"
+            html_path = logfile.parent / f"{logfile.name}.html"
+            self.logger.info("")
+            self.logger.info(f"Saving HTML log viewer to {html_path}")
+            # Flush so the .log contains everything (incl. the line above) before
+            # we read it back to embed in the HTML.
+            for handler in self.logger.handlers:
+                try:
+                    handler.flush()
+                except Exception:
+                    pass
+            log_report.write_log_html(logfile, html_path)
+        except Exception as exc:
+            self.logger.info(f"(!) Could not build HTML log viewer: {exc}")
 
     def _log_fileloopfinish(self):
         """Log that file loop finished"""
