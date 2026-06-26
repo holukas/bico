@@ -7,6 +7,34 @@ from pathlib import Path
 import pandas as pd
 
 
+def search_glob_from_datetime_format(datetime_format: str) -> str:
+    """Derive a filename glob from the filename datetime format.
+
+    The datetime format (e.g. ``yyyymmddHH.CMM``) fully describes the binary
+    filenames, including the extension after the dot. Replacing the datetime
+    tokens with wildcards yields a glob (``*.C*``) that matches exactly those
+    files, so a separate file-extension setting is not needed.
+    """
+    glob = datetime_format
+    for token in ('yyyy', 'mm', 'dd', 'HH', 'MM'):  # 'mm'(month) before 'MM'(minute)
+        glob = glob.replace(token, '*')
+    while '**' in glob:  # collapse runs of wildcards
+        glob = glob.replace('**', '*')
+    return glob
+
+
+def datetime_parsing_string(datetime_format: str) -> str:
+    """Convert a filename datetime format (e.g. ``yyyymmddHH.CMM``) to a strptime
+    pattern (``%Y%m%d%H.C%M``) used to parse a file's date from its name."""
+    s = datetime_format
+    s = s.replace('yyyy', '%Y')
+    s = s.replace('mm', '%m')   # month (lowercase) before minute (uppercase)
+    s = s.replace('dd', '%d')
+    s = s.replace('HH', '%H')
+    s = s.replace('MM', '%M')
+    return s
+
+
 def load_dblocks_props(dblocks_types, settings_dict):
     """Load data block settings from file(s)"""
 
@@ -50,8 +78,11 @@ class SearchAll():
 
     def keep_valid_files(self):
         """Search all files with file id, but then keep only those that fulfil selected requirements"""
+        # The search glob is derived from the filename datetime format (which
+        # already includes the extension), so no separate file-extension setting.
+        file_glob = search_glob_from_datetime_format(self.settings_dict['filename_datetime_format'])
         self.valid_files_dict = self.search_all(dir=self.settings_dict['dir_source'],
-                                                file_id=self.settings_dict['file_ext'],
+                                                file_id=file_glob,
                                                 logger=self.logger)
         self.valid_files_dict = self._keep_files_within_timerange()
         self.valid_files_dict = self._keep_files_with_min_filesize()
@@ -108,8 +139,15 @@ class SearchAll():
         _invalid_files_dict = {}
         valid_files_dict = {}
         for filename, filepath in self.valid_files_dict.items():
-            bin_filedate = dt.datetime.strptime(filename,
-                                                self.settings_dict['filename_datetime_parsing_string'])
+            try:
+                bin_filedate = dt.datetime.strptime(filename,
+                                                    self.settings_dict['filename_datetime_parsing_string'])
+            except ValueError:
+                # Name matched the glob but not the datetime format; skip it.
+                self.logger.info(f"{suffix} (!) Skipping {filename}: name does not match the "
+                                 f"datetime format, cannot read its date.")
+                _invalid_files_dict[filename] = filepath
+                continue
             if (bin_filedate < run_start_date) | (bin_filedate > run_end_date):
                 self.logger.info(
                     f"{suffix} Date of file ({filename}, date: {bin_filedate}) is outside the selected time range"

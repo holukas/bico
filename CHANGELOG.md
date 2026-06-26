@@ -2,6 +2,31 @@
 
 ## v2.0 | XX XXX 2026
 
+### Terminal UI (TUI) replaces the PyQt5 GUI
+
+- Changed: the PyQt5 GUI was removed and replaced by a [Textual](https://textual.textualize.io/) terminal UI.
+  `pyqt5`/`pyqt5-qt5` were dropped from the dependencies and `textual` added. The TUI needs no display server,
+  so it also works over SSH. Start it with `uv run bico -t` (or just `uv run bico`); the headless CLI
+  (`-f`/`-d`/`-a`) is unchanged. The new code lives in `bico/tui/` and is imported lazily, so the conversion
+  core and tests never pull in the UI.
+- Added: a settings panel (Instruments / Raw data / Output / Run options) on the left and a live Rich console on
+  the right, in a compact, scroll-free, modern-dark layout that fills the terminal and adapts to smaller sizes.
+  The settings panel can be hidden (`f`) so the console fills the width.
+- Added: a **Validate** step (`v`) that checks every field, prints the exact settings the run will use (each with
+  a short explanatory note), and counts the matching files in the source folder. **Run is disabled until
+  validation passes**, and any settings edit disables it again, so a run always matches what was validated.
+- Added: a **Test run** (`t`) that dry-converts the first rows of the first matching file (writing nothing), to
+  confirm the settings produce a valid result before a full run; and a progress bar with estimated remaining time
+  shown during a run.
+- Added: a folder picker for the source/output paths (browse, go up, or type/paste a path and press Enter), an
+  in-app help overlay (`?`), and live format validation of the start/end date fields.
+- Changed: the separate "file extension" setting was removed. The search pattern is now derived from the filename
+  datetime format (which already includes the extension), and a file whose name matches the pattern but not the
+  datetime format is skipped instead of aborting the run. Start/end dates are documented as inclusive on both
+  ends. The default `num_processes` is now `1`.
+- Changed: log files use an aligned `time | LEVEL | message` format, and the run logger is reset per run so each
+  run writes to its own log file.
+
 ### Migration to `uv` and Python 3.12
 
 - Changed: dependency management moved from `poetry` to [`uv`](https://docs.astral.sh/uv/). The `pyproject.toml`

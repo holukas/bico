@@ -44,16 +44,31 @@ by hand, or a **headless CLI** for automated/scheduled runs.
   left, and a live console showing the run log is on the right. It needs no display server, so it also works
   over SSH.
 - Layout and controls:
-    - **Instruments** — site, header, and the three instrument data blocks (sonic + gas analyzers).
-    - **Raw data** — source folder, time range, and file-selection settings.
-    - **Output** — output folder, folder-name prefix, compression, worker processes, and which plots to produce.
-    - **Run options** — convert only the most recent *N* days, and skip files already present in the output folder.
-    - **Source folder** and **Output folder** have a **Browse…** button that opens a folder picker; you can also
-      type a path directly into the field.
+    - **Instruments** — site, logger header, and up to three instrument data blocks (sonic + gas analyzers).
+    - **Raw data** — source folder; start/end date (`YYYY-MM-DD HH:MM`, both ends inclusive); the filename
+      datetime format (which includes the extension and also determines which files are searched, so there is no
+      separate file-extension setting); and file-selection settings (`0` = no limit for the file/row limits).
+    - **Output** — output folder, folder-name prefix, compression, worker processes (`0` = auto), and which plots
+      to produce.
+    - **Run options** — convert only the most recent *N* days (`0` = use the date range), and skip files already
+      present in the output folder.
+    - **Source folder** and **Output folder** have a **Browse…** button that opens a folder picker; in the picker
+      you can browse the tree, go **Up**, or type/paste a path and press Enter to jump to it. You can also type the
+      path directly into the field.
+- Workflow: configure the settings, press **Validate** (`v`), then **Run** (`r`). **Validate** checks every field,
+  prints the exact settings the run will use (with a short note on each), and counts the matching files in the
+  source folder. **Run is disabled until validation passes**, and editing any field disables it again — so you
+  always run exactly what you validated. **Test run** (`t`) does a quick dry conversion of the first rows of the
+  first matching file (writing nothing), to confirm the settings produce a valid result before a full run. A
+  progress bar with an estimated remaining time is shown while a run is in progress.
 - Key bindings (also shown in the footer):
+    - `v` — validate settings (enables Run when everything is OK)
+    - `t` — test run (dry conversion of the first file, nothing written)
     - `r` — run the conversion
     - `s` — save the current settings to `BICO.settings`
+    - `f` — show / hide the settings panel (console fills the width)
     - `Ctrl+L` — clear the console
+    - `?` — open the in-app help
     - `q` — quit
 - Saving writes only the user-editable settings back to `bico/settings/BICO.settings` (run-only options such as
   "recent days" and "avoid duplicates" are not persisted). Each run also writes a snapshot of its effective

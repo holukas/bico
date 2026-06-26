@@ -2,7 +2,7 @@ import datetime as dt
 import multiprocessing
 import os
 import sys
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
 import pandas as pd
@@ -18,12 +18,16 @@ class BicoEngine:
             self,
             settings_dict: dict,
             usedgui: bool,
-            avoidduplicates: bool = False
+            avoidduplicates: bool = False,
+            progress_callback=None
     ):
 
         self.settings_dict = settings_dict
         self.usedgui = usedgui
         self.avoidduplicates = avoidduplicates
+        # Optional callable(done, total) invoked as each file finishes converting,
+        # so a UI can show progress / estimated remaining time.
+        self.progress_callback = progress_callback
 
         # Setup outdirs, run ID and logger
         self.run_id = ops_setup.generate_run_id()
@@ -172,15 +176,29 @@ class BicoEngine:
         if not tasks:
             return stats_coll_df
 
-        # Convert files: in parallel across processes, or sequentially for a single file/worker
+        # Convert files: in parallel across processes, or sequentially for a single file/worker.
+        # Results are kept in task order, but progress is reported as each file *finishes*
+        # (via as_completed) so a UI can show a live count / estimated remaining time.
         n_workers = self._n_workers(len(tasks))
+        total = len(tasks)
         logger.info("")
-        logger.info(f"Converting {len(tasks)} file(s) of {num_bin_files} found, using {n_workers} process(es) ...")
+        logger.info(f"Converting {total} file(s) of {num_bin_files} found, using {n_workers} process(es) ...")
+        self._report_progress(0, total)
+        results = [None] * total
+        done = 0
         if n_workers == 1:
-            results = [parallel.process_file(task) for task in tasks]
+            for i, task in enumerate(tasks):
+                results[i] = parallel.process_file(task)
+                done += 1
+                self._report_progress(done, total)
         else:
             with ProcessPoolExecutor(max_workers=n_workers) as executor:
-                results = list(executor.map(parallel.process_file, tasks))
+                future_to_index = {executor.submit(parallel.process_file, task): i
+                                   for i, task in enumerate(tasks)}
+                for future in as_completed(future_to_index):
+                    results[future_to_index[future]] = future.result()
+                    done += 1
+                    self._report_progress(done, total)
 
         # Replay each file's captured log (in file order) and collect per-file stats
         stats_rows = []
@@ -252,6 +270,15 @@ class BicoEngine:
             n = max(1, (os.cpu_count() or 2) - 1)
         return max(1, min(n, num_tasks))
 
+    def _report_progress(self, done, total):
+        """Notify an optional progress callback; never let UI errors break a run."""
+        if self.progress_callback is None:
+            return
+        try:
+            self.progress_callback(done, total)
+        except Exception:
+            pass
+
     @staticmethod
     def _replay_log(logger, text):
         """Write a worker's already-formatted captured log verbatim to the real log destinations."""
@@ -269,13 +296,7 @@ class BicoEngine:
                 handler.release()
 
     def make_datetime_parsing_string(self):
-        _parsing_string = self.settings_dict['filename_datetime_format']
-        _parsing_string = _parsing_string.replace('yyyy', '%Y')
-        _parsing_string = _parsing_string.replace('mm', '%m')
-        _parsing_string = _parsing_string.replace('dd', '%d')
-        _parsing_string = _parsing_string.replace('HH', '%H')
-        _parsing_string = _parsing_string.replace('MM', '%M')
-        return _parsing_string
+        return file.datetime_parsing_string(self.settings_dict['filename_datetime_format'])
 
     def assemble_datablock_sequence(self):
         dblocks_seq = []
