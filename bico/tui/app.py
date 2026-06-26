@@ -8,13 +8,17 @@ responsive.
 """
 import datetime as dt
 import logging
+import threading
 from pathlib import Path
 
+from rich.style import Style
 from rich.text import Text
 from textual import events, on, work
 from textual.app import App, ComposeResult
+from textual.binding import Binding
 from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.screen import ModalScreen
+from textual.strip import Strip
 from textual.validation import Integer, Regex
 from textual.widgets import (Button, DirectoryTree, Footer, Header, Input, Label,
                              Markdown, ProgressBar, RichLog, Select, Static, Switch)
@@ -165,6 +169,9 @@ class PathDropInput(Input):
     is a real path this sets the field to the folder (a dropped file yields its
     parent folder), so source/output folders can be set by dropping instead of
     browsing. Any other paste behaves like a normal Input paste.
+
+    A terminal routes a dropped path to the *focused* widget, so click (focus) the
+    field before dropping onto it.
     """
 
     def _on_paste(self, event: events.Paste) -> None:
@@ -178,6 +185,65 @@ class PathDropInput(Input):
             event.prevent_default()
             event.stop()
         # Otherwise do nothing: Textual still calls Input._on_paste (normal paste).
+
+
+class SelectableRichLog(RichLog):
+    """A ``RichLog`` whose text can be selected with the mouse and copied.
+
+    Plain ``RichLog`` (Textual 8.2) renders pre-styled strips and never attaches
+    the per-cell content offsets the screen uses to map a mouse drag to text, nor
+    does it draw the selection or expose the selected text — so dragging over it
+    selects nothing. This subclass adds the three missing pieces: it stamps each
+    rendered line with its content offset (so a drag forms a selection), paints
+    the selection highlight, and returns the selected text for copy (Ctrl+C).
+    """
+
+    def _selection_style(self) -> Style:
+        """Selection highlight: only a background colour, so the text keeps its own
+        colour and stays readable. (The theme's ``screen--selection`` foreground is
+        ``transparent`` = "keep existing", which, applied as a base style, would turn
+        plain text invisible — so we take just its background.)"""
+        comp = self.screen.get_component_rich_style('screen--selection')
+        return Style(bgcolor=comp.bgcolor) if comp.bgcolor else Style(reverse=True)
+
+    @staticmethod
+    def _highlight_span(line: Strip, start: int, end: int, style: Style) -> Strip:
+        """Return `line` with the background of cells [start, end) set to `style`."""
+        start = max(0, start)
+        end = min(end, line.cell_length)
+        if end <= start:
+            return line
+        before, selected, after = line.divide([start, end, line.cell_length])
+        return Strip.join([before, selected.apply_style(style), after])
+
+    def render_line(self, y: int) -> Strip:
+        scroll_x, scroll_y = self.scroll_offset
+        content_y = scroll_y + y
+        selection = self.text_selection
+        if selection is None:
+            # No selection: keep the base (cached) rendering, but stamp offsets so
+            # a future drag can resolve the cell under the mouse to content text.
+            return super().render_line(y).apply_offsets(scroll_x, content_y)
+        width = self.scrollable_content_region.width
+        if content_y >= len(self.lines):
+            return Strip.blank(width, self.rich_style).apply_offsets(scroll_x, content_y)
+        line = self.lines[content_y]
+        span = selection.get_span(content_y)
+        if span is not None:
+            start, end = span
+            if end == -1:
+                end = line.cell_length
+            line = self._highlight_span(line, start, end, self._selection_style())
+        line = line.crop_extend(scroll_x, scroll_x + width, self.rich_style)
+        line = line.apply_style(self.rich_style)
+        return line.apply_offsets(scroll_x, content_y)
+
+    def get_selection(self, selection):
+        text = '\n'.join(strip.text for strip in self.lines)
+        return selection.extract(text), '\n'
+
+    def selection_updated(self, selection) -> None:
+        self.refresh()
 
 
 HELP_MD = """\
@@ -201,10 +267,26 @@ run's settings, **drag and drop its `bico.settings` file anywhere onto the TUI**
 and the form is filled from it.
 
 ## Drag and drop folders
-Instead of browsing, focus the **Source folder** or **Output folder** field and
-**drag and drop a file or folder onto it** — the field is filled with the folder
-path (dropping a file uses the folder that contains it). Each folder field has a
-**…** button to browse and a **✕** button to empty it.
+Instead of browsing, click the **Source folder** or **Output folder** field to
+focus it, then **drag and drop a file or folder onto the TUI** — the field is
+filled with the folder path (dropping a file uses the folder that contains it).
+Each folder field has a **…** button to browse and a **✕** button to empty it.
+
+## Progress
+While a run is going, the bar shows files done / total. Below it, each file being
+converted right now gets its own line with a per-file progress bar, a percentage,
+and the current step (Reading, Converting, Saving, …) — so with several worker
+processes you see every in-flight file at once. A file's line drops off when it
+finishes, and its detailed log appears in the console at that point.
+
+## Stopping a run
+Press **Stop** to end a running conversion early. The file being converted
+finishes (so its output is complete), then no further files are started and the
+run winds down normally. Files already converted are kept.
+
+## Copy from the log
+Drag with the mouse to select text in the console, then press **Ctrl+C** to copy
+it. Double-click selects a line.
 
 ## Keys
 - `v`: validate the settings (turns on Run once everything is OK)
@@ -400,6 +482,9 @@ class BicoApp(App):
         ('s', 'save_settings', 'Save'),
         ('f', 'toggle_settings', 'Show/hide settings'),
         ('ctrl+l', 'clear_console', 'Clear log'),
+        # Override the App's default ctrl+c (which only shows a "press q to quit"
+        # hint for non-Input widgets) so it copies the console selection instead.
+        Binding('ctrl+c', 'copy_selection', 'Copy', show=False),
         ('h', 'help', 'Help'),
         ('q', 'quit', 'Quit'),
     ]
@@ -416,6 +501,12 @@ class BicoApp(App):
         # Run is only allowed after Validate confirms the settings are OK; any
         # change to a setting clears this so the user must re-validate.
         self._validated = False
+        # Set from the UI when the user presses Stop; the engine polls it between
+        # files and winds the run down (see _run_engine / action_stop_conversion).
+        self._stop_event = threading.Event()
+        # Live per-file progress: task index -> (total, filename, step, fraction).
+        # One line is shown per entry, so parallel files each get their own line.
+        self._file_status: dict[int, tuple] = {}
 
     # -- layout --------------------------------------------------------------
 
@@ -441,12 +532,17 @@ class BicoApp(App):
                     yield Button('Test', id='btn-test')
                     # Run stays disabled until Validate confirms the settings are OK.
                     yield Button('Run', id='btn-run', variant='success', disabled=True)
+                    # Stop is enabled only while a conversion is running.
+                    yield Button('Stop', id='btn-stop', variant='error', disabled=True)
             with Vertical(id='console-pane'):
                 yield Static('Console', classes='pane-title')
                 progress = ProgressBar(id='progress', show_eta=True)
                 progress.display = False  # shown only while a conversion runs
                 yield progress
-                yield RichLog(id='console', highlight=False, markup=False, wrap=True)
+                status = Static('', id='run-status')
+                status.display = False  # shows the current file / step / % live
+                yield status
+                yield SelectableRichLog(id='console', highlight=False, markup=False, wrap=True)
         yield Footer()
 
     def _section(self, title: str, fields):
@@ -567,6 +663,17 @@ class BicoApp(App):
     def action_clear_console(self) -> None:
         self.query_one('#console', RichLog).clear()
 
+    def action_copy_selection(self) -> None:
+        """Copy the current text selection (e.g. from the console) to the clipboard."""
+        text = self.screen.get_selected_text()
+        if not text:
+            self.notify('Select text first — drag across the console, then Ctrl+C.',
+                        severity='information')
+            return
+        self.copy_to_clipboard(text)
+        n = len(text)
+        self.notify(f'Copied {n} character{"" if n == 1 else "s"} to the clipboard.')
+
     def action_help(self) -> None:
         self.push_screen(HelpScreen())
 
@@ -602,6 +709,10 @@ class BicoApp(App):
     @on(Button.Pressed, '#btn-run')
     def _on_run(self) -> None:
         self.action_run_conversion()
+
+    @on(Button.Pressed, '#btn-stop')
+    def _on_stop(self) -> None:
+        self.action_stop_conversion()
 
     @on(Input.Changed)
     @on(Select.Changed)
@@ -996,7 +1107,12 @@ class BicoApp(App):
             self.notify('Cannot run — fix the errors first.', severity='error')
             return
 
+        self._stop_event.clear()
+        self._file_status.clear()
         self._begin_busy('running…')
+        # Stop is available only during a real conversion run.
+        stop_btn = self.query_one('#btn-stop', Button)
+        stop_btn.disabled = False
         bar = self.query_one('#progress', ProgressBar)
         bar.display = True
         bar.update(total=None, progress=0)  # total is set on the first progress report
@@ -1004,6 +1120,17 @@ class BicoApp(App):
         console.write(Text('─' * 40, style='dim'))
         console.write(Text('Starting conversion…', style='bold cyan'))
         self._run_engine(settings, avoid)
+
+    def action_stop_conversion(self) -> None:
+        """Ask the running conversion to stop after the current file."""
+        if not self._busy or self._stop_event.is_set():
+            return
+        self._stop_event.set()
+        self.query_one('#btn-stop', Button).disabled = True
+        self.sub_title = 'stopping…'
+        self.notify('Stopping — the current file will finish first.', severity='warning')
+        console = self.query_one('#console', RichLog)
+        console.write(Text('Stop requested — finishing the current file…', style='bold yellow'))
 
     # -- run plumbing --------------------------------------------------------
 
@@ -1032,7 +1159,9 @@ class BicoApp(App):
         try:
             engine = BicoEngine(settings_dict=settings, usedgui=False,
                                 avoidduplicates=avoidduplicates,
-                                progress_callback=self._on_progress)
+                                progress_callback=self._on_progress,
+                                file_progress_callback=self._on_file_progress,
+                                should_stop=self._stop_event.is_set)
             # Route the engine's logger into the console; drop the stdout stream
             # handler the engine added (it would otherwise fight the TUI).
             for handler in list(engine.logger.handlers):
@@ -1057,12 +1186,58 @@ class BicoApp(App):
         bar.display = True
         bar.update(total=total, progress=done)
 
+    def _on_file_progress(self, idx: int, total: int, filename: str, step: str, frac: float) -> None:
+        """Engine per-file progress (worker thread) → update the live status lines."""
+        self.call_from_thread(self._update_file_status, idx, total, filename, step, frac)
+
+    @staticmethod
+    def _status_line(idx: int, total: int, filename: str, step: str, frac: float) -> Text:
+        pct = int(frac * 100)
+        bar_width = 16
+        filled = round(frac * bar_width)
+        return Text.assemble(
+            ('▶ ', 'bold green'),
+            (f'[{idx}/{total}] ', 'cyan'),
+            (filename, 'bold magenta'),
+            ('  ', ''),
+            ('━' * filled, 'bright_cyan'),
+            ('━' * (bar_width - filled), 'grey30'),
+            (f' {pct:3d}%  ', 'bright_cyan'),
+            (step, 'bold cyan'),
+        )
+
+    def _update_file_status(self, idx: int, total: int, filename: str, step: str, frac: float) -> None:
+        # One line per in-progress file (several convert at once in parallel).
+        # A finished file drops off; the count bar and the log show completion.
+        if step == 'Done' and frac >= 1.0:
+            self._file_status.pop(idx, None)
+        else:
+            self._file_status[idx] = (total, filename, step, frac)
+        self._render_file_status()
+
+    def _render_file_status(self) -> None:
+        status = self.query_one('#run-status', Static)
+        if not self._file_status:
+            status.update('')
+            return
+        status.display = True
+        text = Text()
+        for i, idx in enumerate(sorted(self._file_status)):
+            if i:
+                text.append('\n')
+            text.append_text(self._status_line(idx, *self._file_status[idx]))
+        status.update(text)
+
     def _run_finished(self) -> None:
         self._busy = False
+        self._stop_event.clear()
+        self._file_status.clear()
+        self.query_one('#btn-stop', Button).disabled = True
         for bid in ('#btn-save', '#btn-test', '#btn-validate', '#btn-detect'):
             self.query_one(bid, Button).disabled = False
         self._refresh_run_enabled()  # Run stays gated by validation state
         self.query_one('#progress', ProgressBar).display = False
+        self.query_one('#run-status', Static).display = False
         self.sub_title = f'binary converter  ·  v{info.__version__}'
 
 

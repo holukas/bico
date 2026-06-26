@@ -55,6 +55,8 @@ by hand, or a **headless CLI** for automated/scheduled runs.
       separate file-extension setting); and file-selection settings (`0` = no limit for the file/row limits).
     - **Output** — output folder, folder-name prefix, compression, worker processes (`0` = auto), and which plots
       to produce.
+    - **Stop** — press while a conversion is running to end it early: the file currently being converted finishes,
+      then no further files are started and the run winds down. Already-converted files are kept.
     - **Run options** — convert only the most recent *N* days (`0` = use the date range), and skip files already
       present in the output folder.
     - **Source folder** and **Output folder** have a **Browse…** button that opens a folder picker; in the picker
@@ -64,8 +66,11 @@ by hand, or a **headless CLI** for automated/scheduled runs.
   prints the exact settings the run will use (with a short note on each), and counts the matching files in the
   source folder. **Run is disabled until validation passes**, and editing any field disables it again — so you
   always run exactly what you validated. **Test run** (`t`) does a quick dry conversion of the first rows of the
-  first matching file (writing nothing), to confirm the settings produce a valid result before a full run. A
-  progress bar with an estimated remaining time is shown while a run is in progress.
+  first matching file (writing nothing), to confirm the settings produce a valid result before a full run. While a
+  run is in progress, a progress bar shows files done/total with an estimated remaining time, and below it each
+  file currently being converted gets its own line with a per-file percentage and the current step (Reading,
+  Converting, Saving, …) — so with several worker processes you see every in-flight file at once. Each file's
+  detailed, colour-coded log appears in the console as soon as that file finishes.
 - Key bindings (also shown in the footer):
     - `v` — validate settings (enables Run when everything is OK)
     - `d` — detect the time range from the source files (fills Start/End date)
@@ -82,8 +87,10 @@ by hand, or a **headless CLI** for automated/scheduled runs.
   settings and a log file into that run's output folder; the source `bico.settings` is never modified by a run.
 - To reuse a previous run's settings, **drag and drop its `bico.settings` file anywhere onto the TUI** — the form is
   filled from it. (Most terminals deliver a dropped file as its pasted path, which the TUI recognises.)
-- To set the **source** or **output** folder without browsing, focus that field and **drag and drop a file or folder
-  onto it** — the field is filled with the folder path (a dropped file uses the folder that contains it).
+- To set the **source** or **output** folder without browsing, **click the field to focus it, then drag and drop a
+  file or folder onto the TUI** — the field is filled with the folder path (a dropped file uses the folder that
+  contains it). The terminal sends the dropped path to the focused field, so make sure the field you want is focused.
+- To copy from the **console**, drag with the mouse to select text and press **Ctrl+C** (double-click selects a line).
 - **Detect dates from source files** (`d`) scans the source folder, parses every file's date with the filename
   datetime format, and fills Start/End date with the earliest and latest file (resetting "recent days" to 0 so the
   range is used). You can still adjust the dates afterwards.

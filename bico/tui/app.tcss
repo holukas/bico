@@ -22,6 +22,7 @@ Screen {
     width: 38%;
     min-width: 40;
     max-width: 100;
+    height: 1fr;
     padding: 0 1;
     background: $surface;
     border-right: tall $primary 40%;
@@ -125,10 +126,15 @@ Screen {
     background: $primary 40%;
 }
 
+/* Pinned to the bottom of the settings pane so it always reserves its own row
+   and never overlaps the scrollable fields (which otherwise hid the lower
+   fields, e.g. the output folder, on short terminals). */
 #actions {
+    dock: bottom;
     height: auto;
-    margin: 1 0 0 0;
+    padding: 1 0 0 0;
     align: center middle;
+    background: $surface;
 }
 
 #actions Button {
@@ -151,6 +157,13 @@ Screen {
     color: $accent;
     text-style: bold;
     padding: 0 0 1 1;
+}
+
+#run-status {
+    height: auto;          /* one line per in-progress file (parallel runs) */
+    padding: 0 1;
+    margin: 0 0 1 0;
+    color: $text;
 }
 
 #console {

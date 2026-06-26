@@ -1,8 +1,9 @@
 import datetime as dt
 import multiprocessing
 import os
+import queue as _queue
 import sys
-from concurrent.futures import ProcessPoolExecutor, as_completed
+from concurrent.futures import ProcessPoolExecutor, FIRST_COMPLETED, wait
 from pathlib import Path
 
 import pandas as pd
@@ -19,15 +20,25 @@ class BicoEngine:
             settings_dict: dict,
             usedgui: bool,
             avoidduplicates: bool = False,
-            progress_callback=None
+            progress_callback=None,
+            file_progress_callback=None,
+            should_stop=None
     ):
 
         self.settings_dict = settings_dict
         self.usedgui = usedgui
         self.avoidduplicates = avoidduplicates
+        # Optional callable() -> bool. When it returns True the run stops as soon
+        # as possible: no further files are started (the in-progress file, if any,
+        # finishes), then the run winds down normally. None means never stop.
+        self.should_stop = should_stop
         # Optional callable(done, total) invoked as each file finishes converting,
         # so a UI can show progress / estimated remaining time.
         self.progress_callback = progress_callback
+        # Optional callable(idx, total, filename, step, fraction) invoked while a
+        # file is converting, so a UI can show which file is in progress, the
+        # current step, and a per-file percentage.
+        self.file_progress_callback = file_progress_callback
 
         # Setup outdirs, run ID and logger
         self.run_id = ops_setup.generate_run_id()
@@ -181,44 +192,132 @@ class BicoEngine:
         # (via as_completed) so a UI can show a live count / estimated remaining time.
         n_workers = self._n_workers(len(tasks))
         total = len(tasks)
+        for i, task in enumerate(tasks):
+            task['task_index'] = i + 1  # 1-based, for the live progress display
         logger.info("")
         logger.info(f"Converting {total} file(s) of {num_bin_files} found, using {n_workers} process(es) ...")
         self._report_progress(0, total)
-        results = [None] * total
+
+        # Each file's captured log is replayed (and its stats collected) as soon as
+        # that file finishes, so the console shows progress live instead of dumping
+        # everything at the end. With several workers this is completion order.
+        stats_rows = []
         done = 0
         if n_workers == 1:
-            for i, task in enumerate(tasks):
-                results[i] = parallel.process_file(task)
+            for task in tasks:
+                if self._stop_requested():
+                    self._log_stopped(logger, done, total)
+                    break
+                task['progress_cb'] = self._make_seq_progress_cb(task, total)
+                result = parallel.process_file(task)
                 done += 1
+                self._consume_result(task, result, logger, stats_rows)
                 self._report_progress(done, total)
         else:
-            with ProcessPoolExecutor(max_workers=n_workers) as executor:
-                future_to_index = {executor.submit(parallel.process_file, task): i
-                                   for i, task in enumerate(tasks)}
-                for future in as_completed(future_to_index):
-                    results[future_to_index[future]] = future.result()
-                    done += 1
-                    self._report_progress(done, total)
-
-        # Replay each file's captured log (in file order) and collect per-file stats
-        stats_rows = []
-        for task, result in zip(tasks, results):
-            banner = f"[{task['bin_file']}]"
-            logger.info("")
-            logger.info("")
-            logger.info(banner)
-            logger.info("=" * len(banner))
-            self._replay_log(logger, result['log'])
-            if result['status'] == 'error':
-                logger.info(f"(!) ERROR converting {task['bin_file']}, file skipped: {result['error']}")
-                continue
-            if result['stats_row'] is not None:
-                stats_rows.append(result['stats_row'])
+            done = self._run_pool(tasks, n_workers, total, logger, stats_rows)
 
         if stats_rows:
             stats_coll_df = pd.concat([stats_coll_df] + stats_rows) if not stats_coll_df.empty \
                 else pd.concat(stats_rows)
         return stats_coll_df
+
+    def _run_pool(self, tasks, n_workers, total, logger, stats_rows):
+        """Convert files across a process pool, draining live progress events and
+        replaying each file's log as it completes."""
+        # Workers report live progress through a picklable manager queue (only set
+        # up when a UI asked for per-file progress, to avoid the manager overhead).
+        manager = progress_queue = None
+        if self.file_progress_callback is not None:
+            manager = multiprocessing.Manager()
+            progress_queue = manager.Queue()
+            for task in tasks:
+                task['progress_queue'] = progress_queue
+        done = 0
+        try:
+            with ProcessPoolExecutor(max_workers=n_workers) as executor:
+                future_to_index = {executor.submit(parallel.process_file, task): i
+                                   for i, task in enumerate(tasks)}
+                remaining = set(future_to_index)
+                stopped = False
+                while remaining:
+                    if not stopped and self._stop_requested():
+                        # Cancel files that haven't started; running ones finish.
+                        for future in remaining:
+                            future.cancel()
+                        self._log_stopped(logger, done, total)
+                        stopped = True
+                    completed, remaining = wait(remaining, timeout=0.15,
+                                                return_when=FIRST_COMPLETED)
+                    self._drain_progress_queue(progress_queue, total)
+                    for future in completed:
+                        if future.cancelled():
+                            continue
+                        i = future_to_index[future]
+                        result = future.result()
+                        done += 1
+                        self._consume_result(tasks[i], result, logger, stats_rows)
+                        self._report_progress(done, total)
+                self._drain_progress_queue(progress_queue, total)
+        finally:
+            if manager is not None:
+                manager.shutdown()
+        return done
+
+    def _consume_result(self, task, result, logger, stats_rows):
+        """Replay one file's captured log and collect its stats (or note an error)."""
+        banner = f"[{task['bin_file']}]"
+        logger.info("")
+        logger.info("")
+        logger.info(banner)
+        logger.info("=" * len(banner))
+        self._replay_log(logger, result['log'])
+        if result['status'] == 'error':
+            logger.info(f"(!) ERROR converting {task['bin_file']}, file skipped: {result['error']}")
+            return
+        if result['stats_row'] is not None:
+            stats_rows.append(result['stats_row'])
+
+    def _make_seq_progress_cb(self, task, total):
+        """A (step, fraction) callback for the sequential path that forwards to the
+        engine's file-progress callback."""
+        idx = task['task_index']
+        bin_file = task['bin_file']
+        return lambda step, frac: self._emit_file_progress(idx, total, bin_file, step, frac)
+
+    def _drain_progress_queue(self, progress_queue, total):
+        """Forward any queued worker progress events to the file-progress callback."""
+        if progress_queue is None:
+            return
+        while True:
+            try:
+                ev = progress_queue.get_nowait()
+            except _queue.Empty:
+                break
+            self._emit_file_progress(ev['idx'], total, ev['file'], ev['step'], ev['frac'])
+
+    def _stop_requested(self):
+        """True if the caller asked to stop the run (never raises)."""
+        if self.should_stop is None:
+            return False
+        try:
+            return bool(self.should_stop())
+        except Exception:
+            return False
+
+    def _log_stopped(self, logger, done, total):
+        """Note in the log that the run is stopping at the user's request."""
+        logger.info("")
+        logger.info(f"(!) Stop requested — stopping after {done} of {total} file(s). "
+                    f"A file already converting will finish; no new files are started.")
+
+    def _emit_file_progress(self, idx, total, filename, step, frac):
+        """Notify the optional file-progress callback; never let UI errors break a run."""
+        if self.file_progress_callback is None:
+            return
+        try:
+            self.file_progress_callback(idx, total, filename, step, max(0.0, min(1.0, frac)))
+        except Exception:
+            pass
 
     def _build_tasks(self, bin_found_files_dict, availablefiles, logger):
         """Build picklable per-file work descriptions, applying file-limit and duplicate checks."""

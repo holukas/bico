@@ -31,6 +31,34 @@ def _capture_logger(name):
     return logger, buf
 
 
+def _make_reporter(task):
+    """Build a ``report(step, fraction)`` callback for live per-file progress.
+
+    Sequential runs pass an in-process callable (``task['progress_cb']``);
+    parallel runs pass a picklable ``multiprocessing`` queue
+    (``task['progress_queue']``) that the main process drains. Headless runs pass
+    neither, so reporting is a no-op. Failures here never disturb conversion.
+    """
+    cb = task.get('progress_cb')
+    queue = task.get('progress_queue')
+    if cb is None and queue is None:
+        return lambda step, frac: None
+
+    idx = task.get('task_index', task['counter'])
+    bin_file = task['bin_file']
+
+    def report(step, frac):
+        try:
+            if cb is not None:
+                cb(step, frac)
+            else:
+                queue.put_nowait({'idx': idx, 'file': bin_file, 'step': step, 'frac': frac})
+        except Exception:
+            pass
+
+    return report
+
+
 def process_file(task):
     """Convert a single binary file and produce its outputs.
 
@@ -46,6 +74,7 @@ def process_file(task):
     stats_row (one-row DataFrame or None), log (captured log text).
     """
     logger, buf = _capture_logger(f"bico_worker_{task['counter']}")
+    report = _make_reporter(task)
     result = {
         'counter': task['counter'],
         'bin_filedate': task['bin_filedate'],
@@ -55,6 +84,7 @@ def process_file(task):
         'log': '',
     }
     try:
+        report('Reading file', 0.0)
         obj = bbin.ConvertData(
             binary_filename=task['bin_filepath'],
             size_header=task['size_header'],
@@ -62,6 +92,7 @@ def process_file(task):
             limit_read_lines=task['row_limit'],
             logger=logger,
             cur_file_number=task['counter'],
+            progress_cb=lambda frac: report('Converting', frac),
         )
         obj.run()
         dblock_headers, file_data_rows = obj.get_data()
@@ -69,16 +100,20 @@ def process_file(task):
         if task['add_instr_to_varname']:
             dblock_headers = [(f"{h[0]}_{h[2]}", h[1], h[2]) for h in dblock_headers]
 
+        report('Building table', 0.85)
         ascii_df = format_data.make_df(data_lines=file_data_rows, header=dblock_headers, logger=logger)
 
+        report('Saving CSV', 0.90)
         ascii_filepath = bfile.export_raw_data_ascii(
             df=ascii_df, outdir=task['dir_raw_data_ascii'], outfilename=task['ascii_filename'],
             logger=logger, compression=task['compression'],
         )
 
+        report('Verifying', 0.93)
         file_contents_ascii_df = bfile.read_converted_ascii(ascii_filepath, task['compression'])
 
         # Per-file stats as a single-row frame (the main process concatenates them)
+        report('Stats', 0.96)
         stats_row = bstats.calc(
             stats_df=file_contents_ascii_df.copy(), stats_coll_df=pd.DataFrame(),
             bin_filedate=task['bin_filedate'], counter_bin_files=1, logger=logger,
@@ -89,12 +124,15 @@ def process_file(task):
         stats_row.loc[bfd, ('_total_values', '[#]', '[FILE]', 'total')] = file_contents_ascii_df.size
         result['stats_row'] = stats_row
 
+        if task['plot_ts_hires'] or task['plot_histogram_hires']:
+            report('Plotting', 0.98)
         if task['plot_ts_hires']:
             vis.high_res_ts(df=file_contents_ascii_df.copy(), outfile=task['ascii_filename'],
                             outdir=task['dir_plots_hires'], logger=logger)
         if task['plot_histogram_hires']:
             vis.high_res_histogram(df=file_contents_ascii_df.copy(), outfile=task['ascii_filename'],
                                    outdir=task['dir_plots_hires'], logger=logger)
+        report('Done', 1.0)
     except Exception as exc:  # isolate failures: one bad file must not kill the batch
         result['status'] = 'error'
         result['error'] = f"{exc}\n{traceback.format_exc()}"

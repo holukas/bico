@@ -45,8 +45,13 @@ class ConvertData:
     Read and convert binary data to ASCII, write to file
     """
 
-    def __init__(self, binary_filename, size_header, dblocks, limit_read_lines, logger, cur_file_number):
+    def __init__(self, binary_filename, size_header, dblocks, limit_read_lines, logger,
+                 cur_file_number, progress_cb=None):
         self.tic = time.time()  # Start time
+        # Optional callable(fraction) reporting how far through the file the row
+        # conversion is (bytes read / file size). Used by the TUI for a live
+        # per-file progress; None for the headless path.
+        self._progress_cb = progress_cb
         self.binary_filename = binary_filename
         self.binary_filesize = os.path.getsize(self.binary_filename)
         self.size_header = size_header
@@ -104,6 +109,13 @@ class ConvertData:
             if file_newrow_records:
                 self.file_counter_lines += 1
                 self.file_data_rows.append(file_newrow_records)
+                # Report progress occasionally (every ~8192 rows) so the hot loop
+                # stays cheap; fraction = bytes consumed / total file size.
+                if self._progress_cb is not None and (self.file_counter_lines & 0x1FFF) == 0:
+                    try:
+                        self._progress_cb(self.file_total_bytes_read / self.binary_filesize)
+                    except Exception:
+                        pass
 
             # Limit = 0 means no limit
             if self.limit_read_lines > 0:

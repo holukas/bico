@@ -11,7 +11,8 @@ test needs no running event loop.
 """
 import logging
 
-from bico.tui.log_handler import make_tui_handler, _WidgetStream, _style_for_line
+from bico.tui.log_handler import (make_tui_handler, _WidgetStream, _style_for_line,
+                                   format_log_line)
 
 
 class _FakeRichLog:
@@ -65,7 +66,7 @@ def test_partial_writes_are_buffered_until_newline():
     stream.write("no newline yet")
     assert widget.lines == []           # nothing emitted without a newline
     stream.write(" and now\n")
-    assert widget.lines == [("no newline yet and now", None)]
+    assert [t for t, _ in widget.lines] == ["no newline yet and now"]
 
 
 def test_line_styling_by_level_marker():
@@ -73,3 +74,20 @@ def test_line_styling_by_level_marker():
     assert _style_for_line("... | WARNING | careful") == "yellow"
     assert _style_for_line("... | INFO    | (!) heads up") == "yellow"
     assert _style_for_line("... | INFO    | all good") is None
+
+
+def test_format_log_line_preserves_text_and_adds_color():
+    line = "2026-01-01 00:00:00 | INFO    | Converting 3 file(s)"
+    text = format_log_line(line)
+    # Plain text is byte-faithful (selection/copy + verbatim replay rely on this).
+    assert text.plain == line
+    # Styling is applied as spans (timestamp, level, number, keyword), not one blanket style.
+    assert len(text.spans) > 1
+    styles = " ".join(str(span.style) for span in text.spans)
+    assert "cyan" in styles  # the INFO level / number / keyword colouring
+
+
+def test_format_log_line_colors_error_red():
+    text = format_log_line("2026-01-01 00:00:00 | ERROR   | boom")
+    styles = " ".join(str(span.style) for span in text.spans)
+    assert "red" in styles
