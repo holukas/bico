@@ -1,6 +1,8 @@
 import datetime as dt
+import multiprocessing
 import os
 import sys
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 import pandas as pd
@@ -9,7 +11,7 @@ from PyQt5 import QtGui as qtg
 from PyQt5 import QtWidgets as qtw
 
 from bico.gui.gui import Ui_MainWindow
-from bico.ops import bin, vis, file, stats, cli, format_data
+from bico.ops import bin, vis, file, cli, parallel
 from bico.ops import logger as ops_logger, setup as ops_setup
 from bico.settings import _version
 
@@ -156,7 +158,7 @@ class BicoEngine:
             vis.aggs_ts(df=df, outdir=self.settings_dict['dir_out_run_plots_agg'], logger=self.logger)
 
     def loop(self, bin_found_files_dict, dblocks_props, stats_coll_df, logger, availablefiles: list):
-        """Process files"""
+        """Process files, converting independent files concurrently across processes."""
         logger.info("Processing files ...")
         num_bin_files = len(bin_found_files_dict)
 
@@ -169,99 +171,106 @@ class BicoEngine:
                 _idx += 1
                 logger.info(f"    #{_idx}    {_dblock_var[0]} {_dblock_var[1]} {_dblock_var[2]}")
 
-        counter_bin_files = 0
-        for bin_file, bin_filepath in bin_found_files_dict.items():
-            bin_filedate = dt.datetime.strptime(bin_filepath.name,
-                                                self.settings_dict['filename_datetime_parsing_string'])
-            ascii_filedate = bin_filedate.strftime('%Y%m%d%H%M')  # w/o extension
-            ascii_filename = f"{self.settings_dict['site']}_{ascii_filedate}"  # w/o extension
+        # Build the list of files to convert (file-limit and duplicate checks happen here)
+        tasks = self._build_tasks(bin_found_files_dict, availablefiles, logger)
+        if not tasks:
+            return stats_coll_df
 
-            counter_bin_files += 1
-            # self.statusbar.showMessage(f"Working on file #{counter_bin_files}: {bin_file}")
+        # Convert files: in parallel across processes, or sequentially for a single file/worker
+        n_workers = self._n_workers(len(tasks))
+        logger.info("")
+        logger.info(f"Converting {len(tasks)} file(s) of {num_bin_files} found, using {n_workers} process(es) ...")
+        if n_workers == 1:
+            results = [parallel.process_file(task) for task in tasks]
+        else:
+            with ProcessPoolExecutor(max_workers=n_workers) as executor:
+                results = list(executor.map(parallel.process_file, tasks))
 
-            # Check if file limit is exceeded, break
-            if (counter_bin_files > 1) & (int(self.settings_dict['file_limit']) > 0):
-                if counter_bin_files > int(self.settings_dict['file_limit']):
-                    logger.info(f"File limit ({self.settings_dict['file_limit']}) reached,"
-                                f" ignoring other files.")
-                    break
-
+        # Replay each file's captured log (in file order) and collect per-file stats
+        stats_rows = []
+        for task, result in zip(tasks, results):
+            banner = f"[{task['bin_file']}]"
             logger.info("")
             logger.info("")
-            logger.info(f"[{bin_file}]")
-            logger.info("=" * (len(bin_file) + 2))
+            logger.info(banner)
+            logger.info("=" * len(banner))
+            self._replay_log(logger, result['log'])
+            if result['status'] == 'error':
+                logger.info(f"(!) ERROR converting {task['bin_file']}, file skipped: {result['error']}")
+                continue
+            if result['stats_row'] is not None:
+                stats_rows.append(result['stats_row'])
 
-            # Check for potential duplicate
-            if availablefiles:
-                if any(ascii_filename in f for f in availablefiles):
-                    logger.info(f"[DUPLICATE CHECK]    (!) Skipping file because converted file already available in "
-                                f"{self.settings_dict['dir_out']}")
-                    continue
-
-            logger.info(f"    Reading binary file #{counter_bin_files} of {num_bin_files}: {bin_file}...")
-            logger.info(f"    Data block sequence: {self.dblocks_seq}")
-
-            # Read binary data file
-            obj = bin.ConvertData(binary_filename=bin_filepath,
-                                  size_header=self.bin_size_header,
-                                  dblocks=dblocks_props,
-                                  limit_read_lines=int(self.settings_dict['row_limit']),
-                                  logger=self.logger,
-                                  cur_file_number=counter_bin_files)
-            obj.run()
-            # ascii_df = obj.get_data()
-            dblock_headers, file_data_rows = obj.get_data()
-
-            # Add instrument info to variable name
-            if self.settings_dict['add_instr_to_varname'] == '1':
-                dblock_headers = self.add_instr_to_varname(dblock_headers=dblock_headers)
-
-            # Make dataframe of data
-            ascii_df = format_data.make_df(data_lines=file_data_rows,
-                                           header=dblock_headers,
-                                           logger=self.logger)
-
-            # Save to file
-            ascii_filepath = file.export_raw_data_ascii(df=ascii_df,
-                                                        outdir=self.settings_dict['dir_out_run_raw_data_ascii'],
-                                                        outfilename=ascii_filename,
-                                                        logger=self.logger,
-                                                        compression=self.settings_dict['file_compression'])
-
-            # Read the converted file that was created
-            file_contents_ascii_df = file.read_converted_ascii(filepath=ascii_filepath,
-                                                               compression=self.settings_dict['file_compression'])
-
-            # Stats
-            stats_coll_df = stats.calc(stats_df=file_contents_ascii_df.copy(),
-                                       stats_coll_df=stats_coll_df,
-                                       bin_filedate=bin_filedate,
-                                       counter_bin_files=counter_bin_files,
-                                       logger=logger)
-            stats_coll_df.loc[bin_filedate, ('_filesize', '[Bytes]', '[FILE]', 'total')] = os.path.getsize(bin_filepath)
-            stats_coll_df.loc[bin_filedate, ('_columns', '[#]', '[FILE]', 'total')] = len(
-                file_contents_ascii_df.columns)
-            stats_coll_df.loc[bin_filedate, ('_total_values', '[#]', '[FILE]', 'total')] = file_contents_ascii_df.size
-
-            # Plot high-resolution data
-            if self.settings_dict['plot_ts_hires'] == '1':
-                vis.high_res_ts(df=file_contents_ascii_df.copy(), outfile=ascii_filename,
-                                outdir=self.settings_dict['dir_out_run_plots_hires'], logger=logger)
-            if self.settings_dict['plot_histogram_hires'] == '1':
-                vis.high_res_histogram(df=file_contents_ascii_df.copy(), outfile=ascii_filename,
-                                       outdir=self.settings_dict['dir_out_run_plots_hires'], logger=logger)
-
+        if stats_rows:
+            stats_coll_df = pd.concat([stats_coll_df] + stats_rows) if not stats_coll_df.empty \
+                else pd.concat(stats_rows)
         return stats_coll_df
 
-    def add_instr_to_varname(self, dblock_headers):
-        """Add instrument info to variable name to avoid duplicates
+    def _build_tasks(self, bin_found_files_dict, availablefiles, logger):
+        """Build picklable per-file work descriptions, applying file-limit and duplicate checks."""
+        tasks = []
+        file_limit = int(self.settings_dict['file_limit'])
+        counter_bin_files = 0
+        for bin_file, bin_filepath in bin_found_files_dict.items():
+            counter_bin_files += 1
+            if (counter_bin_files > 1) and (file_limit > 0) and (counter_bin_files > file_limit):
+                logger.info(f"File limit ({file_limit}) reached, ignoring other files.")
+                break
 
-            e.g. The var STATUS_CODE exists both in IRGA72-A and QCL-C
-            and are renamed to STATUS_CODE_IRGA75-A and STATUS_CODE_QCL-C
-        """
-        for idx_h, h in enumerate(dblock_headers):
-            dblock_headers[idx_h] = (f"{h[0]}_{h[2]}", h[1], h[2])
-        return dblock_headers
+            bin_filedate = dt.datetime.strptime(bin_filepath.name,
+                                                self.settings_dict['filename_datetime_parsing_string'])
+            ascii_filename = f"{self.settings_dict['site']}_{bin_filedate.strftime('%Y%m%d%H%M')}"
+
+            if availablefiles and any(ascii_filename in f for f in availablefiles):
+                logger.info(f"[{bin_file}] [DUPLICATE CHECK] (!) Skipping, converted file already available in "
+                            f"{self.settings_dict['dir_out']}")
+                continue
+
+            sd = self.settings_dict
+            tasks.append({
+                'counter': counter_bin_files,
+                'bin_file': bin_file,
+                'bin_filepath': bin_filepath,
+                'bin_filedate': bin_filedate,
+                'ascii_filename': ascii_filename,
+                'size_header': self.bin_size_header,
+                'dblocks_props': self.dblocks_props,
+                'row_limit': int(sd['row_limit']),
+                'add_instr_to_varname': sd['add_instr_to_varname'] == '1',
+                'compression': sd['file_compression'],
+                'dir_raw_data_ascii': sd['dir_out_run_raw_data_ascii'],
+                'dir_plots_hires': sd['dir_out_run_plots_hires'],
+                'plot_ts_hires': sd['plot_ts_hires'] == '1',
+                'plot_histogram_hires': sd['plot_histogram_hires'] == '1',
+            })
+        return tasks
+
+    def _n_workers(self, num_tasks):
+        """Number of worker processes: optional 'num_processes' setting, else (cpu_count - 1)."""
+        configured = self.settings_dict.get('num_processes')
+        try:
+            n = int(configured)
+        except (TypeError, ValueError):
+            n = 0
+        if n <= 0:
+            n = max(1, (os.cpu_count() or 2) - 1)
+        return max(1, min(n, num_tasks))
+
+    @staticmethod
+    def _replay_log(logger, text):
+        """Write a worker's already-formatted captured log verbatim to the real log destinations."""
+        if not text:
+            return
+        for handler in logger.handlers:
+            stream = getattr(handler, 'stream', None)
+            if stream is None:
+                continue
+            handler.acquire()
+            try:
+                stream.write(text)
+                handler.flush()
+            finally:
+                handler.release()
 
     def make_datetime_parsing_string(self):
         _parsing_string = self.settings_dict['filename_datetime_format']
@@ -570,6 +579,7 @@ def main(args):
 
 def main_cli():
     """Console-script entry point (``bico`` / ``python -m bico``)."""
+    multiprocessing.freeze_support()  # required for process pool in a PyInstaller-frozen build
     args = cli.validate_args(cli.get_args())
     main(args)
 

@@ -1,6 +1,9 @@
 import datetime as dt
 import os
 
+import matplotlib
+matplotlib.use("Agg")  # plots are only saved to files (never shown); works head-less and in worker processes
+
 import matplotlib.dates as mdates
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt

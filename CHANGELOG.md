@@ -23,6 +23,10 @@
   per-row loop in `ops.bin` now uses a precomputed per-datablock plan (block size, variable count and bit map dict
   are computed once instead of every row) and decodes values with `int.from_bytes` instead of recombining bytes in
   Python. Output is byte-for-byte identical to before.
+- Improved: files are now converted in parallel across processes (one file per worker, up to about the CPU count),
+  which speeds up multi-file runs roughly with the number of cores, on top of the per-file speedup. Single-file or
+  single-worker runs fall back to sequential processing, and a failing file no longer aborts the whole run. Per-file
+  output is unchanged (byte-for-byte identical). The optional `num_processes` setting overrides the worker count.
 - Added: a `pytest` test suite (`tests/`). It includes a golden-file test that converts a small truncated real
   binary file and compares the result against a committed expected output (guarding against unintended changes to
   converted values or formatting), an explicit test for the short/missing data-block fill path (the IRGA72

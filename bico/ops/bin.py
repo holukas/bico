@@ -1,6 +1,5 @@
 import mmap
 import os
-import struct
 import time
 
 import pandas as pd
@@ -121,10 +120,10 @@ class ConvertData:
 
         The per-row conversion loop is the performance bottleneck, so anything
         constant per data block is computed once here instead of on every row:
-        compiled `struct.Struct` objects, the nominal block size and variable
-        count, base-256 recombination factors for multi-byte values, the bit map
-        dict, and the per-variable conversion flags. Produces results identical
-        to the original per-row logic, just without the repeated work.
+        the nominal block size and variable count, the signed/unsigned decode
+        flag per variable, the bit map dict, and the per-variable conversion
+        flags. Produces results identical to the original per-row logic, just
+        without the repeated work.
         """
         plans = []
         for dblock in dblocks:
@@ -288,99 +287,6 @@ class ConvertData:
         # return dblock_data
         return dblock_data, end_of_data_reached
 
-    def convert_val(self, units, var_val):
-        """Convert var value to hex or octal"""
-        if units == 'diag_val_hs':
-            var_val = self.convert_val_to_diag_val_hs(var_val=var_val)
-        if units == 'status_code_irga':
-            var_val = self.convert_val_to_status_code_irga(var_val=var_val)
-        if units == 'status_code_lgr':
-            var_val = self.convert_val_to_status_code_lgr(var_val=var_val)
-        return var_val
-
-    @staticmethod
-    def convert_val_to_diag_val_hs(var_val):
-        """Convert value to diagnostic value for Gill HS-50 and HS-100 sonic anemometers
-
-        Saved as an integer value. The integer can be converted to binary to get more
-        information. Since the information in this variable is quite complex, please
-        refer to the sonic anemometer manual for details.
-
-        Examples:
-            - var_val = 47.0, is converted to integer 47, this is the value that is
-              then stored in the converted ASCII file.
-
-        Notes:
-            - The variable SA_DIAG_TYPE from the sonic HS anmometers gives info
-              which type of information is given in SA_DIAG_VAL.
-            - To get more information from the integer, it can be converted to
-              binary, e.g. integer 47 becomes binary "0b101111"
-              In Python, this can be done with bin(47) --> "0b101111"
-            - The first two characters "0b" mean that this is binary format
-            - The information is contained in "101111", it tells us which bits are
-              set to 1 or 0. This can be interpreted using the sonic manual, there
-              is a list what each bit set to 1 or 0 means.
-
-        Returns: string
-        """
-        # hex_val = hex(int(var_val))  # Note: has hexadecimal prefix '0x' at start, e.g. '0x28'
-        # hex_val_no_prefix = hex_val[2:]  # Remove hex prefix from val
-        diag_val_hs = int(var_val)
-        return diag_val_hs
-
-    @staticmethod
-    def convert_val_to_status_code_irga(var_val):
-        """Convert value to octal
-
-        Examples:
-            - var_val = 0.0, is converted to integer 0,
-                is converted to octal '0o0', is converted to octal without prefix '0'
-        Returns: int
-        """
-        # if var_val != 0:
-        #     print("x")
-        var_val_int = int(var_val)  # Convert to integer
-        # var_val_bin = bin(var_val_int)[2:]  # Convert to binary string
-        # var_val_bin = var_val_bin.zfill(8)  # F
-        # var_val_oct = int(var_val_bin, 8)  # Elegant way to convert binary string to octal
-        # bin(int(var_val))[2:].zfill(16)
-        oct_val = oct(var_val_int)  # Note: has octal prefix '0o' at start, e.g. '0o0'
-        oct_val_no_prefix = oct_val[2:]  # Remove octal prefix from val
-        return int(oct_val_no_prefix)
-
-    @staticmethod
-    def convert_val_to_status_code_lgr(var_val):
-        """Convert value to status code for LGR laser analyzer
-
-        Format for the LGR status code that is recorded in the raw binary files.
-
-        Example:
-            - var_val = 113.0
-            - var_val_int = 113
-            - var_val_bin = '0001'
-            - status_code = 1
-        Returns: int
-        """
-        # try:
-        var_val_int = int(var_val)  # Convert to integer
-        var_val_bin = bin(var_val_int)[-4:]  # Convert to binary string, relevant info is in last 4 bits
-        status_code = int(var_val_bin, 2)  # Convert binary back to integer with base 2
-        # var_val_oct = int(var_val_bin, 8)  # Elegant way to convert binary string to octal
-        # except:
-        #     print("X1")
-        # else:
-        #     var_val_oct = -9999
-        # return var_val_int
-        return status_code
-
-    def extract_bit_map(self, var_val, num_bytes, dblock):
-        """Extract multiple variables from one bit map variable"""
-        var_binary_string = self.bit_map_var_to_bin(var_val=var_val, num_bytes=num_bytes)
-        bit_map_dict = self.bit_map_get_vars(dblock=dblock)
-        bit_map_vals = self.bit_map_extract_vals(bit_map_dict=bit_map_dict,
-                                                 var_binary_string=var_binary_string)
-        return bit_map_vals
-
     def read_rest_of_bytes(self, dblock_true_size, dblock_bytes_read):
         """Read rest of datablock bytes but do nothing with the data
 
@@ -393,88 +299,6 @@ class ConvertData:
         # bytes_notread = 0  # for testing
         _varbytes = self.open_binary.read(bytes_notread)
         return None
-
-    @staticmethod
-    def set_extracted_vars_to_missing(dblock, dblock_data_so_far):
-        """Add missing value -9999 for each of the bit map vars that was selected for output"""
-        for var, props in dblock.items():
-            if 'bit_pos_start' in props.keys():
-                if props['output'] == 1:
-                    dblock_data_so_far.append(-9999)
-        return dblock_data_so_far
-
-    @staticmethod
-    def set_vars_notread_to_missing(dblock_data_so_far, dblock_numvars, dblock_vars_read):
-        """Generate missing values for main vars that were not read"""
-        vars_notread = dblock_numvars - dblock_vars_read
-        for v in range(0, vars_notread):
-            dblock_data_so_far.append(-9999)
-        return dblock_data_so_far
-
-    @staticmethod
-    def check_if_dblock_size_zero(dblock_true_size):
-        """Immediately stop if data block is zero bytes"""
-        end_of_data_reached = True if dblock_true_size == 0 else False
-        return end_of_data_reached
-
-    def check_if_end_of_data(self, varbytes, required_varbytes):
-        """Check if the end of available data is reached"""
-        # Check if no more bytes available, True if length equals zero
-        varbytes_zero = len(varbytes) == 0
-
-        # Check if enough bytes for this var available, True if not enough bytes
-        varbytes_not_enough_bytes = (len(varbytes) != 0) and (len(varbytes) < required_varbytes)
-
-        if varbytes_zero | varbytes_not_enough_bytes:
-            end_of_data_reached = True
-        else:
-            end_of_data_reached = False
-
-        return end_of_data_reached
-
-    def get_var_val(self, var, varbytes, gain_on_signal, offset_on_signal,
-                    apply_gain, add_offset, conversion_type, datablock, format):
-        dblock_struct = struct.Struct(format)  # Define format of read bytes
-        dblock_unpacked = dblock_struct.unpack(varbytes)
-        var_val = self.convert_bytes_to_value(unpacked_data=dblock_unpacked)
-
-        if conversion_type == 'regular':
-            var_val = self.remove_gain_offset(var_value=var_val,
-                                              gain=gain_on_signal,
-                                              offset=offset_on_signal)
-            var_val = self.apply_gain_offset(var_value=var_val, gain=apply_gain, offset=add_offset)
-
-        elif conversion_type == 'exception':
-            if (datablock == 'R2-A') & (var == 'T_SONIC'):
-                var_val = bce.dblock_r2a_t_sonic(var_val=var_val)
-
-        else:
-            var_val = '-conversion-type-not-defined-'
-        return var_val
-
-    @staticmethod
-    def remove_gain_offset(var_value, gain, offset):
-        """Remove gain by division and subtract offset"""
-        return (var_value / gain) - offset
-
-    @staticmethod
-    def apply_gain_offset(var_value, gain, offset):
-        """Apply gain by multiplication and add offset"""
-        return (var_value * gain) + offset
-
-    @staticmethod
-    def convert_bytes_to_value(unpacked_data):
-        """Convert multiple Bytes to one value, or use value from one Byte"""
-        # based on: u = ((unpacked_data[0] * 256) + unpacked_data[1]) / 100
-        if len(unpacked_data) > 1:
-            length = len(unpacked_data) - 1
-            power = list(range(length, -1, -1))
-            power = [256 ** p for p in power]
-            var_value = [unpacked_data[i] * power[i] for i in range(len(unpacked_data))]
-            var_value = sum(var_value)
-        else:
-            var_value = unpacked_data[0]
-        return var_value
 
     @staticmethod
     def bit_map_extract_vals(bit_map_dict, var_binary_string):
@@ -506,18 +330,6 @@ class ConvertData:
             # 8-bit binary string, yields e.g. '11111001'
             var_binary_string = bin(int(var_val))[2:].zfill(8)
         return var_binary_string
-
-    @staticmethod
-    def block_info(dblock):
-        """Data block info: get nominal size in Bytes and number of vars"""
-        dblock_nominal_size = 0
-        dblock_numvars = 0
-        for var, props in dblock.items():
-            # Only count bytes of variables in original datastream, do not count extracted vars
-            if 'bytes' in props.keys():
-                dblock_nominal_size += props['bytes']
-                dblock_numvars += 1
-        return dblock_nominal_size, dblock_numvars
 
     @staticmethod
     def bit_map_get_vars(dblock):
@@ -560,111 +372,3 @@ class ConvertData:
             runtime_line_avg = 0
         _len = f"    {self.file_counter_lines} data rows converted in {toc:.2f}s, speed: {int(runtime_line_avg)} rows s-1"
         self.logger.info(_len)
-
-# def read_file(binary_filename, size_header, dblocks, limit_read_lines, logger, statusbar):
-# binary_filesize = os.path.getsize(binary_filename)
-# logger.info(f"    File size: {binary_filesize} Bytes")
-
-# # File header
-# # Make header for all data blocks
-# dblock_headers = []
-# for dblock in dblocks:
-#     dblock_header = make_header(dblock=dblock)
-#     for dblock_var in dblock_header:
-#         dblock_headers.append(dblock_var)
-
-# Open binary file
-# tic = time.time()
-# open_binary = read_bin_file_to_mem(binary_filename=binary_filename, logger=logger)
-# counter_lines = 0
-# total_bytes_read = 0
-# data_rows = []  # Collects all data, i.e. all line records
-
-# # First read header at top of file
-# settings.data_blocks.header.wecom3.data_block_header(open_binary, size_header)
-
-# Then loop through rest of binary file contents
-# logger.info(f"    Reading file data, converting to ASCII ...")
-# end_of_data_reached = False
-# while not end_of_data_reached:
-#     newdata_onerow_records = []
-#     # Read data blocks per instrument
-#     for instr in dblocks:
-#         obj = ReadInstrDatablock(open_binary=open_binary,
-#                                  dblock=instr,
-#                                  total_bytes_read=total_bytes_read,
-#                                  logger=logger)
-#         newdata_instr, total_bytes_read, end_of_data_reached = obj.get_dblock_data()
-#         # print(len(newdata_instr))
-#
-#         if not end_of_data_reached:
-#             newdata_onerow_records = newdata_onerow_records + newdata_instr
-#         else:
-#             newdata_onerow_records = False
-#             break  # Breaks FOR loop
-#
-#     if newdata_onerow_records:
-#         counter_lines += 1
-#         data_rows.append(newdata_onerow_records)
-#         # Check if all bytes of current files were read
-#         # if total_bytes_read >= binary_filesize:
-#         #     print("X")
-#
-#         # # Info stats
-#         # if counter_lines % 15000 == 0:
-#         #     toc = time.time() - tic
-#         #     time_per_byte = toc / total_bytes_read
-#         #     bytes_not_read = binary_filesize - total_bytes_read
-#         #     rem_time = bytes_not_read * time_per_byte
-#         #     bytes_read_perc = (total_bytes_read / binary_filesize) * 100
-#         #     print(f"\r    Read {counter_lines} lines / {total_bytes_read} Bytes ({bytes_read_perc:.1f}%) / "
-#         #           f"time remaining: {rem_time:.1f}s ...", end='')
-#
-#     # Limit = 0 means no limit
-#     if limit_read_lines > 0:
-#         if counter_lines == limit_read_lines:
-#             break
-
-# open_binary.close()
-# data_header = dblock_headers
-# return data_rows, data_header, tic, counter_lines
-
-# def generate_file_header(dblocks):
-#     """Make header for converted output file"""
-#     header = []
-#     units = []
-#     for instr in dblocks:
-#         header += list(instr.keys())
-#         for key, val in instr.items():
-#             units += f"[{val['units']}]",
-#     header = list(zip(header, units))  # List of tuples: header name and units
-#     return header
-#     # a= (instr.keys(), key = lambda x: (instr[x][by])
-
-
-# # Info stats
-# if counter_lines % 15000 == 0:
-#     toc = time.time() - tic
-#     time_per_byte = toc / total_bytes_read
-#     bytes_not_read = binary_filesize - total_bytes_read
-#     rem_time = bytes_not_read * time_per_byte
-#     bytes_read_perc = (total_bytes_read / binary_filesize) * 100
-#     print(f"\r    Read {counter_lines} lines / {total_bytes_read} Bytes ({bytes_read_perc:.1f}%) / "
-#           f"time remaining: {rem_time:.1f}s ...", end='')
-
-
-# def write_multirow_header_to_ascii(self, asciiWriter):
-#     """Write header info from list of tuples to file as multi-row header
-#
-#     Since self.dblock_headers is a list of tuples and the output ascii is
-#     written row-by-row, the header info is extracted from the list: each tuple
-#     in the list comprises three elements (variable name, units and instrument).
-#     Therefore, first the first element of each tuple (all variable names) is written
-#     to the first row of the file, then all second elements (units) are written to the
-#     second row, and finally the third elements (instrument) are written to the
-#     third row of the output file.
-#
-#     """
-#     for headerrow in range(0, 3):
-#         headerrow_out = [i[headerrow] for i in self.dblock_headers]
-#         asciiWriter.writerow(headerrow_out)
