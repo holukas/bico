@@ -3,7 +3,7 @@
 ## Variables
 - DATA_SIZE ... Data size of current data block, number of bytes in LGR record
   (2 = missing, 33 = available)
-- STATUS_CODE ... Status of LGR data aquisition, see Table 11 and 13 in WE's sonicread.pdf
+- STATUS_CODE ... Status of LGR data aquisition, see Table 11 and 13 in WE's [sonicread.pdf](../../../docs/sonicread_20190503.pdf)
     - status code converted to integer yields:
     - 0 .. Status OK, no problems (corresponds to binary 0000)
     - 1 .. Old LGR record replicated (0001)

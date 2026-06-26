@@ -24,7 +24,7 @@
 - AGC / LI75_AGC ... Automatic gain control from the LI-7500 (%)
   - low values close to 50 mean good signal
   - extracted from GA_DIAG_CODE
-- STATUS_CODE / LI75_STATUS_CODE ... Status of IRGA data aquisition, see Table 7 in WE's sonicread.pdf
+- STATUS_CODE / LI75_STATUS_CODE ... Status of IRGA data aquisition, see Table 7 in WE's [sonicread.pdf](../../../docs/sonicread_20190503.pdf)
     - same as STATUS_CODE found in other datablocks
     - octal value converted to integer yields:
     - 0 .. Status OK, no problems (octal 0000)

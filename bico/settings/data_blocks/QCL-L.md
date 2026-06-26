@@ -7,7 +7,7 @@
 - STATUS_CODE ... Status information and extension variant information
     - Most significant bits of this byte (bits 4–7) contain the VARIANT information
         - On Windows systems (LSB): bits 0-3
-        - Gives variant information according to Table 2 in WE's sonicread.pdf
+        - Gives variant information according to Table 2 in WE's [sonicread.pdf](../../../docs/sonicread_20190503.pdf)
         - Example: "6" means variant 6 as listed in Table 2
     - Least significant bits (bits 0–3) contain STATUS information
         - On Windows systems (LSB): bits 4-7

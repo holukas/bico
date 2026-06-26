@@ -14,14 +14,14 @@ instrument_3=-None-
 # ========
 
 # Source Folder
-dir_source=
+dir_source=\\nas12.ethz.ch\green_groups_gl_rawdata\FluxData\CH-DAV_Davos\20_sonic_ghg\2026\06\20_HS_LI72
 
 # Time Range
-start_date=2025-06-01 00:00
-end_date=2025-12-31 23:59
+start_date=2026-06-01 01:00
+end_date=2026-06-25 13:00
 
 # File Settings
-filename_datetime_format=yyyymmddHH.CMM
+filename_datetime_format=yyyymmddHH.XMM
 file_size_min=900
 file_limit=0
 row_limit=0

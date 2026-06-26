@@ -27,7 +27,7 @@
           of `6.67` according to the manual is used. Instead, the maximum value is `100.05%`.
 - SIGNAL_STRENGTH ... signal strength, 100% = best
 - STATUS_CODE ... Status of IRGA data aquisition
-    - For the original description for files logged with `sonicread`, see Table 7 in WE's sonicread.pdf
+    - For the original description for files logged with `sonicread`, see Table 7 in WE's [sonicread.pdf](../../../docs/sonicread_20190503.pdf)
     - Description for the original `sonicread` files:
       - octal value converted to integer yields:
       - 0 .. Status OK, no problems (octal 0000)

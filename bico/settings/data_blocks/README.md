@@ -21,6 +21,15 @@ instrument data blocks (a sonic anemometer and one or two gas analyzers); see th
 site `bico.settings` files and the conversion core in
 [`bico/ops/bin.py`](../../ops/bin.py).
 
+## Logging scripts
+
+The [`sonicread`](../../../docs/sonicread_20190503.pdf) logging script was used at
+all sites since 2004 and writes the compressed binary raw data that `bico`
+converts. Starting in 2023 (first at site CH-FRU), EC raw-data logging is being
+migrated to **`rECord`**, an updated and improved version of `sonicread`. `rECord`
+writes data directly in ASCII, so its data blocks need no binary conversion — see
+[rECord formats](#record-formats-documentation-only-no-dblock) below.
+
 ## Logger header
 
 | Header | Spec |
@@ -84,9 +93,10 @@ Original manufacturer documentation for the logged instruments (in
 
 ## rECord formats (documentation only, no `.dblock`)
 
-Data blocks from the `rECord` logging script. These files are already logged
-directly in ASCII, so they need **no** binary conversion. Their info is kept here
-only to document them alongside the other data blocks, all in one place; they are
+Data blocks from the `rECord` logging script (the successor to `sonicread`, see
+[Logging scripts](#logging-scripts) above). `rECord` writes data directly in
+ASCII, so these files need **no** binary conversion. Their info is kept here only
+to document them alongside the other data blocks, all in one place; they are
 informational and are not used for conversion (hence no companion `.dblock`).
 
 - [HS50-R1.md](HS50-R1.md)

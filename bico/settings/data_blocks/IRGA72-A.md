@@ -3,7 +3,7 @@
 ## Variables
 - DATA_SIZE ... Data size of current data block, number of bytes in Licor 7200 record
   (2 = missing, 26 = available)
-- STATUS_CODE ... Status of IRGA data aquisition, see Table 7 in WE's sonicread.pdf
+- STATUS_CODE ... Status of IRGA data aquisition, see Table 7 in WE's [sonicread.pdf](../../../docs/sonicread_20190503.pdf)
     - octal value converted to integer yields:
     - 0 .. Status OK, no problems (octal 0000)
     - 20 .. IRGA did not respond (0020)
