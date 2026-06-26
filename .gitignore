@@ -6,6 +6,11 @@
 /_tests/
 start BICO.lnk
 
+# BICO settings backups / temp churn (not the tracked BICO.settings template)
+BICO.settingsOld
+BICO.settingsTemp
+BICO.settings.BAK
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

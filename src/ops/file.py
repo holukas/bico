@@ -4,8 +4,6 @@ import fnmatch
 import os
 import random
 from pathlib import Path
-from shutil import copyfile
-
 import pandas as pd
 
 
@@ -210,28 +208,51 @@ def export_stats_collection_csv(df, outdir, run_id, logger):
     df.to_csv(f"{outpath}.csv", index=True)
 
 
-def save_settings_to_file(settings_dict, copy_to_outdir=False):
-    """Save settings dict to settings file """
-    old_settings_file = os.path.join(settings_dict['dir_settings'], 'BICO.settings')
-    new_settings_file = os.path.join(settings_dict['dir_settings'], 'BICO.settingsTemp')
-    with open(old_settings_file) as infile, open(new_settings_file, 'w') as outfile:
-        for line in infile:  # cycle through all lines in settings file
-            if ('=' in line) and (not line.startswith('#')):  # identify lines that contain setting
-                line_id, line_setting = line.strip().split('=')
-                line = '{}={}\n'.format(line_id, settings_dict[line_id])  # insert setting from dict
-            outfile.write(line)
-    try:
-        os.remove(old_settings_file + 'Old')
-    except:
-        pass
-    os.rename(old_settings_file, old_settings_file + 'Old')
-    os.rename(new_settings_file, old_settings_file)
+# Settings that are derived/computed at runtime. They must never be written back
+# into the user's BICO.settings file: doing so pollutes it with per-run values
+# (run_id) and machine-specific absolute paths (dir_script, dir_out_run, ...).
+DERIVED_SETTING_KEYS = {
+    'run_id', 'filename_datetime_parsing_string',
+    'dir_bico', 'dir_script', 'dir_settings', 'dir_root',
+    'dir_out_run', 'dir_out_run_log', 'dir_out_run_plots',
+    'dir_out_run_plots_hires', 'dir_out_run_plots_agg', 'dir_out_run_raw_data_ascii',
+}
 
-    # Save a copy of the settings file also in the output dir
-    if copy_to_outdir:
-        run_settings_file_path = Path(settings_dict['dir_out_run']) / 'BICO.settings'
-        copyfile(old_settings_file, run_settings_file_path)
-        pass
+
+def save_settings_to_file(settings_dict):
+    """Persist user settings back to the source BICO.settings file.
+
+    Only user-configurable settings are written; keys in DERIVED_SETTING_KEYS are
+    skipped (and dropped if an older file still contains them) so the file is not
+    polluted with per-run values or machine-specific paths. Comments and section
+    headers in the existing file are preserved. The file is replaced atomically.
+    """
+    settings_path = Path(settings_dict['dir_settings']) / 'BICO.settings'
+    tmp_path = settings_path.with_name('BICO.settingsTemp')
+    with open(settings_path) as infile, open(tmp_path, 'w') as outfile:
+        for line in infile:  # cycle through all lines in settings file
+            if ('=' in line) and (not line.startswith('#')):  # identify lines that contain a setting
+                line_id = line.split('=', 1)[0].strip()
+                if line_id in DERIVED_SETTING_KEYS:
+                    continue  # never persist derived/runtime keys
+                if line_id in settings_dict:
+                    line = f"{line_id}={settings_dict[line_id]}\n"  # insert current value from dict
+            outfile.write(line)
+    os.replace(tmp_path, settings_path)  # atomic replace, no .settingsOld churn
+
+
+def write_run_settings_snapshot(settings_dict, outdir):
+    """Write the full effective settings of a run to its output folder.
+
+    This is a provenance record of exactly what was run (it intentionally includes
+    derived keys). It is written only into the run output folder; the source
+    BICO.settings file is never modified by a run.
+    """
+    snapshot_path = Path(outdir) / 'BICO.settings'
+    with open(snapshot_path, 'w') as outfile:
+        for key, val in settings_dict.items():
+            outfile.write(f"{key}={val}\n")
+    return snapshot_path
 
 
 def read_converted_ascii(filepath, compression):

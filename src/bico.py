@@ -41,8 +41,9 @@ class BicoEngine:
 
     def run(self):
 
-        # Save settings file to outdir
-        file.save_settings_to_file(self.settings_dict, copy_to_outdir=True)
+        # Write a snapshot of this run's effective settings to its output folder
+        # (the source BICO.settings file is never modified by a run)
+        file.write_run_settings_snapshot(self.settings_dict, self.settings_dict['dir_out_run'])
 
         # Log info
         self.logger.info(f"Run ID: {self.run_id}")
@@ -371,11 +372,13 @@ class BicoGUI(qtw.QMainWindow, Ui_MainWindow):
         self.settings_dict['dir_bico'] = Path(self.settings_dict['dir_script']).parents[0]
         self.settings_dict['dir_root'] = Path(self.settings_dict['dir_script']).parents[1]
 
-        # Update dirs that can be changed in the gui
+        # Update dirs that can be changed in the gui; default empty paths to dir_bico
         self.settings_dict['dir_source'] = \
-            self.dir_bico if not self.settings_dict['dir_source'] else self.settings_dict['dir_source']
+            self.settings_dict['dir_bico'] if not self.settings_dict['dir_source'] \
+            else self.settings_dict['dir_source']
         self.settings_dict['dir_out'] = \
-            self.dir_bico if not self.settings_dict['dir_out'] else self.settings_dict['dir_out']
+            self.settings_dict['dir_bico'] if not self.settings_dict['dir_out'] \
+            else self.settings_dict['dir_out']
 
     def _set_gui_combobox(self, combobox, find_text):
         idx = combobox.findText(find_text, qtc.Qt.MatchContains)
