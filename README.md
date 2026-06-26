@@ -32,24 +32,46 @@ in the same folder.
 `bico` is installed as a package and exposes a `bico` command (run `uv sync` once to set up the environment).
 The same command is available as `uv run python -m bico`.
 
-### GUI
+`bico` can be run two ways: an interactive **terminal UI (TUI)** for configuring and launching conversions
+by hand, or a **headless CLI** for automated/scheduled runs.
 
-- Start the GUI with:
-    - `uv run bico -g`
+### TUI (terminal UI)
 
-### CLI
+- Start the TUI with either of:
+    - `uv run bico -t`
+    - `uv run bico` (the TUI is the default when no other action is given)
+- The TUI runs in your terminal — full-screen, but it also adapts to smaller window sizes. Settings are on the
+  left, and a live console showing the run log is on the right. It needs no display server, so it also works
+  over SSH.
+- Layout and controls:
+    - **Instruments** — site, header, and the three instrument data blocks (sonic + gas analyzers).
+    - **Raw data** — source folder, time range, and file-selection settings.
+    - **Output** — output folder, folder-name prefix, compression, worker processes, and which plots to produce.
+    - **Run options** — convert only the most recent *N* days, and skip files already present in the output folder.
+    - **Source folder** and **Output folder** have a **Browse…** button that opens a folder picker; you can also
+      type a path directly into the field.
+- Key bindings (also shown in the footer):
+    - `r` — run the conversion
+    - `s` — save the current settings to `BICO.settings`
+    - `Ctrl+L` — clear the console
+    - `q` — quit
+- Saving writes only the user-editable settings back to `bico/settings/BICO.settings` (run-only options such as
+  "recent days" and "avoid duplicates" are not persisted). Each run also writes a snapshot of its effective
+  settings and a log file into that run's output folder; the source `BICO.settings` is never modified by a run.
 
-- `bico` can also be run from the command-line interface (CLI). This can be used to  
-  execute the script automatically at certain intervals. For example, `bico` is used to
+### CLI (headless)
+
+- `bico` can also be run from the command-line interface (CLI) without the TUI. This is useful to
+  execute conversions automatically at certain intervals. For example, `bico` is used to
   convert binary files to ASCII csv files for the site CH-OE2 once a day:
     - `uv run bico -f Z:\CH-OE2_Oensingen\20_ec_fluxes\2022\raw_data_ascii -d 8 -a`
     - `uv run bico` runs the installed `bico` command (use `uv run --project <bico-dir> bico ...` from another directory,
       or activate the project's virtual environment)
     - `-f Z:\CH-OE2_Oensingen\20_ec_fluxes\2022\raw_data_ascii` specifies the folder where the `BICO.settings` file
-      and the raw binary files for this site (CH-OE2) are located. The settings file can be created via the GUI, or
-      edited directly with a text editor.
+      and the raw binary files for this site (CH-OE2) are located. The settings file can be created/edited in the TUI
+      (via **Save settings**), or edited directly with a text editor.
     - `-d 8` converts binary files from the last 8 days to ASCII
     - `-a` means "avoid duplicates", converts only binary files that were not converted before. The folder specified
       with `-f` is checked if a specific files was already converted. If the file already exists in the folder, then it
       is not converted again.
-  
+- Run `uv run bico -h` to see all available options.
