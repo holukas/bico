@@ -153,15 +153,6 @@ def _dropped_folder(text: str):
     return None
 
 
-def _dropped_settings_file(text: str):
-    """Resolve dropped text to a bico.settings file Path, or None."""
-    path = _parse_dropped_path(text)
-    if path is not None and path.is_file() \
-            and path.name.lower() == bfile.SETTINGS_FILENAME.lower():
-        return path
-    return None
-
-
 class PathDropInput(Input):
     """A path field that fills itself from a dragged-in file or folder.
 
@@ -399,8 +390,18 @@ class HelpScreen(ModalScreen):
         self.dismiss()
 
 
-class DirectoryPickerScreen(ModalScreen[str]):
-    """Modal folder browser. Dismisses with the chosen path, or None if cancelled."""
+class _PickerScreen(ModalScreen[str]):
+    """Shared modal browser: an editable path field over a ``DirectoryTree``.
+
+    Subclasses supply the title/labels (``compose``) and decide what counts as a
+    valid pick (the tree-selection, path-submit and OK handlers). Dismisses with
+    the chosen path string, or None if cancelled.
+
+    Only the handlers common to every picker live here. Textual dispatches every
+    ``@on`` handler found across the MRO (deduped by function, not by name), so an
+    override in a subclass would *also* run the base version — the differing
+    handlers must therefore stay in the subclasses, not here.
+    """
 
     BINDINGS = [('escape', 'cancel', 'Cancel')]
 
@@ -414,18 +415,6 @@ class DirectoryPickerScreen(ModalScreen[str]):
             path = Path.home()
         self._root = path
         self._selected = str(path)
-
-    def compose(self) -> ComposeResult:
-        with Vertical(id='picker'):
-            yield Static('Select a folder (type or paste a path, then Enter)',
-                         classes='picker-title')
-            yield Input(self._selected, id='picker-path',
-                        placeholder='Paste a folder path and press Enter')
-            yield DirectoryTree(str(self._root), id='picker-tree')
-            with Horizontal(id='picker-actions'):
-                yield Button('Up', id='picker-up')
-                yield Button('Select folder', id='picker-ok', variant='success')
-                yield Button('Cancel', id='picker-cancel')
 
     def _set_selected(self, path) -> None:
         """Update the selected path and reflect it in the editable path field."""
@@ -441,6 +430,34 @@ class DirectoryPickerScreen(ModalScreen[str]):
             return True
         return False
 
+    @on(Button.Pressed, '#picker-up')
+    def _on_up(self) -> None:
+        tree = self.query_one('#picker-tree', DirectoryTree)
+        self._goto(Path(tree.path).parent)
+
+    @on(Button.Pressed, '#picker-cancel')
+    def _on_cancel(self) -> None:
+        self.dismiss(None)
+
+    def action_cancel(self) -> None:
+        self.dismiss(None)
+
+
+class DirectoryPickerScreen(_PickerScreen):
+    """Modal folder browser. Dismisses with the chosen folder, or None if cancelled."""
+
+    def compose(self) -> ComposeResult:
+        with Vertical(id='picker'):
+            yield Static('Select a folder (type or paste a path, then Enter)',
+                         classes='picker-title')
+            yield Input(self._selected, id='picker-path',
+                        placeholder='Paste a folder path and press Enter')
+            yield DirectoryTree(str(self._root), id='picker-tree')
+            with Horizontal(id='picker-actions'):
+                yield Button('Up', id='picker-up')
+                yield Button('Select folder', id='picker-ok', variant='success')
+                yield Button('Cancel', id='picker-cancel')
+
     @on(DirectoryTree.DirectorySelected)
     def _on_dir_selected(self, event: DirectoryTree.DirectorySelected) -> None:
         self._set_selected(event.path)
@@ -451,22 +468,64 @@ class DirectoryPickerScreen(ModalScreen[str]):
         if not self._goto(event.value.strip()):
             self.notify(f'Not a folder: {event.value}', severity='warning')
 
-    @on(Button.Pressed, '#picker-up')
-    def _on_up(self) -> None:
-        tree = self.query_one('#picker-tree', DirectoryTree)
-        self._goto(Path(tree.path).parent)
-
     @on(Button.Pressed, '#picker-ok')
     def _on_ok(self) -> None:
         # The editable path field is the source of truth.
         self.dismiss(self.query_one('#picker-path', Input).value.strip())
 
-    @on(Button.Pressed, '#picker-cancel')
-    def _on_cancel(self) -> None:
-        self.dismiss(None)
 
-    def action_cancel(self) -> None:
-        self.dismiss(None)
+class FilePickerScreen(_PickerScreen):
+    """Modal file browser. Dismisses with the chosen file path, or None if cancelled.
+
+    Clicking a folder expands it; clicking a file selects it; OK is gated on the
+    path field naming an existing file. When the start path is a file, the tree
+    opens at its folder with that file pre-selected.
+    """
+
+    def __init__(self, start_path: str, title: str = 'Select a file'):
+        self._title = title
+        start = Path(start_path) if start_path else None
+        self._initial_file = str(start) if start and start.is_file() else ''
+        # Root the tree at the file's folder when a file path is given.
+        super().__init__(str(start.parent) if self._initial_file else start_path)
+        if self._initial_file:
+            self._selected = self._initial_file
+
+    def compose(self) -> ComposeResult:
+        with Vertical(id='picker'):
+            yield Static(f'{self._title} (type or paste a path, then Enter)',
+                         classes='picker-title')
+            yield Input(self._selected, id='picker-path',
+                        placeholder='Paste a file path and press Enter')
+            yield DirectoryTree(str(self._root), id='picker-tree')
+            with Horizontal(id='picker-actions'):
+                yield Button('Up', id='picker-up')
+                yield Button('Select file', id='picker-ok', variant='success')
+                yield Button('Cancel', id='picker-cancel')
+
+    @on(DirectoryTree.FileSelected)
+    def _on_file_selected(self, event: DirectoryTree.FileSelected) -> None:
+        self._set_selected(event.path)
+
+    @on(Input.Submitted, '#picker-path')
+    def _on_path_submitted(self, event: Input.Submitted) -> None:
+        # A typed file path selects it (opening the tree at its folder); a folder
+        # path re-roots the tree there.
+        value = event.value.strip()
+        path = Path(value)
+        if path.is_file():
+            self._goto(path.parent)
+            self._set_selected(path)
+        elif not self._goto(value):
+            self.notify(f'Not a file or folder: {value}', severity='warning')
+
+    @on(Button.Pressed, '#picker-ok')
+    def _on_ok(self) -> None:
+        value = self.query_one('#picker-path', Input).value.strip()
+        if not Path(value).is_file():
+            self.notify(f'Not a file: {value}', severity='warning')
+            return
+        self.dismiss(value)
 
 
 class BicoApp(App):
@@ -482,6 +541,7 @@ class BicoApp(App):
         ('v', 'validate', 'Validate'),
         ('d', 'detect_dates', 'Detect dates'),
         ('s', 'save_settings', 'Save'),
+        ('l', 'load_settings', 'Load'),
         ('e', 'export_settings', 'Export'),
         ('f', 'toggle_settings', 'Show/hide settings'),
         ('ctrl+l', 'clear_console', 'Clear log'),
@@ -531,6 +591,10 @@ class BicoApp(App):
                     yield from self._section('Run options', RUN_FIELDS)
                 with Horizontal(id='actions'):
                     yield Button('Save', id='btn-save', variant='primary')
+                    load = Button('Load…', id='btn-load')
+                    load.tooltip = ('Load a bico.settings from a folder you choose into the '
+                                    'form. The source bico.settings is not changed until you Save.')
+                    yield load
                     export = Button('Export…', id='btn-export')
                     export.tooltip = ('Write a bico.settings with the current form values into a '
                                       'folder you choose — e.g. a headless run folder. The source '
@@ -615,7 +679,7 @@ class BicoApp(App):
                 widget.value = '' if value is None else str(value)
 
     def _load_settings_from_path(self, path: Path) -> None:
-        """Load a bico.settings file into the form (e.g. dragged in or from a run)."""
+        """Load a bico.settings file into the form (e.g. via the Load… button)."""
         try:
             settings = ops_setup.read_settings_file_to_dict(
                 dir_settings=path.parent, file=path.name, reset_paths=False)
@@ -630,20 +694,6 @@ class BicoApp(App):
         console = self.query_one('#console', RichLog)
         console.write(Text(f'Loaded settings from {path}', style='bold cyan'))
         self.notify(f'Loaded settings from {path.name}', severity='information')
-
-    def on_paste(self, event: events.Paste) -> None:
-        """Drag-and-drop a bico.settings file onto the TUI to load it.
-
-        Reached only when focus is not on an Input (those consume paste
-        themselves; the source/output folder fields handle dropped paths via
-        PathDropInput). If the dropped text points at a bico.settings file we
-        load it; otherwise the paste is left to the focused widget.
-        """
-        path = _dropped_settings_file(event.text)
-        if path is None:
-            return  # not a settings-file drop — let the normal paste happen
-        event.stop()
-        self._load_settings_from_path(path)
 
     def _collect_form(self) -> dict:
         """Read widget values, merged onto the base (file) settings."""
@@ -701,6 +751,36 @@ class BicoApp(App):
     @on(Button.Pressed, '#btn-save')
     def _on_save(self) -> None:
         self.action_save_settings()
+
+    def action_load_settings(self) -> None:
+        """Load a settings file the user picks into the form.
+
+        The counterpart to Export…: choose a settings file (any name read by the
+        same parser) and it is read into the form. The source bico.settings is not
+        touched until Save.
+        """
+        if self._busy:
+            self.notify('Busy — finish the current run first.', severity='warning')
+            return
+
+        def apply(path: str | None) -> None:
+            if not path:
+                return
+            settings_file = Path(path)
+            if not settings_file.is_file():
+                self.notify(f'Not a file: {path}', severity='error')
+                return
+            self._load_settings_from_path(settings_file)
+
+        # Start the picker at the source folder's bico.settings, a likely target.
+        settings = self._collect_form()
+        folder = settings.get('dir_source') or settings.get('dir_out') or ''
+        start = str(Path(folder) / bfile.SETTINGS_FILENAME) if folder else ''
+        self.push_screen(FilePickerScreen(start, title='Select a settings file'), apply)
+
+    @on(Button.Pressed, '#btn-load')
+    def _on_load(self) -> None:
+        self.action_load_settings()
 
     def action_export_settings(self) -> None:
         """Export the current form settings as a bico.settings into a chosen folder.
@@ -1138,7 +1218,7 @@ class BicoApp(App):
     def _begin_busy(self, subtitle: str) -> None:
         """Mark a run/test as in progress and disable the action buttons."""
         self._busy = True
-        for bid in ('#btn-run', '#btn-save', '#btn-export', '#btn-test', '#btn-validate', '#btn-detect'):
+        for bid in ('#btn-run', '#btn-save', '#btn-load', '#btn-export', '#btn-test', '#btn-validate', '#btn-detect'):
             self.query_one(bid, Button).disabled = True
         self.sub_title = subtitle
 
@@ -1279,7 +1359,7 @@ class BicoApp(App):
         self._stop_event.clear()
         self._file_status.clear()
         self.query_one('#btn-stop', Button).disabled = True
-        for bid in ('#btn-save', '#btn-export', '#btn-test', '#btn-validate', '#btn-detect'):
+        for bid in ('#btn-save', '#btn-load', '#btn-export', '#btn-test', '#btn-validate', '#btn-detect'):
             self.query_one(bid, Button).disabled = False
         self._refresh_run_enabled()  # Run stays gated by validation state
         self.query_one('#progress', ProgressBar).display = False
