@@ -71,6 +71,39 @@ def test_run_snapshot_includes_all_keys_and_leaves_source_untouched(tmp_path):
     assert source.read_text() == source_before
 
 
+def test_export_settings_to_folder_renders_from_template(tmp_path):
+    """Export writes a bico.settings into a chosen folder, using a template for
+    layout, with current values substituted and derived keys dropped."""
+    template = _write(tmp_path / "template.settings", (
+        "# INSTRUMENTS\n"
+        "site=CH-OLD\n"
+        "dir_source=/old/source\n"
+        "dir_out=/old/out\n"
+        "run_id=BICO-old\n"
+    ))
+    dest = tmp_path / "headless_run"
+    dest.mkdir()
+    settings_dict = {
+        "site": "CH-DAV",
+        "dir_source": "/new/source",
+        "dir_out": "/new/out",
+        "run_id": "BICO-new",  # derived, must not be written
+    }
+
+    out = bfile.export_settings_to_folder(settings_dict, dest, template)
+
+    assert out == dest / "bico.settings"
+    text = out.read_text()
+    assert "site=CH-DAV" in text
+    assert "dir_source=/new/source" in text
+    assert "dir_out=/new/out" in text
+    assert "run_id" not in text             # derived key dropped
+    assert "# INSTRUMENTS" in text          # template comments preserved
+    # the template/source file is left untouched
+    assert "site=CH-OLD" in template.read_text()
+    assert not (dest / "bico.settingsTemp").exists()
+
+
 def test_find_settings_file_prefers_lowercase_and_accepts_legacy(tmp_path):
     # nothing there yet
     assert bfile.find_settings_file(tmp_path) is None

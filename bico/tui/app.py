@@ -293,7 +293,9 @@ it. Double-click selects a line.
 - `d`: detect the time range from the source files (fills Start/End date)
 - `t`: test run, converting the first rows of the first file and writing nothing
 - `r`: run the conversion
-- `s`: save settings to `bico.settings`
+- `s`: save settings to the source `bico.settings`
+- `e`: export the current settings as a `bico.settings` into a folder you choose
+  (e.g. a headless run folder); the source `bico.settings` is left unchanged
 - `f`: show or hide the settings panel
 - `ctrl+l`: clear the console
 - `h`: this help
@@ -480,6 +482,7 @@ class BicoApp(App):
         ('v', 'validate', 'Validate'),
         ('d', 'detect_dates', 'Detect dates'),
         ('s', 'save_settings', 'Save'),
+        ('e', 'export_settings', 'Export'),
         ('f', 'toggle_settings', 'Show/hide settings'),
         ('ctrl+l', 'clear_console', 'Clear log'),
         # Override the App's default ctrl+c (which only shows a "press q to quit"
@@ -528,6 +531,11 @@ class BicoApp(App):
                     yield from self._section('Run options', RUN_FIELDS)
                 with Horizontal(id='actions'):
                     yield Button('Save', id='btn-save', variant='primary')
+                    export = Button('Export…', id='btn-export')
+                    export.tooltip = ('Write a bico.settings with the current form values into a '
+                                      'folder you choose — e.g. a headless run folder. The source '
+                                      'bico.settings is not changed.')
+                    yield export
                     yield Button('Validate', id='btn-validate')
                     yield Button('Test', id='btn-test')
                     # Run stays disabled until Validate confirms the settings are OK.
@@ -693,6 +701,44 @@ class BicoApp(App):
     @on(Button.Pressed, '#btn-save')
     def _on_save(self) -> None:
         self.action_save_settings()
+
+    def action_export_settings(self) -> None:
+        """Export the current form settings as a bico.settings into a chosen folder.
+
+        Lets the user edit settings on screen and drop them into a headless run
+        folder. The source bico.settings (loaded on startup) is left untouched.
+        """
+        if self._busy:
+            self.notify('Busy — finish the current run first.', severity='warning')
+            return
+        settings = self._collect_form()
+
+        def apply(path: str | None) -> None:
+            if not path:
+                return
+            dest = Path(path)
+            if not dest.is_dir():
+                self.notify(f'Not a folder: {path}', severity='error')
+                return
+            # Prefer an existing bico.settings in the target as the template (keeps
+            # any local comments); otherwise use the canonical source file.
+            template = dest / bfile.SETTINGS_FILENAME
+            if not template.is_file():
+                template = SETTINGS_DIR / bfile.SETTINGS_FILENAME
+            try:
+                out = bfile.export_settings_to_folder(settings, dest, template)
+            except Exception as exc:
+                self.notify(f'Export failed: {exc}', severity='error')
+                return
+            self.notify(f'Settings exported to {out}', severity='information')
+
+        # Start the picker at the output folder, the most likely export target.
+        start = settings.get('dir_out') or settings.get('dir_source') or ''
+        self.push_screen(DirectoryPickerScreen(start), apply)
+
+    @on(Button.Pressed, '#btn-export')
+    def _on_export(self) -> None:
+        self.action_export_settings()
 
     @on(Button.Pressed, '#btn-validate')
     def _on_validate(self) -> None:
@@ -1092,7 +1138,7 @@ class BicoApp(App):
     def _begin_busy(self, subtitle: str) -> None:
         """Mark a run/test as in progress and disable the action buttons."""
         self._busy = True
-        for bid in ('#btn-run', '#btn-save', '#btn-test', '#btn-validate', '#btn-detect'):
+        for bid in ('#btn-run', '#btn-save', '#btn-export', '#btn-test', '#btn-validate', '#btn-detect'):
             self.query_one(bid, Button).disabled = True
         self.sub_title = subtitle
 
@@ -1233,7 +1279,7 @@ class BicoApp(App):
         self._stop_event.clear()
         self._file_status.clear()
         self.query_one('#btn-stop', Button).disabled = True
-        for bid in ('#btn-save', '#btn-test', '#btn-validate', '#btn-detect'):
+        for bid in ('#btn-save', '#btn-export', '#btn-test', '#btn-validate', '#btn-detect'):
             self.query_one(bid, Button).disabled = False
         self._refresh_run_enabled()  # Run stays gated by validation state
         self.query_one('#progress', ProgressBar).display = False

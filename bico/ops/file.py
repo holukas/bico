@@ -282,6 +282,29 @@ DERIVED_SETTING_KEYS = {
 }
 
 
+def _write_settings_from_template(template_path, dest_path, settings_dict):
+    """Render a bico.settings file by substituting values into a template.
+
+    Each setting line in `template_path` gets its value replaced from
+    `settings_dict`; comments and section headers are preserved verbatim, and
+    DERIVED_SETTING_KEYS are dropped so the result never carries per-run values
+    or machine-specific paths. Written atomically (temp file + os.replace).
+    """
+    template_path = Path(template_path)
+    dest_path = Path(dest_path)
+    tmp_path = dest_path.with_name(f'{dest_path.name}Temp')
+    with open(template_path) as infile, open(tmp_path, 'w') as outfile:
+        for line in infile:  # cycle through all lines in settings file
+            if ('=' in line) and (not line.startswith('#')):  # identify lines that contain a setting
+                line_id = line.split('=', 1)[0].strip()
+                if line_id in DERIVED_SETTING_KEYS:
+                    continue  # never persist derived/runtime keys
+                if line_id in settings_dict:
+                    line = f"{line_id}={settings_dict[line_id]}\n"  # insert current value from dict
+            outfile.write(line)
+    os.replace(tmp_path, dest_path)  # atomic replace, no .settingsOld churn
+
+
 def save_settings_to_file(settings_dict):
     """Persist user settings back to the source bico.settings file.
 
@@ -291,17 +314,21 @@ def save_settings_to_file(settings_dict):
     headers in the existing file are preserved. The file is replaced atomically.
     """
     settings_path = Path(settings_dict['dir_settings']) / SETTINGS_FILENAME
-    tmp_path = settings_path.with_name(f'{SETTINGS_FILENAME}Temp')
-    with open(settings_path) as infile, open(tmp_path, 'w') as outfile:
-        for line in infile:  # cycle through all lines in settings file
-            if ('=' in line) and (not line.startswith('#')):  # identify lines that contain a setting
-                line_id = line.split('=', 1)[0].strip()
-                if line_id in DERIVED_SETTING_KEYS:
-                    continue  # never persist derived/runtime keys
-                if line_id in settings_dict:
-                    line = f"{line_id}={settings_dict[line_id]}\n"  # insert current value from dict
-            outfile.write(line)
-    os.replace(tmp_path, settings_path)  # atomic replace, no .settingsOld churn
+    # The existing file is its own template, so its layout is preserved in place.
+    _write_settings_from_template(settings_path, settings_path, settings_dict)
+
+
+def export_settings_to_folder(settings_dict, dest_dir, template_path):
+    """Write a bico.settings into `dest_dir` for a headless run there.
+
+    Renders from `template_path` (an existing bico.settings whose comments and
+    layout are kept) with the current values from `settings_dict`. Returns the
+    written path. Used by the TUI's "Export" so settings edited on screen can be
+    dropped into a headless run folder.
+    """
+    dest_path = Path(dest_dir) / SETTINGS_FILENAME
+    _write_settings_from_template(template_path, dest_path, settings_dict)
+    return dest_path
 
 
 def write_run_settings_snapshot(settings_dict, outdir):
