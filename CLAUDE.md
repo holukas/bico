@@ -6,7 +6,6 @@ Guidance for working in the `bico` repository.
 
 - **Never commit unless explicitly asked.** Make and stage changes freely, then stop and let the user request the commit.
 - **Never add `Co-Authored-By:` trailers** (or any co-author/attribution) to commit messages or PR bodies. Write plain commit messages.
-- The default branch is `master`. Prefer creating a new branch rather than committing directly to `master`.
 
 ## Project overview
 
