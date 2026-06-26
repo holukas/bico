@@ -1,5 +1,7 @@
 # bico
 
+<img src="images/logo_bico2.png" alt="bico logo" width="200">
+
 **Binary Converter for converting ETH eddy covariance binary raw data to ASCII CSV files**
 
 `bico` converts eddy covariance raw data files from a compressed binary format
@@ -12,10 +14,13 @@ data blocks sent by sonic anemometers comprises the wind variables, sonic temper
 and other variables. Data blocks from gas analyzers comprise concentrations (e.g., CO2,
 H2O), instrument metrics (e.g., signal strength), among others.
 
-The data blocks implemented in `bico` are listed in the folder `bico/settings/data_blocks`.
-The data block information that is used in code to convert binary to ASCII is given
-in `.dblock` files. Accompanying information can be found in the respective `.md` files
-in the same folder.
+The data blocks implemented in `bico` live in
+[`bico/settings/data_blocks`](bico/settings/data_blocks). The information used to
+convert binary to ASCII is given in `.dblock` files, with accompanying notes in
+the respective `.md` files. See the
+[**data blocks overview**](bico/settings/data_blocks/README.md) for the full list
+of supported instruments (sonic anemometers, IRGA / QCL / LGR gas analyzers), each
+linked to its spec and documentation.
 
 ## Installation
 
@@ -99,3 +104,26 @@ by hand, or a **headless CLI** for automated/scheduled runs.
       with `-f` is checked if a specific files was already converted. If the file already exists in the folder, then it
       is not converted again.
 - Run `uv run bico -h` to see all available options.
+
+## Documentation
+
+- [Data blocks overview](bico/settings/data_blocks/README.md) — all supported
+  instruments and logging variants, each linked to its `.dblock` spec and `.md` notes.
+- [Settings reference](bico/settings/data_blocks/_help_bico_settings.md) — explains
+  every variable property used inside a `.dblock` file.
+- [Reference comparisons](tests/reference_comparisons.md) — regression tests that
+  assert byte-identical converted output against a known-good (bico-1.6.0) reference
+  across several sites.
+- [Changelog](CHANGELOG.md) — release history and notable changes.
+
+## Testing
+
+Set up the environment with `uv sync`, then run the test suite:
+
+```bash
+uv run pytest
+```
+
+The default run is fast. The [reference comparisons](tests/reference_comparisons.md)
+are marked `slow` and excluded by default (they need large data that lives outside
+the repo); run them with `uv run pytest -m slow`.
