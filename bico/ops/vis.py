@@ -10,6 +10,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+# Shared plot style, kept here so the plot functions below don't repeat literals.
+PLOT_DPI = 150
+# One device pixel: the densest, fastest marker for high-resolution (20 Hz) data.
+# Combined with a low alpha, overplotting itself reveals where samples pile up.
+HIRES_MARKER = ','
+HIRES_ALPHA = 0.07
+COLOR_DATA = '#5f87ae'    # primary data colour
+COLOR_ACCENT = '#455A64'  # medians / totals
+COLOR_DARK = '#37474F'    # counts / emphasis
+
 
 def availability_heatmap(bin_found_files_dict, bin_file_datefrmt, root_outdir, logger):
     """
@@ -50,8 +60,9 @@ def availability_heatmap(bin_found_files_dict, bin_file_datefrmt, root_outdir, l
     fig, ax = plt.subplots(1, 1, figsize=(16, 9))
     ax.set_title("Filesizes of binary raw data per day")
 
-    # Colormap
-    cmap = plt.get_cmap('RdYlBu').copy()  # Make copy of cmap b/c it will be modified
+    # Colormap: sequential + perceptually uniform, since filesize is a magnitude
+    # (0..max), not a diverging quantity.
+    cmap = plt.get_cmap('viridis').copy()  # Make copy of cmap b/c it will be modified
     agg_plot_df = np.ma.masked_invalid(agg_plot_df)  # Mask NaN as missing
     cmap.set_bad(color='#EEEEEE', alpha=1.)  # Set missing data to specific color
 
@@ -79,7 +90,7 @@ def availability_heatmap(bin_found_files_dict, bin_file_datefrmt, root_outdir, l
 
     # Save
     out_file = root_outdir / f"file_availability_heatmap"
-    plt.savefig(f"{out_file}.png", dpi=150, bbox_inches='tight')
+    plt.savefig(f"{out_file}.png", dpi=PLOT_DPI, bbox_inches='tight')
     plt.close()
 
     return None
@@ -111,9 +122,9 @@ def aggs_ts(df, outdir, logger):
         ax2 = fig.add_subplot(gs[1, 0])
 
         if ishires:
-            ax1.plot(var_df.index, var_df['median'], 'o', alpha=.5, c='#455A64', label='median')
+            ax1.plot(var_df.index, var_df['median'], 'o', alpha=.5, c=COLOR_ACCENT, label='median')
             ax1.fill_between(x=var_df.index, y1=var_df['q95'], y2=var_df['q05'],
-                             alpha=.2, color='#5f87ae', label='5-95th percentile')
+                             alpha=.2, color=COLOR_DATA, label='5-95th percentile')
             ax1.errorbar(var_df.index, var_df['mean'], var_df['std'],
                          marker='o', mec='black', mfc='None', color='black', capsize=0,
                          label='mean +/- std', alpha=.2)
@@ -121,9 +132,9 @@ def aggs_ts(df, outdir, logger):
                 ax1.set_ylim(var_df['q01'].min(), var_df['q99'].max())
             except ValueError:
                 pass
-            ax2.plot(var_df.index, var_df['count'], 'o', alpha=1, c='#37474F', label='count')
+            ax2.plot(var_df.index, var_df['count'], 'o', alpha=1, c=COLOR_DARK, label='count')
         else:
-            ax1.plot(var_df.index, var_df['total'], 'o', alpha=1, c='#455A64', label='total')
+            ax1.plot(var_df.index, var_df['total'], 'o', alpha=1, c=COLOR_ACCENT, label='total')
 
         text_args = dict(verticalalignment='top',
                          size=14, color='black', backgroundcolor='none', zorder=100)
@@ -144,7 +155,7 @@ def aggs_ts(df, outdir, logger):
 
         outfile = outdir / f"stats_agg_{var[0]}_{var[1]}_{var[2]}"
         fig.savefig(f"{outfile}.png", format='png', bbox_inches='tight', facecolor='w',
-                    transparent=True, dpi=150)
+                    transparent=True, dpi=PLOT_DPI)
 
 
 def high_res_histogram(df, outfile, outdir, logger):
@@ -183,7 +194,12 @@ def high_res_histogram(df, outfile, outdir, logger):
             # dataok = check_plot_data(ax=ax, df=dblock_df, col=col)
 
             if not dblock_df[col].dropna().empty:
-                ax.hist(dblock_df[col], bins=20)
+                data = dblock_df[col].dropna()
+                # Data-driven bin count instead of a fixed 20, so the shape of
+                # each distribution is resolved on its own terms.
+                ax.hist(data, bins='auto', color=COLOR_DATA)
+                ax.axvline(data.median(), color=COLOR_DARK, ls='-', lw=1, zorder=5)
+                ax.axvline(data.mean(), color=COLOR_ACCENT, ls='--', lw=1, zorder=5)
                 _default_format(ax=ax, width=1, length=2, txt_xlabel="", txt_ylabel="Counts", fontsize=7)
                 ax.text(0.01, 0.96, f"{col[0]} {col[1]} {col[2]}", transform=ax.transAxes, horizontalalignment='left',
                         **text_args)
@@ -203,7 +219,7 @@ def high_res_histogram(df, outfile, outdir, logger):
 
         dblock_outfile = outdir / f"{outfile}_hires_histogram_{dblock}"
         fig.savefig(f"{dblock_outfile}.png", format='png', bbox_inches='tight', facecolor='w',
-                    transparent=True, dpi=100)
+                    transparent=True, dpi=PLOT_DPI)
 
 
 def high_res_ts(df, outfile, outdir, logger):
@@ -244,8 +260,20 @@ def high_res_ts(df, outfile, outdir, logger):
 
             dataok = check_plot_data(ax=ax, df=dblock_df, col=col)
             if dataok:
-                # Numeric data, values available
-                ax.plot(dblock_df[col].index, dblock_df[col], alpha=0.5, c='#5f87ae', marker='.', ms=1)
+                # Numeric data: draw every sample as a one-pixel marker with no
+                # connecting line, so dense 20 Hz data shows as many points as
+                # possible. The low alpha lets overplotting reveal sample density
+                # (a format string with only a marker draws no line).
+                ax.plot(dblock_df[col].index, dblock_df[col], HIRES_MARKER,
+                        c=COLOR_DATA, alpha=HIRES_ALPHA, rasterized=True)
+                # Robust y-range so isolated spikes don't squash the series.
+                try:
+                    ylow = dblock_df[col].quantile(0.01)
+                    yhigh = dblock_df[col].quantile(0.99)
+                    if np.isfinite(ylow) and np.isfinite(yhigh) and ylow < yhigh:
+                        ax.set_ylim(ylow, yhigh)
+                except (ValueError, TypeError):
+                    pass
                 txt_info = f"values: {dblock_df[col].count():.0f}\n" \
                            f"median: {dblock_df[col].median():.3f} | mean: {dblock_df[col].mean():.3f}\n" \
                            f"min: {dblock_df[col].min():.3f} | max:{dblock_df[col].max():.3f}"
@@ -267,7 +295,7 @@ def high_res_ts(df, outfile, outdir, logger):
 
         dblock_outfile = outdir / f"{outfile}_hires_{dblock}"
         fig.savefig(f"{dblock_outfile}.png", format='png', bbox_inches='tight', facecolor='w',
-                    transparent=True, dpi=150)
+                    transparent=True, dpi=PLOT_DPI)
 
 
 def check_plot_data(ax, df, col):
