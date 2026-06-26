@@ -2,23 +2,23 @@
 # ===========
 
 # Site
-site=CH-CHA
+site=CH-DAV
 
 # Data Blocks
 header=WECOM3
-instrument_1=R350-B
-instrument_2=IRGA75-A
-instrument_3=-None-
+instrument_1=HS50-A
+instrument_2=IRGA72-A
+instrument_3=QCL-C2
 
 # RAW DATA
 # ========
 
 # Source Folder
-dir_source=\\nas12.ethz.ch\green_groups_gl_rawdata\FluxData\CH-DAV_Davos\20_sonic_ghg\2026\06\20_HS_LI72
+dir_source=F:\Sync\luhk_work\dev-data\flux-data\bico-data\tmp
 
 # Time Range
-start_date=2026-06-01 01:00
-end_date=2026-06-25 13:00
+start_date=2026-06-24 07:00
+end_date=2026-06-25 07:00
 
 # File Settings
 filename_datetime_format=yyyymmddHH.XMM
@@ -31,7 +31,7 @@ select_random_files=0
 
 # OUTPUT
 # ======
-dir_out=
+dir_out=F:\Sync\luhk_work\dev-data\flux-data\bico-data\tmp
 
 output_folder_name_prefix=test
 file_compression=gzip

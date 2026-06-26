@@ -11,6 +11,7 @@ import pandas as pd
 from bico.ops import bin, vis, file, cli, parallel
 from bico.ops import logger as ops_logger, setup as ops_setup
 from bico.settings import _version
+from bico.settings.model import UserSettings, RunContext
 
 
 class BicoEngine:
@@ -26,6 +27,11 @@ class BicoEngine:
     ):
 
         self.settings_dict = settings_dict
+        # Typed snapshot of the user-configurable settings. Built here so both the
+        # headless (BicoFolder) and TUI entry points get it, since both construct
+        # BicoEngine. Nothing consumes it yet — call sites still read settings_dict
+        # — but it is parsed in the live run path, ready for incremental migration.
+        self.settings = UserSettings.from_raw(settings_dict)
         self.usedgui = usedgui
         self.avoidduplicates = avoidduplicates
         # Optional callable() -> bool. When it returns True the run stops as soon
@@ -40,10 +46,15 @@ class BicoEngine:
         # current step, and a per-file percentage.
         self.file_progress_callback = file_progress_callback
 
-        # Setup outdirs, run ID and logger
+        # Setup outdirs, run ID and logger. RunContext is the single source of
+        # truth for this run's derived paths and strptime pattern; its values are
+        # mirrored back onto settings_dict for the consumers that still read the
+        # dict (file.SearchAll, the logger, the settings snapshot).
         self.run_id = ops_setup.generate_run_id()
         self.settings_dict['run_id'] = self.run_id
-        self.settings_dict = ops_setup.make_run_outdirs(settings_dict=self.settings_dict)
+        self.run_context = RunContext.create(self.settings, self.run_id)
+        self.run_context.make_dirs()
+        self._mirror_run_context()
         self.logger = ops_logger.setup_logger(settings_dict=self.settings_dict)
 
         self.stats_coll_df = pd.DataFrame()  # Collects agg stats
@@ -55,7 +66,7 @@ class BicoEngine:
 
         # Write a snapshot of this run's effective settings to its output folder
         # (the source bico.settings file is never modified by a run)
-        file.write_run_settings_snapshot(self.settings_dict, self.settings_dict['dir_out_run'])
+        file.write_run_settings_snapshot(self.settings_dict, self.run_context.dir_out_run)
 
         # Log info
         self.logger.info(f"Run ID: {self.run_id}")
@@ -66,14 +77,14 @@ class BicoEngine:
         for key, val in self.settings_dict.items():
             self.logger.info(f"    {key}: {val}")
 
-        # Format string to parse datetime info from filename
-        self.settings_dict['filename_datetime_parsing_string'] = self.make_datetime_parsing_string()
+        # The strptime pattern (run_context) is already mirrored onto settings_dict
+        # in __init__, so file.SearchAll and _build_tasks can read it from the dict.
 
         # Settings for file header
-        self.bin_size_header = 29 if self.settings_dict['header'] == 'WECOM3' else 38  # todo better solution
+        self.bin_size_header = self.settings.header_size
 
         # Load settings for datablocks: their types, sequence and properties
-        self.dblocks_seq = self.assemble_datablock_sequence()
+        self.dblocks_seq = self.settings.instruments
         self.dblocks_props = file.load_dblocks_props(dblocks_types=self.dblocks_seq,
                                                      settings_dict=self.settings_dict)  # Load data block settings
 
@@ -93,10 +104,10 @@ class BicoEngine:
             availablefiles = False
 
         # Plot availability heatmap
-        if self.settings_dict['plot_file_availability'] == '1':
+        if self.settings.plot_file_availability:
             vis.availability_heatmap(bin_found_files_dict=bin_found_files_dict,
-                                     bin_file_datefrmt=self.settings_dict['filename_datetime_parsing_string'],
-                                     root_outdir=self.settings_dict['dir_out_run_plots'],
+                                     bin_file_datefrmt=self.run_context.datetime_parsing_string,
+                                     root_outdir=self.run_context.dir_out_run_plots,
                                      logger=self.logger)
 
         # Loop through binary files
@@ -109,11 +120,11 @@ class BicoEngine:
 
         if not stats_coll_df.empty:
             # Stats collection export
-            file.export_stats_collection_csv(df=stats_coll_df, outdir=self.settings_dict['dir_out_run_plots_agg'],
+            file.export_stats_collection_csv(df=stats_coll_df, outdir=self.run_context.dir_out_run_plots_agg,
                                              run_id=self.run_id, logger=self.logger)
 
             # Plot aggregated stats collection from files
-            if self.settings_dict['plot_ts_agg'] == '1':
+            if self.settings.plot_ts_agg:
                 self._plot_stats_collection_agg()
         else:
             self.logger.info("(!) Aggregated plots not generated because aggregated stats are empty.")
@@ -146,7 +157,7 @@ class BicoEngine:
 
         # Search for stats files
         bin_found_files_dict = file.SearchAll.search_all(
-            dir=self.settings_dict['dir_out_run_plots_agg'],
+            dir=self.run_context.dir_out_run_plots_agg,
             file_id='stats_*.csv',
             logger=self.logger
         )
@@ -166,7 +177,7 @@ class BicoEngine:
             )
 
             # Generate plots for aggregated data
-            vis.aggs_ts(df=df, outdir=self.settings_dict['dir_out_run_plots_agg'], logger=self.logger)
+            vis.aggs_ts(df=df, outdir=self.run_context.dir_out_run_plots_agg, logger=self.logger)
 
     def loop(self, bin_found_files_dict, dblocks_props, stats_coll_df, logger, availablefiles: list):
         """Process files, converting independent files concurrently across processes."""
@@ -322,7 +333,7 @@ class BicoEngine:
     def _build_tasks(self, bin_found_files_dict, availablefiles, logger):
         """Build picklable per-file work descriptions, applying file-limit and duplicate checks."""
         tasks = []
-        file_limit = int(self.settings_dict['file_limit'])
+        file_limit = self.settings.file_limit
         counter_bin_files = 0
         for bin_file, bin_filepath in bin_found_files_dict.items():
             counter_bin_files += 1
@@ -331,15 +342,16 @@ class BicoEngine:
                 break
 
             bin_filedate = dt.datetime.strptime(bin_filepath.name,
-                                                self.settings_dict['filename_datetime_parsing_string'])
-            ascii_filename = f"{self.settings_dict['site']}_{bin_filedate.strftime('%Y%m%d%H%M')}"
+                                                self.run_context.datetime_parsing_string)
+            ascii_filename = f"{self.settings.site}_{bin_filedate.strftime('%Y%m%d%H%M')}"
 
             if availablefiles and any(ascii_filename in f for f in availablefiles):
                 logger.info(f"[{bin_file}] [DUPLICATE CHECK] (!) Skipping, converted file already available in "
                             f"{self.settings_dict['dir_out']}")
                 continue
 
-            sd = self.settings_dict
+            s = self.settings
+            ctx = self.run_context
             tasks.append({
                 'counter': counter_bin_files,
                 'bin_file': bin_file,
@@ -348,23 +360,19 @@ class BicoEngine:
                 'ascii_filename': ascii_filename,
                 'size_header': self.bin_size_header,
                 'dblocks_props': self.dblocks_props,
-                'row_limit': int(sd['row_limit']),
-                'add_instr_to_varname': sd['add_instr_to_varname'] == '1',
-                'compression': sd['file_compression'],
-                'dir_raw_data_ascii': sd['dir_out_run_raw_data_ascii'],
-                'dir_plots_hires': sd['dir_out_run_plots_hires'],
-                'plot_ts_hires': sd['plot_ts_hires'] == '1',
-                'plot_histogram_hires': sd['plot_histogram_hires'] == '1',
+                'row_limit': s.row_limit,
+                'add_instr_to_varname': s.add_instr_to_varname,
+                'compression': s.file_compression,
+                'dir_raw_data_ascii': ctx.dir_out_run_raw_data_ascii,
+                'dir_plots_hires': ctx.dir_out_run_plots_hires,
+                'plot_ts_hires': s.plot_ts_hires,
+                'plot_histogram_hires': s.plot_histogram_hires,
             })
         return tasks
 
     def _n_workers(self, num_tasks):
         """Number of worker processes: optional 'num_processes' setting, else (cpu_count - 1)."""
-        configured = self.settings_dict.get('num_processes')
-        try:
-            n = int(configured)
-        except (TypeError, ValueError):
-            n = 0
+        n = self.settings.num_processes  # already an int; 0 when unset/invalid
         if n <= 0:
             n = max(1, (os.cpu_count() or 2) - 1)
         return max(1, min(n, num_tasks))
@@ -394,16 +402,25 @@ class BicoEngine:
             finally:
                 handler.release()
 
-    def make_datetime_parsing_string(self):
-        return file.datetime_parsing_string(self.settings_dict['filename_datetime_format'])
+    def _mirror_run_context(self):
+        """Copy the RunContext's derived values onto settings_dict.
 
-    def assemble_datablock_sequence(self):
-        dblocks_seq = []
-        instrument_settings = ['instrument_1', 'instrument_2', 'instrument_3']
-        for key, val in self.settings_dict.items():
-            if key in instrument_settings:
-                dblocks_seq.append(val)
-        return dblocks_seq
+        The engine itself reads ``self.run_context`` directly, but several
+        consumers still take the raw dict: ``file.SearchAll`` (the strptime
+        pattern), the logger (``run_id`` / log dir), and the run snapshot (which
+        records every derived key as a provenance record). This shim keeps them
+        working without threading the context through each one.
+        """
+        ctx = self.run_context
+        self.settings_dict.update({
+            'filename_datetime_parsing_string': ctx.datetime_parsing_string,
+            'dir_out_run': ctx.dir_out_run,
+            'dir_out_run_log': ctx.dir_out_run_log,
+            'dir_out_run_plots': ctx.dir_out_run_plots,
+            'dir_out_run_plots_hires': ctx.dir_out_run_plots_hires,
+            'dir_out_run_plots_agg': ctx.dir_out_run_plots_agg,
+            'dir_out_run_raw_data_ascii': ctx.dir_out_run_raw_data_ascii,
+        })
 
 
 class BicoFolder:

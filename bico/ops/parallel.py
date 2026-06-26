@@ -66,7 +66,7 @@ def process_file(task):
     ----------
     task : dict
         Fully picklable description of the work (paths, flags, the data-block
-        properties, etc.). See ``build_task`` in bico.py.
+        properties, etc.). See ``BicoEngine._build_tasks`` in bico.py.
 
     Returns
     -------
