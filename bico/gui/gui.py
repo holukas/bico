@@ -1,12 +1,19 @@
 # -*- coding: utf-8 -*-
+from pathlib import Path
+
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtWidgets as qtw
 from PyQt5.QtGui import QPixmap
 
-import settings._version as info
-from gui import gui_elements
-from help import tooltips
+from bico.settings import _version as info
+from bico.gui import gui_elements
+from bico.help import tooltips
+
+# Resource locations resolved relative to this file, so the GUI works regardless
+# of the current working directory (no os.chdir needed).
+_GUI_DIR = Path(__file__).resolve().parent
+_IMAGES_DIR = _GUI_DIR.parent / 'images'
 
 
 class Ui_MainWindow(object):
@@ -17,7 +24,7 @@ class Ui_MainWindow(object):
     def setupUi(self, mainwindow):
         # Main window
         mainwindow.setWindowTitle(f"bico")
-        mainwindow.setWindowIcon(qtg.QIcon('images/logo_bico2_icon.png'))
+        mainwindow.setWindowIcon(qtg.QIcon(str(_IMAGES_DIR / 'logo_bico2_icon.png')))
         # mainwindow.resize(250, 150)
 
         # # todo Center mainwindow on screen
@@ -40,9 +47,11 @@ class Ui_MainWindow(object):
         self.statusbar.showMessage('No processing running.')
         mainwindow.setStatusBar(self.statusbar)
 
-        # CSS
-        with open('gui/gui.css', "r") as fh:
-            mainwindow.setStyleSheet(fh.read())
+        # CSS (rewrite the stylesheet's relative image url()s to absolute paths,
+        # since Qt resolves QSS url() against the working directory)
+        css = (_GUI_DIR / 'gui.css').read_text()
+        css = css.replace('url("images/', f'url("{_IMAGES_DIR.as_posix()}/')
+        mainwindow.setStyleSheet(css)
 
         # ADD SECTIONS to LAYOUT CONTAINER
         container = qtw.QHBoxLayout()
@@ -60,7 +69,7 @@ class Ui_MainWindow(object):
         section.setProperty('labelClass', 'section_bg_output')
         grid = qtw.QGridLayout()
         label_image = qtw.QLabel()
-        label_image.setPixmap(QPixmap('images/logo_bico2_256px.png'))
+        label_image.setPixmap(QPixmap(str(_IMAGES_DIR / 'logo_bico2_256px.png')))
 
         label_txt = qtw.QLabel("bico - binary converter")
         label_txt.setProperty('labelClass', 'header_3')

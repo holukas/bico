@@ -4,9 +4,7 @@ A run must never rewrite the user's source BICO.settings file, and saving from
 the GUI must not pollute it with derived/runtime keys (per-run ids and
 machine-specific absolute paths). These tests lock in that behavior.
 """
-from conftest import SRC_DIR  # noqa: F401  (ensures src/ is on sys.path)
-
-from ops import file as bfile
+from bico.ops import file as bfile
 
 
 def _write(path, text):

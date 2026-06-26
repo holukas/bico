@@ -1,15 +1,13 @@
 """Shared pytest setup for the bico test suite.
 
-`bico` runs as a script (the `src/` directory is put on `sys.path` at runtime
-rather than installed as a package), so the tests reproduce that by adding
-`src/` to `sys.path`. This lets tests import the conversion modules directly
-(`from ops import bin`) without importing the PyQt5 GUI in `bico.py`.
+`bico` is an installed package (editable, via `uv sync`), so tests import the
+conversion modules directly as `from bico.ops import bin`. Importing the `bico`
+package itself is intentionally light and does not pull in PyQt5.
 """
-import sys
 from pathlib import Path
 
-SRC_DIR = Path(__file__).resolve().parents[1] / "src"
-DATA_DIR = Path(__file__).resolve().parent / "data"
+import bico
 
-if str(SRC_DIR) not in sys.path:
-    sys.path.insert(0, str(SRC_DIR))
+# Location of the installed `bico` package (holds settings/data_blocks, images).
+PACKAGE_DIR = Path(bico.__file__).resolve().parent
+DATA_DIR = Path(__file__).resolve().parent / "data"

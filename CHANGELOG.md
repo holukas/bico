@@ -6,7 +6,7 @@
 
 - Changed: dependency management moved from `poetry` to [`uv`](https://docs.astral.sh/uv/). The `pyproject.toml`
   now uses the standard PEP 621 `[project]` table, `poetry.lock` was removed and replaced by `uv.lock`. Create the
-  environment with `uv sync` and run the script with `uv run python src\bico.py` (see `README.md`).
+  environment with `uv sync` (see `README.md`).
 - Changed: minimum Python version is now 3.12 (was 3.9). Dependencies were updated to versions that support
   Python 3.12: `pandas` (1.3.4 -> 2.x), `numpy` (1.21.2 -> 1.26.x), `matplotlib` (3.5.0 -> 3.8+),
   `pytz` (2021.3 -> 2024+).
@@ -26,8 +26,17 @@
 - Added: a `pytest` test suite (`tests/`). It includes a golden-file test that converts a small truncated real
   binary file and compares the result against a committed expected output (guarding against unintended changes to
   converted values or formatting), an explicit test for the short/missing data-block fill path (the IRGA72
-  16-vs-26-byte case), and a test that keeps the version in `pyproject.toml` and `src/settings/_version.py` in sync.
+  16-vs-26-byte case), and a test that keeps the version in `pyproject.toml` and `bico/settings/_version.py` in sync.
   Run with `uv run pytest`.
+- Changed: settings handling. A run no longer rewrites the source `BICO.settings` file; instead it writes a
+  settings snapshot into the run's output folder. Saving from the GUI no longer persists derived/runtime keys
+  (run id, machine-specific paths). The tracked `BICO.settings` was cleaned of derived keys and machine paths, and
+  stale `BICO.settings.BAK` / `BICO.settingsOld` files were removed from the repository.
+- Changed: project layout. The source moved from `src/` to an installed package `bico/` with package-qualified
+  imports and a `bico` console entry point. Run with `uv run bico` (or `uv run python -m bico`) instead of
+  `python src/bico.py`. The previous `os.chdir()` working-directory hack was removed; the GUI now resolves its
+  logo/stylesheet via paths relative to the package. **This changes how scheduled jobs invoke bico** (use
+  `uv run bico ...` instead of calling the script by path).
 
 ## v1.6.11 | 20 Nov 2025
 

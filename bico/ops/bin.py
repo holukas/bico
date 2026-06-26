@@ -5,7 +5,7 @@ import time
 
 import pandas as pd
 
-import settings.data_blocks.header.wecom3
+from bico.settings.data_blocks.header import wecom3
 from . import bin_conversion_exceptions as bce
 
 
@@ -72,8 +72,8 @@ class ConvertData:
         self.open_binary = self.read_bin_file_to_mem(binary_filename=self.binary_filename, logger=self.logger)
 
         # First read binary header at top of file, but don't write to output file
-        settings.data_blocks.header.wecom3.data_block_header(open_file_object=self.open_binary,
-                                                             size_header=self.size_header)
+        wecom3.data_block_header(open_file_object=self.open_binary,
+                                 size_header=self.size_header)
 
         self.convert_to_ascii()
 

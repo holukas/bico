@@ -16,9 +16,9 @@ import logging
 
 import pytest
 
-from conftest import SRC_DIR, DATA_DIR
+from conftest import PACKAGE_DIR, DATA_DIR
 
-from ops import bin as bbin, file as bfile, format_data
+from bico.ops import bin as bbin, file as bfile, format_data
 
 # Matches the reference run: site CH-DAV with these three instruments, the
 # WECOM3 header (29 bytes), and add_instr_to_varname enabled.
@@ -49,7 +49,7 @@ def logger():
 
 @pytest.fixture(scope="module")
 def dblocks_props(logger):
-    return bfile.load_dblocks_props(DBLOCK_SEQUENCE, {"dir_script": str(SRC_DIR)})
+    return bfile.load_dblocks_props(DBLOCK_SEQUENCE, {"dir_script": str(PACKAGE_DIR)})
 
 
 @pytest.fixture(scope="module")

@@ -10,29 +10,30 @@ Guidance for working in the `bico` repository.
 
 ## Project overview
 
-`bico` (Binary Converter) converts ETH eddy covariance raw data from a compressed binary format to uncompressed ASCII CSV files for use in EddyPro. It runs as an application (not an installed package) via `src/bico.py`, with both a PyQt5 GUI and a CLI.
+`bico` (Binary Converter) converts ETH eddy covariance raw data from a compressed binary format to uncompressed ASCII CSV files for use in EddyPro. It is an installed package (`bico/`) exposing a `bico` console command, with both a PyQt5 GUI and a CLI.
 
 ## Environment & tooling
 
 - Dependency management uses [`uv`](https://docs.astral.sh/uv/) (migrated from poetry). Source of truth: `pyproject.toml` (PEP 621), locked in `uv.lock`.
 - Requires Python 3.12.
 - Set up the environment: `uv sync`
-- Run the GUI: `uv run python src\bico.py -g`
-- Run headless: `uv run python src\bico.py -f <folder> -d <days> -a`
+- Run the GUI: `uv run bico -g`
+- Run headless: `uv run bico -f <folder> -d <days> -a` (also available as `uv run python -m bico ...`)
 - Run the tests: `uv run pytest`
 
 ## Testing
 
 - Tests live in `tests/` and use `pytest` (a dev dependency, in the `dev` group of `pyproject.toml`).
-- `tests/conftest.py` puts `src/` on `sys.path` so tests import the conversion modules directly
-  (`from ops import bin`) without importing the PyQt5 GUI.
+- `tests/conftest.py` exposes the installed package location; tests import the conversion modules directly
+  (`from bico.ops import bin`). Importing the `bico` package is light and does not pull in the PyQt5 GUI.
 - The main test is a golden-file test: it converts a small truncated real binary
   (`tests/data/*.X00`) and asserts the output matches a committed expected CSV (`tests/data/*.golden.csv`).
   The conversion output must stay byte-for-byte stable, so this guards against regressions in converted values.
 
 ## Architecture notes
 
-- `src/bico.py` — entry point; `BicoEngine` (conversion), `BicoGUI`, `BicoFolder` (CLI).
-- `src/ops/` — `bin.py` (binary->ASCII core, struct/mmap), `file.py` (search/IO), `stats.py`, `vis.py`, `setup.py`, `cli.py`.
-- `src/settings/data_blocks/*.dblock` — data-driven format specs (one per instrument/logging variant), each parsed as Python dict literals. Adding instrument support means adding a `.dblock` file, not changing code. Companion `.md` files document each block.
-- Version is set in `src/settings/_version.py` and `pyproject.toml`.
+- `bico/bico.py` — entry point (`main_cli`); `BicoEngine` (conversion), `BicoGUI`, `BicoFolder` (CLI). `bico/__main__.py` enables `python -m bico`.
+- `bico/ops/` — `bin.py` (binary->ASCII core, struct/mmap), `file.py` (search/IO), `stats.py`, `vis.py`, `setup.py`, `cli.py`.
+- `bico/settings/data_blocks/*.dblock` — data-driven format specs (one per instrument/logging variant), each parsed as Python dict literals. Adding instrument support means adding a `.dblock` file, not changing code. Companion `.md` files document each block.
+- Internal imports are package-qualified (`from bico.ops import ...`); the package is installed editable via `uv sync` and `[project.scripts] bico` points to `bico.bico:main_cli`.
+- Version is set in `bico/settings/_version.py` and `pyproject.toml` (kept in sync by a test).

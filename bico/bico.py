@@ -8,11 +8,10 @@ from PyQt5 import QtCore as qtc
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtWidgets as qtw
 
-import ops.logger
-import ops.setup
-from gui.gui import Ui_MainWindow
-from ops import bin, vis, file, stats, cli, format_data
-from settings import _version
+from bico.gui.gui import Ui_MainWindow
+from bico.ops import bin, vis, file, stats, cli, format_data
+from bico.ops import logger as ops_logger, setup as ops_setup
+from bico.settings import _version
 
 
 class BicoEngine:
@@ -29,10 +28,10 @@ class BicoEngine:
         self.avoidduplicates = avoidduplicates
 
         # Setup outdirs, run ID and logger
-        self.run_id = ops.setup.generate_run_id()
+        self.run_id = ops_setup.generate_run_id()
         self.settings_dict['run_id'] = self.run_id
-        self.settings_dict = ops.setup.make_run_outdirs(settings_dict=self.settings_dict)
-        self.logger = ops.logger.setup_logger(settings_dict=self.settings_dict)
+        self.settings_dict = ops_setup.make_run_outdirs(settings_dict=self.settings_dict)
+        self.logger = ops_logger.setup_logger(settings_dict=self.settings_dict)
 
         self.stats_coll_df = pd.DataFrame()  # Collects agg stats
         self.dblocks_seq = []
@@ -298,7 +297,7 @@ class BicoGUI(qtw.QMainWindow, Ui_MainWindow):
 
         # Read Settings: File --> Dict
         self.settings_dict = \
-            ops.setup.read_settings_file_to_dict(dir_settings=dir_settings,
+            ops_setup.read_settings_file_to_dict(dir_settings=dir_settings,
                                                  file='BICO.settings',
                                                  reset_paths=False)
 
@@ -471,7 +470,7 @@ class BicoGUI(qtw.QMainWindow, Ui_MainWindow):
         selected_dir = qtw.QFileDialog.getExistingDirectory(None, dialog_txt, str(start_dir))  # Open dialog
         self.settings_dict[dir_setting] = selected_dir  # Update settings dict
         update_label.setText(self.settings_dict[dir_setting])  # Update gui
-        # ops.setup.settings_dict_to_file(settings_dict=self.settings_dict)  # Save to file
+        # ops_setup.settings_dict_to_file(settings_dict=self.settings_dict)  # Save to file
 
 
 class BicoFolder:
@@ -524,7 +523,7 @@ class BicoFolder:
 
         # Read Settings: File --> Dict
         self.settings_dict = \
-            ops.setup.read_settings_file_to_dict(dir_settings=self.folder,
+            ops_setup.read_settings_file_to_dict(dir_settings=self.folder,
                                                  file='BICO.settings',
                                                  reset_paths=False)
 
@@ -552,12 +551,6 @@ class BicoFolder:
 
 
 def main(args):
-    abspath = Path(os.path.abspath(__file__)).parent  # directory of bico.py
-    os.chdir(abspath)
-    wd = os.getcwd()
-    print(f"Working directory: {wd}")
-    # bico.main()
-
     # Run BICO w/o GUI
     if args.folder:
         days = args.days if args.days else None
@@ -575,10 +568,14 @@ def main(args):
         print("Please add arg how BICO should be executed. Add '-h' for help.")
 
 
-if __name__ == '__main__':
-    args = cli.get_args()
-    args = cli.validate_args(args)
+def main_cli():
+    """Console-script entry point (``bico`` / ``python -m bico``)."""
+    args = cli.validate_args(cli.get_args())
     main(args)
+
+
+if __name__ == '__main__':
+    main_cli()
 
 # # Compress uncompressed ASCII to gzip, delete uncompressed if gzip selected
 # if self.settings_dict['file_compression'] == 'gzip':

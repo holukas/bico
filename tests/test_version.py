@@ -9,11 +9,11 @@ wrong version number.
 import tomllib
 from pathlib import Path
 
-from conftest import SRC_DIR
+from conftest import PACKAGE_DIR
 
-from settings import _version
+from bico.settings import _version
 
-PYPROJECT = SRC_DIR.parent / "pyproject.toml"
+PYPROJECT = PACKAGE_DIR.parent / "pyproject.toml"
 
 
 def test_pyproject_version_matches_version_module():

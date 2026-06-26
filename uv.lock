@@ -10,7 +10,7 @@ resolution-markers = [
 [[package]]
 name = "bico"
 version = "2.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "matplotlib" },
     { name = "numpy" },
