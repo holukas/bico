@@ -19,12 +19,13 @@ in the same folder.
 
 ## Installation
 
+`bico` requires Python 3.12 and uses [`uv`](https://docs.astral.sh/uv/) for dependency management.
+
 - Latest release: https://github.com/holukas/bico/releases/latest
-- `bico` can be installed directly from source by specifying the desired version number
-  via `pip install https://github.com/holukas/bico/archive/refs/tags/v1.6.0.tar.gz`
-- Using [`uv`](https://docs.astral.sh/uv/), the file `pyproject.toml` can be used to install the environment that
-  contains all required dependencies to run the script. From the repository root, run `uv sync` to create the
-  virtual environment (`.venv`) with all pinned dependencies.
+- From a clone (recommended): run `uv sync` in the repository root to create the virtual environment (`.venv`)
+  with all pinned dependencies from `pyproject.toml` / `uv.lock`, then run the app with `uv run bico` (see Usage).
+- As a package: `bico` can also be installed directly from a release tag, e.g.
+  `pip install https://github.com/holukas/bico/archive/refs/tags/v2.0.tar.gz`, which provides the `bico` command.
 
 ## Usage
 

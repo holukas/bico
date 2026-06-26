@@ -33,7 +33,9 @@ Guidance for working in the `bico` repository.
 ## Architecture notes
 
 - `bico/bico.py` — entry point (`main_cli`); `BicoEngine` (conversion), `BicoGUI`, `BicoFolder` (CLI). `bico/__main__.py` enables `python -m bico`.
-- `bico/ops/` — `bin.py` (binary->ASCII core, struct/mmap), `file.py` (search/IO), `stats.py`, `vis.py`, `setup.py`, `cli.py`.
+- `bico/ops/` — `bin.py` (binary->ASCII core, mmap + `int.from_bytes`, with a precomputed per-datablock plan), `parallel.py` (per-file worker), `file.py` (search/IO), `stats.py`, `vis.py`, `setup.py`, `cli.py`.
+- Conversion runs one file per worker process via `ProcessPoolExecutor` (`BicoEngine.loop` -> `ops.parallel.process_file`), with a sequential fallback for a single file/worker. Worker count comes from the optional `num_processes` setting, else `cpu_count - 1`. `ops.vis` forces matplotlib's `Agg` backend so plotting works in workers.
 - `bico/settings/data_blocks/*.dblock` — data-driven format specs (one per instrument/logging variant), each parsed as Python dict literals. Adding instrument support means adding a `.dblock` file, not changing code. Companion `.md` files document each block.
+- A run never modifies the source `BICO.settings`; it writes a settings snapshot into the run's output folder. The GUI's "save" persists only user keys (`file.save_settings_to_file`); derived/runtime keys are excluded.
 - Internal imports are package-qualified (`from bico.ops import ...`); the package is installed editable via `uv sync` and `[project.scripts] bico` points to `bico.bico:main_cli`.
 - Version is set in `bico/settings/_version.py` and `pyproject.toml` (kept in sync by a test).
