@@ -68,7 +68,7 @@ by hand, or a **headless CLI** for automated/scheduled runs.
     - `s` — save the current settings to `BICO.settings`
     - `f` — show / hide the settings panel (console fills the width)
     - `Ctrl+L` — clear the console
-    - `?` — open the in-app help
+    - `h` — open the in-app help
     - `q` — quit
 - Saving writes only the user-editable settings back to `bico/settings/BICO.settings` (run-only options such as
   "recent days" and "avoid duplicates" are not persisted). Each run also writes a snapshot of its effective

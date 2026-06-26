@@ -13,28 +13,23 @@ Screen {
 }
 
 /* ---- settings (left) ----
-   Compact, scroll-free form: two side-by-side columns, one row per field
-   (label + control on the same line, single cell tall). Borders are stripped
-   from inputs to keep each field exactly one row high. */
+   Single wide column, one row per field (label + control on the same line,
+   one cell tall). Borders are stripped from inputs to keep each field exactly
+   one row high. The pane takes a generous, scaling share of the width so paths
+   stay readable; the console fills the rest. */
 
-/* Fixed-width settings pane sized to its two compact columns; the console
-   takes all remaining width. This keeps settings tight even on very wide
-   terminals, and degrades gracefully on narrow ones. */
 #settings {
-    width: 82;
+    width: 38%;
+    min-width: 40;
+    max-width: 100;
     padding: 0 1;
     background: $surface;
     border-right: tall $primary 40%;
 }
 
-#settings-cols {
+#settings-fields {
     width: 1fr;
     height: 1fr;
-}
-
-.settings-col {
-    width: 39;
-    height: auto;
     padding: 0 1;
 }
 
@@ -61,10 +56,21 @@ Screen {
     width: 1fr;
     height: 1;
     border: none;
-    background: $boost;
     padding: 0 1;
 }
 
+/* text fields: subtle tint, distinct from the pane */
+.field Input {
+    background: $boost;
+}
+
+/* dropdowns: a distinct accent tint so they stand out more */
+.field Select,
+.field Select SelectCurrent {
+    background: $primary 25%;
+}
+
+/* invalid input (e.g. a non-number in a numeric field) turns red */
 .field Input.-invalid {
     background: $error 30%;
 }

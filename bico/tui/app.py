@@ -15,7 +15,7 @@ from textual import on, work
 from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.screen import ModalScreen
-from textual.validation import Regex
+from textual.validation import Integer, Regex
 from textual.widgets import (Button, DirectoryTree, Footer, Header, Input, Label,
                              Markdown, ProgressBar, RichLog, Select, Static, Switch)
 
@@ -118,65 +118,107 @@ def _field_id(key: str) -> str:
 
 
 HELP_MD = """\
-# bico — help
+# bico help
 
-**bico** converts ETH eddy-covariance raw binary files to ASCII CSV for EddyPro.
-Configure the run in the settings panel on the left; the console on the right
-shows validation results and the live run log.
+bico converts ETH eddy-covariance raw binary files to ASCII CSV for EddyPro.
+Set up the run in the settings panel on the left. The console on the right shows
+validation results and the live run log.
 
 ## Workflow
 1. Set the options (Instruments, Raw data, Output, Run options).
-2. Press **Validate** (`v`) — it checks every field, shows the effective
-   settings, and counts the matching files in the source folder.
-3. **Run** (`r`) stays disabled until Validate passes. Editing any field
-   disables it again, so you always run exactly what you validated.
+2. Press **Validate** (`v`). It checks every field, shows the settings the run
+   will use, and counts the matching files in the source folder.
+3. Press **Run** (`r`). Run stays off until Validate passes, and editing any
+   field switches it off again, so you always run exactly what you validated.
 
 ## Keys
-- `v` — Validate the settings (enables Run when everything is OK)
-- `t` — Test run: convert the first rows of the first file, writing nothing
-- `r` — Run the conversion
-- `s` — Save settings to `BICO.settings`
-- `f` — Show / hide the settings panel
-- `ctrl+l` — Clear the console
-- `?` — This help
-- `q` — Quit
+- `v`: validate the settings (turns on Run once everything is OK)
+- `t`: test run, converting the first rows of the first file and writing nothing
+- `r`: run the conversion
+- `s`: save settings to `BICO.settings`
+- `f`: show or hide the settings panel
+- `ctrl+l`: clear the console
+- `h`: this help
+- `q`: quit
 
 ## Settings
-**Instruments** — site, logger header, and up to three instrument data blocks
-(sonic + gas analyzers), in order.
+
+**Instruments.** Site, logger header, and up to three instrument data blocks
+(sonic and gas analyzers), in order.
 
 **Raw data**
-- *Source folder* — where binary files are read from (Browse… or type a path).
-- *Start / End date* — `YYYY-MM-DD HH:MM`; both ends are **inclusive**.
-- *Filename dt format* — datetime pattern incl. extension (e.g. `yyyymmddHH.CMM`).
-  This also determines which files are searched — there is no separate
-  file-extension setting.
-- *Min size* — files smaller than this many bytes are skipped.
-- *File limit* / *Row limit* — `0` means no limit.
-- *Random files* — `0` means no random selection.
+- *Source folder*: where binary files are read from (Browse… or type a path).
+- *Start / End date*: `YYYY-MM-DD HH:MM`. Both ends are inclusive.
+- *Filename dt format*: the datetime pattern in the filenames, including the
+  extension (e.g. `yyyymmddHH.CMM`). It also sets which files are searched, so
+  there is no separate file-extension setting.
+- *Min size*: files smaller than this many bytes are skipped.
+- *File limit* and *Row limit*: `0` means no limit.
+- *Random files*: `0` means no random selection.
 
 **Output**
-- *Output folder* — where converted files are written.
-- *Folder prefix* — prefixes the run output folder name.
-- *Compression* — `gzip` → `.csv.gz`, `None` → `.csv`.
-- *Processes* — parallel workers; `0` = auto (cpu_count − 1).
-- *Instr in varname* — append the instrument name to each variable.
-- *Plots* — which figures to generate.
+- *Output folder*: where converted files are written.
+- *Folder prefix*: goes in front of the run output folder name.
+- *Compression*: `gzip` writes `.csv.gz`, `None` writes `.csv`.
+- *Processes*: number of parallel workers. `0` picks it automatically
+  (cpu_count minus 1).
+- *Instr in varname*: adds the instrument name to each variable.
+- *Plots*: which figures to generate.
 
 **Run options**
-- *Recent days* — convert only the last N days; `0` uses the start/end range.
-- *Avoid duplicates* — skip files already present in the output folder.
+- *Recent days*: convert only the last N days. `0` uses the start/end range.
+- *Avoid duplicates*: skip files already present in the output folder.
 
 ## Folder picker
-Browse with the tree, use **Up** for the parent folder, or type / paste a path
-into the field and press Enter to jump there. **Select folder** confirms.
+Browse the tree, use **Up** for the parent folder, or type or paste a path into
+the field and press Enter to jump there. **Select folder** confirms.
+
+## How bico works
+
+bico turns ETH eddy-covariance raw binary files into uncompressed ASCII CSV that
+EddyPro and other tools can read.
+
+**Data blocks.** Each instrument writes its measurements as a data block, a fixed
+binary layout of variables. A sonic anemometer writes wind components and sonic
+temperature. A gas analyzer writes CO₂/H₂O concentrations, diagnostics, and cell
+temperature and pressure, among others. A logger *file* starts with a header.
+Each *record* (one timestamp) then holds only the data blocks of the configured
+instruments, one after another. The layout of every block is described by a spec
+file (`bico/settings/data_blocks/*.dblock`), so supporting a new instrument means
+adding a spec rather than changing code. The **Instruments** settings (header
+plus Instrument 1 to 3) tell bico which blocks to expect and in what order.
+
+## The run pipeline
+1. *Find files.* Search the source folder for names that match the filename
+   datetime format. The same format gives both the search pattern and each
+   file's timestamp.
+2. *Filter.* Keep files inside the start/end date range, above the minimum size,
+   and within the file limit. Optionally take a random subset.
+3. *Convert.* For each file, read the binary with the data-block specs and decode
+   every record into rows of named variables. Files convert in parallel, one
+   process per file, up to the number of workers set by *Processes*. A bad file
+   is skipped instead of stopping the run.
+4. *Write.* Save each file as ASCII CSV, either gzipped (`.csv.gz`) or plain
+   (`.csv`), and optionally add the instrument name to each variable.
+5. *Summarise.* Compute per-file and aggregated statistics, and render the
+   availability heatmap, the high-resolution time series and histograms, and the
+   aggregated time series when those plots are enabled.
+
+**Output.** Each run makes a timestamped folder under the output folder, named
+from the *Folder prefix* and the run id. It holds `raw_data_ascii/` with the
+converted files, `plots/`, a `log/` with the full run log, and a snapshot of the
+exact settings used. A run never changes the source `BICO.settings`.
+
+**Same engine everywhere.** The TUI (`bico -t`) and the headless CLI
+(`bico -f <folder> -d <days> -a`, used for scheduled jobs) run the same
+conversion engine, so the output is the same however you start a run.
 """
 
 
 class HelpScreen(ModalScreen):
     """Scrollable help overlay explaining the TUI."""
 
-    BINDINGS = [('escape', 'close', 'Close'), ('q', 'close', 'Close'), ('?', 'close', 'Close')]
+    BINDINGS = [('escape', 'close', 'Close'), ('q', 'close', 'Close'), ('h', 'close', 'Close')]
 
     def compose(self) -> ComposeResult:
         with Vertical(id='help'):
@@ -278,7 +320,7 @@ class BicoApp(App):
         ('s', 'save_settings', 'Save'),
         ('f', 'toggle_settings', 'Show/hide settings'),
         ('ctrl+l', 'clear_console', 'Clear log'),
-        ('?', 'help', 'Help'),
+        ('h', 'help', 'Help'),
         ('q', 'quit', 'Quit'),
     ]
 
@@ -299,14 +341,12 @@ class BicoApp(App):
         yield Header()
         with Horizontal(id='body'):
             with Vertical(id='settings'):
-                # Two compact columns so the whole form fits without scrolling.
-                with Horizontal(id='settings-cols'):
-                    with Vertical(classes='settings-col'):
-                        yield from self._section('Instruments', INSTRUMENT_FIELDS)
-                        yield from self._section('Raw data', RAWDATA_FIELDS)
-                    with Vertical(classes='settings-col'):
-                        yield from self._section('Output', OUTPUT_FIELDS)
-                        yield from self._section('Run options', RUN_FIELDS)
+                # Single wide column so paths stay as readable as possible.
+                with VerticalScroll(id='settings-fields'):
+                    yield from self._section('Instruments', INSTRUMENT_FIELDS)
+                    yield from self._section('Raw data', RAWDATA_FIELDS)
+                    yield from self._section('Output', OUTPUT_FIELDS)
+                    yield from self._section('Run options', RUN_FIELDS)
                 with Horizontal(id='actions'):
                     yield Button('Save', id='btn-save', variant='primary')
                     yield Button('Validate', id='btn-validate')
@@ -342,8 +382,12 @@ class BicoApp(App):
                     if key in ('start_date', 'end_date'):
                         validators = [Regex(DATE_PATTERN,
                                             failure_description='Use 2025-12-31 23:59')]
-                    control = Input(id=_field_id(key),
-                                    type='integer' if kind == 'int' else 'text',
+                    elif kind == 'int':
+                        # Validate (instead of blocking input) so a disallowed
+                        # character turns the field red rather than being silently
+                        # dropped.
+                        validators = [Integer(failure_description='Whole number only')]
+                    control = Input(id=_field_id(key), type='text',
                                     placeholder=FIELD_PLACEHOLDERS.get(key, ''),
                                     validators=validators)
                 control.tooltip = hint

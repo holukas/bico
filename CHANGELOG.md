@@ -19,7 +19,7 @@
   confirm the settings produce a valid result before a full run; and a progress bar with estimated remaining time
   shown during a run.
 - Added: a folder picker for the source/output paths (browse, go up, or type/paste a path and press Enter), an
-  in-app help overlay (`?`), and live format validation of the start/end date fields.
+  in-app help overlay (`h`), and live format validation of the start/end date fields.
 - Changed: the separate "file extension" setting was removed. The search pattern is now derived from the filename
   datetime format (which already includes the extension), and a file whose name matches the pattern but not the
   datetime format is skipped instead of aborting the run. Start/end dates are documented as inclusive on both
