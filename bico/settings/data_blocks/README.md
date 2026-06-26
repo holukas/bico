@@ -82,10 +82,12 @@ Original manufacturer documentation for the logged instruments (in
 - [Aerodyne QCL](../../../docs/qcldoc_20200515.pdf)
 - [Los Gatos Research (LGR) analyzer](../../../docs/lgrdoc_20180601.pdf)
 
-## Reference-only docs (no `.dblock`)
+## rECord formats (documentation only, no `.dblock`)
 
-Documentation for older/legacy formats kept for reference; these have no
-companion `.dblock` and are not selectable for conversion.
+Data blocks from the `rECord` logging script. These files are already logged
+directly in ASCII, so they need **no** binary conversion. Their info is kept here
+only to document them alongside the other data blocks, all in one place; they are
+informational and are not used for conversion (hence no companion `.dblock`).
 
 - [HS50-R1.md](HS50-R1.md)
 - [R350-R1.md](R350-R1.md)
