@@ -1,6 +1,6 @@
 """Tests for settings persistence.
 
-A run must never rewrite the user's source BICO.settings file, and saving from
+A run must never rewrite the user's source bico.settings file, and saving from
 the GUI must not pollute it with derived/runtime keys (per-run ids and
 machine-specific absolute paths). These tests lock in that behavior.
 """
@@ -13,7 +13,7 @@ def _write(path, text):
 
 
 def test_save_settings_drops_derived_keys_and_updates_user_keys(tmp_path):
-    _write(tmp_path / "BICO.settings", (
+    _write(tmp_path / "bico.settings", (
         "# INSTRUMENTS\n"
         "site=CH-OLD\n"
         "file_compression=gzip\n"
@@ -33,7 +33,7 @@ def test_save_settings_drops_derived_keys_and_updates_user_keys(tmp_path):
     }
 
     bfile.save_settings_to_file(settings_dict)
-    text = (tmp_path / "BICO.settings").read_text()
+    text = (tmp_path / "bico.settings").read_text()
 
     # user keys updated
     assert "site=CH-DAV" in text
@@ -45,11 +45,11 @@ def test_save_settings_drops_derived_keys_and_updates_user_keys(tmp_path):
     # comments preserved
     assert "# INSTRUMENTS" in text
     # no leftover temp file
-    assert not (tmp_path / "BICO.settingsTemp").exists()
+    assert not (tmp_path / "bico.settingsTemp").exists()
 
 
 def test_run_snapshot_includes_all_keys_and_leaves_source_untouched(tmp_path):
-    source = _write(tmp_path / "BICO.settings", "site=CH-DAV\n")
+    source = _write(tmp_path / "bico.settings", "site=CH-DAV\n")
     source_before = source.read_text()
 
     outdir = tmp_path / "run_out"
@@ -69,3 +69,20 @@ def test_run_snapshot_includes_all_keys_and_leaves_source_untouched(tmp_path):
     assert "run_id=BICO-xyz" in snap_text
     # the source settings file is untouched by a run
     assert source.read_text() == source_before
+
+
+def test_find_settings_file_prefers_lowercase_and_accepts_legacy(tmp_path):
+    # nothing there yet
+    assert bfile.find_settings_file(tmp_path) is None
+
+    # a legacy uppercase file is still found
+    legacy = _write(tmp_path / "BICO.settings", "site=CH-DAV\n")
+    found = bfile.find_settings_file(tmp_path)
+    assert found is not None and found.name.lower() == "bico.settings"
+
+    # the canonical lowercase name wins when both exist (case-sensitive FS only;
+    # on a case-insensitive FS the two are the same file, which is also fine)
+    lower = tmp_path / "bico.settings"
+    if not lower.exists() or lower.samefile(legacy) is False:
+        _write(lower, "site=CH-FRU\n")
+        assert bfile.find_settings_file(tmp_path).name == "bico.settings"

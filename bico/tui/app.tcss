@@ -95,12 +95,34 @@ Screen {
     background: $boost;
 }
 
-.browse-btn {
+.browse-btn,
+.clear-btn {
     width: 3;
     min-width: 3;
     height: 1;
     margin: 0;
     border: none;
+}
+
+/* the clear (✕) button: muted by default, red on hover to signal it empties */
+.clear-btn {
+    color: $text-muted;
+}
+.clear-btn:hover {
+    background: $error 40%;
+}
+
+/* full-width helper button under the Raw data section (auto-detect date range) */
+.detect-row-btn {
+    width: 1fr;
+    height: 1;
+    margin: 1 0 0 0;
+    border: none;
+    background: $boost;
+    color: $accent;
+}
+.detect-row-btn:hover {
+    background: $primary 40%;
 }
 
 #actions {

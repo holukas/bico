@@ -43,7 +43,7 @@ class BicoEngine:
     def run(self):
 
         # Write a snapshot of this run's effective settings to its output folder
-        # (the source BICO.settings file is never modified by a run)
+        # (the source bico.settings file is never modified by a run)
         file.write_run_settings_snapshot(self.settings_dict, self.settings_dict['dir_out_run'])
 
         # Log info
@@ -349,16 +349,16 @@ class BicoFolder:
         return settings_dict
 
     def run(self):
-        settingsfilefound = self.search_settingsfile()
+        settings_file = file.find_settings_file(self.folder)
 
-        if not settingsfilefound:
-            print(f"(!)ERROR: No 'BICO.settings' file found. Please make sure it is in folder '{self.folder}'")
+        if not settings_file:
+            print(f"(!)ERROR: No 'bico.settings' file found. Please make sure it is in folder '{self.folder}'")
             sys.exit()
 
         # Read Settings: File --> Dict
         self.settings_dict = \
             ops_setup.read_settings_file_to_dict(dir_settings=self.folder,
-                                                 file='BICO.settings',
+                                                 file=settings_file.name,
                                                  reset_paths=False)
 
         # Update folder settings
@@ -371,11 +371,6 @@ class BicoFolder:
         self.settings_dict = self._update_settings_from_args(settings_dict=self.settings_dict)
 
         self.execute_in_folder()
-
-    def search_settingsfile(self):
-        files = os.listdir(self.folder)
-        settingsfilefound = True if 'BICO.settings' in files else False
-        return settingsfilefound
 
     def execute_in_folder(self):
         bicoengine = BicoEngine(settings_dict=self.settings_dict,

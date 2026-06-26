@@ -6,7 +6,11 @@
 /_tests/
 start BICO.lnk
 
-# BICO settings backups / temp churn (not the tracked BICO.settings template)
+# bico settings backups / temp churn (not the tracked bico.settings template)
+bico.settingsOld
+bico.settingsTemp
+bico.settings.BAK
+# legacy uppercase names from older versions
 BICO.settingsOld
 BICO.settingsTemp
 BICO.settings.BAK

@@ -26,6 +26,18 @@
   ends. The default `num_processes` is now `1`.
 - Changed: log files use an aligned `time | LEVEL | message` format, and the run logger is reset per run so each
   run writes to its own log file.
+- Changed: the settings file is now lowercase `bico.settings` (was `BICO.settings`). The headless CLI still finds
+  a legacy `BICO.settings` in a folder (matched case-insensitively via `file.find_settings_file`), so existing
+  output folders keep working. Each run continues to drop a `bico.settings` snapshot into its output folder.
+- Added: the TUI loads the last-saved `bico.settings` on startup, so it always opens where you left off. You can
+  also **drag and drop a `bico.settings` file anywhere onto the TUI** (e.g. a previous run's snapshot) to load
+  those settings into the form.
+- Added: **drag and drop a file or folder onto the Source folder or Output folder field** to fill it with the
+  folder path (dropping a file uses its containing folder), so the paths can be set without browsing. Each folder
+  field also gained a **✕** button to clear it (next to the **…** browse button).
+- Added: a **Detect dates from source files** button (`d`) that scans the source folder, parses every file's date
+  with the filename datetime format, and sets Start/End date to the earliest/latest file (and resets "recent days"
+  to 0). The range can still be adjusted afterwards.
 
 ### Migration to `uv` and Python 3.12
 

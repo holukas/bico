@@ -39,11 +39,11 @@ def get_args():
                              "The TUI is also launched when no arguments are given.")
     parser.add_argument('-f', '--folder', type=str,
                         help="Path to folder: "
-                             "run BICO without GUI in the specified FOLDER, needs 'BICO.settings' file in FOLDER")
+                             "run BICO without GUI in the specified FOLDER, needs 'bico.settings' file in FOLDER")
     parser.add_argument('-d', '--days', type=int,
                         help="Convert data for most recent number of DAYS: "
                              "only considered if FOLDER is defined, otherwise the date range given "
-                             "in the 'BICO.settings' file is used")
+                             "in the 'bico.settings' file is used")
     parser.add_argument('-a', '--avoidduplicates', action='store_true',
                         help="Avoid duplicates: skip files that share the same filename as a file that is already "
                              "available in the output folder specified in the bico.settings file.")

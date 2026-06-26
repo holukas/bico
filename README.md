@@ -63,16 +63,25 @@ by hand, or a **headless CLI** for automated/scheduled runs.
   progress bar with an estimated remaining time is shown while a run is in progress.
 - Key bindings (also shown in the footer):
     - `v` — validate settings (enables Run when everything is OK)
+    - `d` — detect the time range from the source files (fills Start/End date)
     - `t` — test run (dry conversion of the first file, nothing written)
     - `r` — run the conversion
-    - `s` — save the current settings to `BICO.settings`
+    - `s` — save the current settings to `bico.settings`
     - `f` — show / hide the settings panel (console fills the width)
     - `Ctrl+L` — clear the console
     - `h` — open the in-app help
     - `q` — quit
-- Saving writes only the user-editable settings back to `bico/settings/BICO.settings` (run-only options such as
-  "recent days" and "avoid duplicates" are not persisted). Each run also writes a snapshot of its effective
-  settings and a log file into that run's output folder; the source `BICO.settings` is never modified by a run.
+- The TUI opens with the settings you last saved to `bico/settings/bico.settings`, so it always starts where you
+  left off. Saving writes only the user-editable settings back to that file (run-only options such as "recent days"
+  and "avoid duplicates" are not persisted). Each run also writes a `bico.settings` snapshot of its effective
+  settings and a log file into that run's output folder; the source `bico.settings` is never modified by a run.
+- To reuse a previous run's settings, **drag and drop its `bico.settings` file anywhere onto the TUI** — the form is
+  filled from it. (Most terminals deliver a dropped file as its pasted path, which the TUI recognises.)
+- To set the **source** or **output** folder without browsing, focus that field and **drag and drop a file or folder
+  onto it** — the field is filled with the folder path (a dropped file uses the folder that contains it).
+- **Detect dates from source files** (`d`) scans the source folder, parses every file's date with the filename
+  datetime format, and fills Start/End date with the earliest and latest file (resetting "recent days" to 0 so the
+  range is used). You can still adjust the dates afterwards.
 
 ### CLI (headless)
 
@@ -82,7 +91,7 @@ by hand, or a **headless CLI** for automated/scheduled runs.
     - `uv run bico -f Z:\CH-OE2_Oensingen\20_ec_fluxes\2022\raw_data_ascii -d 8 -a`
     - `uv run bico` runs the installed `bico` command (use `uv run --project <bico-dir> bico ...` from another directory,
       or activate the project's virtual environment)
-    - `-f Z:\CH-OE2_Oensingen\20_ec_fluxes\2022\raw_data_ascii` specifies the folder where the `BICO.settings` file
+    - `-f Z:\CH-OE2_Oensingen\20_ec_fluxes\2022\raw_data_ascii` specifies the folder where the `bico.settings` file
       and the raw binary files for this site (CH-OE2) are located. The settings file can be created/edited in the TUI
       (via **Save settings**), or edited directly with a text editor.
     - `-d 8` converts binary files from the last 8 days to ASCII

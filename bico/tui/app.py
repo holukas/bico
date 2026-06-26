@@ -1,6 +1,6 @@
 """Textual TUI for bico.
 
-Left column: every setting from BICO.settings plus the run-time options that the
+Left column: every setting from bico.settings plus the run-time options that the
 CLI exposes (recent-days window, avoid-duplicates). Right column: a live Rich
 console showing the run log. The same conversion engine (``BicoEngine``) used by
 the headless CLI does the work, driven here from a worker thread so the UI stays
@@ -11,7 +11,7 @@ import logging
 from pathlib import Path
 
 from rich.text import Text
-from textual import on, work
+from textual import events, on, work
 from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.screen import ModalScreen
@@ -45,7 +45,7 @@ GAS_ANALYZERS = ['IRGA72-A', 'IRGA72-A-GN1', 'IRGA72-B', 'IRGA72-B-GN1', 'IRGA75
 COMPRESSION = ['gzip', 'None']
 
 # Field spec: (key, label, kind, options). `kind` is 'select' | 'input' |
-# 'int' | 'switch'. Keys match BICO.settings keys, except the run-only options
+# 'int' | 'switch'. Keys match bico.settings keys, except the run-only options
 # 'days' and 'avoidduplicates', which are not persisted to the settings file.
 INSTRUMENT_FIELDS = [
     ('site', 'Site', 'select', SITES),
@@ -109,12 +109,75 @@ FIELD_PLACEHOLDERS = {
     'end_date': 'YYYY-MM-DD HH:MM',
     'filename_datetime_format': 'yyyymmddHH.CMM',
 }
-# Keys that are persisted to BICO.settings (everything but the run-only options).
+# Keys that are persisted to bico.settings (everything but the run-only options).
 PERSISTED_KEYS = [key for key, _, _, _ in INSTRUMENT_FIELDS + RAWDATA_FIELDS + OUTPUT_FIELDS]
 
 
 def _field_id(key: str) -> str:
     return f'field-{key}'
+
+
+def _parse_dropped_path(text: str):
+    """Parse pasted/dropped text into a filesystem Path, or None.
+
+    Terminals deliver a dragged-in file or folder as pasted text: its path,
+    often wrapped in quotes or given as a file:// URI. Returns None for empty or
+    multi-line text, so ordinary pastes are left untouched.
+    """
+    candidate = (text or '').strip().strip('"').strip("'").strip()
+    if not candidate or '\n' in candidate:
+        return None
+    if candidate.startswith('file://'):
+        from urllib.parse import unquote, urlparse
+        candidate = unquote(urlparse(candidate).path)
+        # file:///C:/... → strip the leading slash before the drive letter
+        if len(candidate) > 2 and candidate[0] == '/' and candidate[2] == ':':
+            candidate = candidate[1:]
+    return Path(candidate)
+
+
+def _dropped_folder(text: str):
+    """Resolve dropped text to a folder path string (a dropped file yields its
+    parent folder), or None if the text is not an existing path."""
+    path = _parse_dropped_path(text)
+    if path is None:
+        return None
+    if path.is_dir():
+        return str(path)
+    if path.is_file():
+        return str(path.parent)
+    return None
+
+
+def _dropped_settings_file(text: str):
+    """Resolve dropped text to a bico.settings file Path, or None."""
+    path = _parse_dropped_path(text)
+    if path is not None and path.is_file() \
+            and path.name.lower() == bfile.SETTINGS_FILENAME.lower():
+        return path
+    return None
+
+
+class PathDropInput(Input):
+    """A path field that fills itself from a dragged-in file or folder.
+
+    Most terminals paste a dropped file/folder as its path; when the pasted text
+    is a real path this sets the field to the folder (a dropped file yields its
+    parent folder), so source/output folders can be set by dropping instead of
+    browsing. Any other paste behaves like a normal Input paste.
+    """
+
+    def _on_paste(self, event: events.Paste) -> None:
+        folder = _dropped_folder(event.text)
+        if folder is not None:
+            self.value = folder
+            self.cursor_position = len(folder)
+            # Textual dispatches `_on_paste` for every class in the MRO; only
+            # prevent_default() stops Input's own handler from then inserting the
+            # raw path. stop() keeps it from bubbling to the app paste handler.
+            event.prevent_default()
+            event.stop()
+        # Otherwise do nothing: Textual still calls Input._on_paste (normal paste).
 
 
 HELP_MD = """\
@@ -131,11 +194,24 @@ validation results and the live run log.
 3. Press **Run** (`r`). Run stays off until Validate passes, and editing any
    field switches it off again, so you always run exactly what you validated.
 
+## Settings files
+The TUI opens with the settings you last saved (`s`) to `bico.settings`. Each run
+also drops a `bico.settings` snapshot into its output folder. To reuse a previous
+run's settings, **drag and drop its `bico.settings` file anywhere onto the TUI**
+and the form is filled from it.
+
+## Drag and drop folders
+Instead of browsing, focus the **Source folder** or **Output folder** field and
+**drag and drop a file or folder onto it** — the field is filled with the folder
+path (dropping a file uses the folder that contains it). Each folder field has a
+**…** button to browse and a **✕** button to empty it.
+
 ## Keys
 - `v`: validate the settings (turns on Run once everything is OK)
+- `d`: detect the time range from the source files (fills Start/End date)
 - `t`: test run, converting the first rows of the first file and writing nothing
 - `r`: run the conversion
-- `s`: save settings to `BICO.settings`
+- `s`: save settings to `bico.settings`
 - `f`: show or hide the settings panel
 - `ctrl+l`: clear the console
 - `h`: this help
@@ -148,7 +224,10 @@ validation results and the live run log.
 
 **Raw data**
 - *Source folder*: where binary files are read from (Browse… or type a path).
-- *Start / End date*: `YYYY-MM-DD HH:MM`. Both ends are inclusive.
+- *Start / End date*: `YYYY-MM-DD HH:MM`. Both ends are inclusive. Use
+  **Detect dates from source files** (`d`) to fill these from the earliest and
+  latest file in the source folder (parsed with the filename datetime format);
+  this also resets *Recent days* to 0 so the range is used. Adjust afterwards.
 - *Filename dt format*: the datetime pattern in the filenames, including the
   extension (e.g. `yyyymmddHH.CMM`). It also sets which files are searched, so
   there is no separate file-extension setting.
@@ -207,7 +286,7 @@ plus Instrument 1 to 3) tell bico which blocks to expect and in what order.
 **Output.** Each run makes a timestamped folder under the output folder, named
 from the *Folder prefix* and the run id. It holds `raw_data_ascii/` with the
 converted files, `plots/`, a `log/` with the full run log, and a snapshot of the
-exact settings used. A run never changes the source `BICO.settings`.
+exact settings used. A run never changes the source `bico.settings`.
 
 **Same engine everywhere.** The TUI (`bico -t`) and the headless CLI
 (`bico -f <folder> -d <days> -a`, used for scheduled jobs) run the same
@@ -317,6 +396,7 @@ class BicoApp(App):
         ('r', 'run_conversion', 'Run'),
         ('t', 'test_run', 'Test run'),
         ('v', 'validate', 'Validate'),
+        ('d', 'detect_dates', 'Detect dates'),
         ('s', 'save_settings', 'Save'),
         ('f', 'toggle_settings', 'Show/hide settings'),
         ('ctrl+l', 'clear_console', 'Clear log'),
@@ -328,8 +408,10 @@ class BicoApp(App):
         super().__init__()
         # Base settings read from file; non-form keys (e.g. dir_server_*) are
         # preserved here and merged back in when collecting form values.
+        # On startup this is the last-saved bico.settings, so the TUI always
+        # opens with the settings last persisted via Save.
         self._base_settings = ops_setup.read_settings_file_to_dict(
-            dir_settings=SETTINGS_DIR, file='BICO.settings', reset_paths=False)
+            dir_settings=SETTINGS_DIR, file=bfile.SETTINGS_FILENAME, reset_paths=False)
         self._busy = False
         # Run is only allowed after Validate confirms the settings are OK; any
         # change to a setting clears this so the user must re-validate.
@@ -345,6 +427,12 @@ class BicoApp(App):
                 with VerticalScroll(id='settings-fields'):
                     yield from self._section('Instruments', INSTRUMENT_FIELDS)
                     yield from self._section('Raw data', RAWDATA_FIELDS)
+                    detect = Button('Detect dates from source files', id='btn-detect',
+                                    classes='detect-row-btn')
+                    detect.tooltip = ('Scan the source folder, parse every file date with the '
+                                      'filename datetime format, and set Start/End date to the '
+                                      'earliest/latest file. You can adjust them afterwards.')
+                    yield detect
                     yield from self._section('Output', OUTPUT_FIELDS)
                     yield from self._section('Run options', RUN_FIELDS)
                 with Horizontal(id='actions'):
@@ -376,7 +464,7 @@ class BicoApp(App):
                     control = Select([(o, o) for o in options], id=_field_id(key),
                                      allow_blank=False)
                 elif kind == 'path':
-                    control = Input(id=_field_id(key), type='text')
+                    control = PathDropInput(id=_field_id(key), type='text')
                 else:
                     validators = None
                     if key in ('start_date', 'end_date'):
@@ -393,7 +481,12 @@ class BicoApp(App):
                 control.tooltip = hint
                 yield control
                 if kind == 'path':
-                    yield Button('…', id=f'browse-{key}', classes='browse-btn')
+                    browse = Button('…', id=f'browse-{key}', classes='browse-btn')
+                    browse.tooltip = 'Browse for a folder'
+                    yield browse
+                    clear = Button('✕', id=f'clear-{key}', classes='clear-btn')
+                    clear.tooltip = 'Clear this field'
+                    yield clear
 
     # -- wiring --------------------------------------------------------------
 
@@ -416,6 +509,37 @@ class BicoApp(App):
                 widget.value = value if value else Select.BLANK
             else:
                 widget.value = '' if value is None else str(value)
+
+    def _load_settings_from_path(self, path: Path) -> None:
+        """Load a bico.settings file into the form (e.g. dragged in or from a run)."""
+        try:
+            settings = ops_setup.read_settings_file_to_dict(
+                dir_settings=path.parent, file=path.name, reset_paths=False)
+        except Exception as exc:
+            self.notify(f'Could not read {path.name}: {exc}', severity='error')
+            return
+        # Replace the base settings (preserving non-form keys from the loaded file)
+        # and refresh the form. Loading invalidates any prior validation.
+        self._base_settings = settings
+        self._load_settings_into_form(settings)
+        self._set_validated(False)
+        console = self.query_one('#console', RichLog)
+        console.write(Text(f'Loaded settings from {path}', style='bold cyan'))
+        self.notify(f'Loaded settings from {path.name}', severity='information')
+
+    def on_paste(self, event: events.Paste) -> None:
+        """Drag-and-drop a bico.settings file onto the TUI to load it.
+
+        Reached only when focus is not on an Input (those consume paste
+        themselves; the source/output folder fields handle dropped paths via
+        PathDropInput). If the dropped text points at a bico.settings file we
+        load it; otherwise the paste is left to the focused widget.
+        """
+        path = _dropped_settings_file(event.text)
+        if path is None:
+            return  # not a settings-file drop — let the normal paste happen
+        event.stop()
+        self._load_settings_from_path(path)
 
     def _collect_form(self) -> dict:
         """Read widget values, merged onto the base (file) settings."""
@@ -455,7 +579,9 @@ class BicoApp(App):
         settings = self._collect_form()
         settings['dir_settings'] = SETTINGS_DIR
         bfile.save_settings_to_file(settings)
-        self.notify('Settings saved to BICO.settings', severity='information')
+        # Keep the in-memory base in step so a later collect/save round-trips cleanly.
+        self._base_settings = dict(settings)
+        self.notify(f'Settings saved to {bfile.SETTINGS_FILENAME}', severity='information')
 
     @on(Button.Pressed, '#btn-save')
     def _on_save(self) -> None:
@@ -464,6 +590,10 @@ class BicoApp(App):
     @on(Button.Pressed, '#btn-validate')
     def _on_validate(self) -> None:
         self.action_validate()
+
+    @on(Button.Pressed, '#btn-detect')
+    def _on_detect(self) -> None:
+        self.action_detect_dates()
 
     @on(Button.Pressed, '#btn-test')
     def _on_test(self) -> None:
@@ -497,6 +627,14 @@ class BicoApp(App):
     @on(Button.Pressed, '#browse-dir_out')
     def _browse_out(self) -> None:
         self._open_picker('dir_out')
+
+    @on(Button.Pressed, '.clear-btn')
+    def _on_clear_field(self, event: Button.Pressed) -> None:
+        # Empty the associated path field (and re-focus it for typing/dropping).
+        key = event.button.id.removeprefix('clear-')
+        field = self.query_one(f'#{_field_id(key)}', Input)
+        field.value = ''
+        field.focus()
 
     def _open_picker(self, key: str) -> None:
         field = self.query_one(f'#{_field_id(key)}', Input)
@@ -565,6 +703,78 @@ class BicoApp(App):
                            style='yellow'))
         except Exception as exc:
             write(Text(f'  (!) Folder check failed: {exc}', style='yellow'))
+
+    def action_detect_dates(self) -> None:
+        """Fill Start/End date from the earliest/latest file in the source folder.
+
+        Uses the filename datetime format (the parsing pattern) to read each
+        file's date, so only the source folder and that format are required."""
+        if self._busy:
+            self.notify('A conversion is already running.', severity='warning')
+            return
+        src = self.query_one(f'#{_field_id("dir_source")}', Input).value.strip()
+        fmt = self.query_one(f'#{_field_id("filename_datetime_format")}', Input).value.strip()
+        console = self.query_one('#console', RichLog)
+        issues = []
+        if not src:
+            issues.append('Source folder is empty.')
+        elif not Path(src).is_dir():
+            issues.append(f'Source folder does not exist: {src}')
+        if not fmt:
+            issues.append('Filename datetime format is empty.')
+        if issues:
+            console.write(Text('✗ Cannot detect dates:', style='bold red'))
+            for m in issues:
+                console.write(Text(f'    • {m}', style='red'))
+            self.notify('Fix the errors before detecting dates.', severity='warning')
+            return
+        self._detect_dates(src, fmt)
+
+    @work(thread=True, exclusive=True, group='bico-detect')
+    def _detect_dates(self, src: str, fmt: str) -> None:
+        """Scan the source folder and set the date range to the file date span."""
+        console = self.query_one('#console', RichLog)
+        write = lambda renderable: self.call_from_thread(console.write, renderable)
+        write(Text('─' * 40, style='dim'))
+        write(Text('Detecting time range from source files…', style='bold cyan'))
+        try:
+            file_glob = bfile.search_glob_from_datetime_format(fmt)
+            parsing = bfile.datetime_parsing_string(fmt)
+            qlog = self._quiet_logger()
+            matched = bfile.SearchAll.search_all(dir=src, file_id=file_glob, logger=qlog)
+            if not matched:
+                write(Text(f'  No files match "{file_glob}" in {src}.', style='yellow'))
+                self.call_from_thread(self.notify, 'No matching files found.', severity='warning')
+                return
+            dates = []
+            unparsed = 0
+            for name in matched:
+                try:
+                    dates.append(dt.datetime.strptime(name, parsing))
+                except ValueError:
+                    unparsed += 1  # matched the glob but not the datetime format
+            if not dates:
+                write(Text(f'  None of the {len(matched)} matched file(s) could be parsed with "{fmt}".',
+                           style='yellow'))
+                self.call_from_thread(self.notify, 'No file dates could be parsed.', severity='warning')
+                return
+            start_s = min(dates).strftime('%Y-%m-%d %H:%M')
+            end_s = max(dates).strftime('%Y-%m-%d %H:%M')
+            self.call_from_thread(self._apply_detected_range, start_s, end_s)
+            note = f' ({unparsed} unparseable, skipped)' if unparsed else ''
+            write(Text(f'  Parsed {len(dates)} file date(s){note}.', style='dim'))
+            write(Text(f'✓ Time range set to {start_s} → {end_s}. Adjust the dates if needed.',
+                       style='bold green'))
+        except Exception as exc:
+            write(Text(f'(!) Date detection failed: {exc}', style='yellow'))
+
+    def _apply_detected_range(self, start_s: str, end_s: str) -> None:
+        """Write the detected range into the form (on the UI thread)."""
+        self.query_one(f'#{_field_id("start_date")}', Input).value = start_s
+        self.query_one(f'#{_field_id("end_date")}', Input).value = end_s
+        # Recent-days overrides the explicit range, so reset it to 0 to make the
+        # detected range take effect; the user can still change any of these.
+        self.query_one(f'#{_field_id("days")}', Input).value = '0'
 
     def _validate(self, settings: dict, days):
         """Return a list of (level, message); level is 'error' or 'warning'."""
@@ -771,7 +981,7 @@ class BicoApp(App):
     def _begin_busy(self, subtitle: str) -> None:
         """Mark a run/test as in progress and disable the action buttons."""
         self._busy = True
-        for bid in ('#btn-run', '#btn-save', '#btn-test', '#btn-validate'):
+        for bid in ('#btn-run', '#btn-save', '#btn-test', '#btn-validate', '#btn-detect'):
             self.query_one(bid, Button).disabled = True
         self.sub_title = subtitle
 
@@ -849,7 +1059,7 @@ class BicoApp(App):
 
     def _run_finished(self) -> None:
         self._busy = False
-        for bid in ('#btn-save', '#btn-test', '#btn-validate'):
+        for bid in ('#btn-save', '#btn-test', '#btn-validate', '#btn-detect'):
             self.query_one(bid, Button).disabled = False
         self._refresh_run_enabled()  # Run stays gated by validation state
         self.query_one('#progress', ProgressBar).display = False

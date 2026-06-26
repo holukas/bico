@@ -246,8 +246,33 @@ def export_stats_collection_csv(df, outdir, run_id, logger):
     df.to_csv(f"{outpath}.csv", index=True)
 
 
+# Canonical settings filename, written and read in lowercase. A run also drops a
+# copy of this name into each output folder as a provenance snapshot.
+SETTINGS_FILENAME = 'bico.settings'
+
+
+def find_settings_file(directory):
+    """Return the path of the settings file in `directory`, or None if absent.
+
+    Matches `bico.settings` case-insensitively so folders written by older
+    versions (`BICO.settings`) still load. The lowercase name wins if both exist.
+    """
+    directory = Path(directory)
+    if not directory.is_dir():
+        return None
+    target = SETTINGS_FILENAME.lower()
+    match = None
+    for name in os.listdir(directory):
+        if name.lower() == target:
+            path = directory / name
+            if name == SETTINGS_FILENAME:  # exact lowercase match takes priority
+                return path
+            match = path
+    return match
+
+
 # Settings that are derived/computed at runtime. They must never be written back
-# into the user's BICO.settings file: doing so pollutes it with per-run values
+# into the user's bico.settings file: doing so pollutes it with per-run values
 # (run_id) and machine-specific absolute paths (dir_script, dir_out_run, ...).
 DERIVED_SETTING_KEYS = {
     'run_id', 'filename_datetime_parsing_string',
@@ -258,15 +283,15 @@ DERIVED_SETTING_KEYS = {
 
 
 def save_settings_to_file(settings_dict):
-    """Persist user settings back to the source BICO.settings file.
+    """Persist user settings back to the source bico.settings file.
 
     Only user-configurable settings are written; keys in DERIVED_SETTING_KEYS are
     skipped (and dropped if an older file still contains them) so the file is not
     polluted with per-run values or machine-specific paths. Comments and section
     headers in the existing file are preserved. The file is replaced atomically.
     """
-    settings_path = Path(settings_dict['dir_settings']) / 'BICO.settings'
-    tmp_path = settings_path.with_name('BICO.settingsTemp')
+    settings_path = Path(settings_dict['dir_settings']) / SETTINGS_FILENAME
+    tmp_path = settings_path.with_name(f'{SETTINGS_FILENAME}Temp')
     with open(settings_path) as infile, open(tmp_path, 'w') as outfile:
         for line in infile:  # cycle through all lines in settings file
             if ('=' in line) and (not line.startswith('#')):  # identify lines that contain a setting
@@ -284,9 +309,9 @@ def write_run_settings_snapshot(settings_dict, outdir):
 
     This is a provenance record of exactly what was run (it intentionally includes
     derived keys). It is written only into the run output folder; the source
-    BICO.settings file is never modified by a run.
+    bico.settings file is never modified by a run.
     """
-    snapshot_path = Path(outdir) / 'BICO.settings'
+    snapshot_path = Path(outdir) / SETTINGS_FILENAME
     with open(snapshot_path, 'w') as outfile:
         for key, val in settings_dict.items():
             outfile.write(f"{key}={val}\n")
