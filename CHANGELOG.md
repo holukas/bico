@@ -23,9 +23,11 @@
   per-row loop in `ops.bin` now uses a precomputed per-datablock plan (block size, variable count and bit map dict
   are computed once instead of every row) and decodes values with `int.from_bytes` instead of recombining bytes in
   Python. Output is byte-for-byte identical to before.
-- Added: a `pytest` test suite (`tests/`) with a golden-file test for the conversion. It converts a small truncated
-  real binary file and compares the result against a committed expected output, guarding against unintended changes
-  to converted values or formatting. Run with `uv run pytest`.
+- Added: a `pytest` test suite (`tests/`). It includes a golden-file test that converts a small truncated real
+  binary file and compares the result against a committed expected output (guarding against unintended changes to
+  converted values or formatting), an explicit test for the short/missing data-block fill path (the IRGA72
+  16-vs-26-byte case), and a test that keeps the version in `pyproject.toml` and `src/settings/_version.py` in sync.
+  Run with `uv run pytest`.
 
 ## v1.6.11 | 20 Nov 2025
 
