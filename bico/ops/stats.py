@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 import pandas as pd
 
@@ -6,17 +8,38 @@ def calc(stats_df, stats_coll_df, bin_filedate, counter_bin_files, logger):
     """Calculate stats for raw data"""
     logger.info("    Calculating stats ...")
 
-    if stats_df.empty:
+    had_no_rows = stats_df.empty
+    if had_no_rows:
         # In case there are no data, create df with one row of NaNs
         stats_df = pd.DataFrame(index=[0], columns=stats_df.columns)
 
     # Replace missing values -9999 with NaNs for correct stats calcs
     stats_df.replace(-9999, np.nan, inplace=True)
 
+    # A variable that has data rows but no valid values at all (everything
+    # missing) is usually a sign of a misconfiguration — e.g. an instrument /
+    # data block defined in the settings that isn't actually present in the
+    # binary. Numpy used to surface this as a raw "Mean of empty slice"
+    # RuntimeWarning, but that goes to stderr and corrupts the live TUI display.
+    # Report it through the logger instead (shown in the TUI, saved to the run
+    # log), so the useful signal is kept but routed through the proper channel.
+    if not had_no_rows:
+        empty_vars = [c for c in stats_df.columns if stats_df[c].isna().all()]
+        if empty_vars:
+            names = ', '.join(_var_label(c) for c in empty_vars)
+            logger.warning(f"    No valid data for {len(empty_vars)} variable(s) "
+                           f"(all values missing) - check instrument settings: {names}")
+
     stats_df['index'] = bin_filedate
     stats_df.sort_index(axis=1, inplace=True)  # lexsort for better performance
     aggs = ['count', 'min', 'max', 'mean', 'std', 'median', q01, q05, q95, q99]
-    stats_df = stats_df.groupby('index').agg(aggs)
+    # All-missing variables leave all-NaN slices, so numpy still emits "Mean of
+    # empty slice"/"Degrees of freedom <= 0" RuntimeWarnings here. NaN is the
+    # intended result, and the warning above already reported the cause in a
+    # readable way, so silence the raw stderr noise (which corrupts the TUI).
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', RuntimeWarning)
+        stats_df = stats_df.groupby('index').agg(aggs)
 
     # else:
     #     # In case there are no data in the file, create a dataframe containing only missing
@@ -36,6 +59,14 @@ def calc(stats_df, stats_coll_df, bin_filedate, counter_bin_files, logger):
         stats_coll_df = pd.concat([stats_coll_df, stats_df])
 
     return stats_coll_df
+
+
+def _var_label(col):
+    """Readable label for a column key (a ``(name, units, instr)`` tuple or str)."""
+    if isinstance(col, tuple):
+        parts = [str(p) for p in col if p is not None and str(p) != '']
+        return ' '.join(parts) if parts else str(col)
+    return str(col)
 
 
 def q01(x):

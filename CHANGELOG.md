@@ -1,5 +1,23 @@
 # BICO Changelog
 
+## v2.0.1 | XX
+
+- Fixed: the TUI **Export…** could write an incomplete or stale `bico.settings`. It updated only keys already present
+  in the template and preferred a (possibly old) settings file in the destination, so newer keys such as
+  `num_processes` were silently dropped while legacy/removed keys (`file_ext`, the reference-only `dir_server_*`
+  entries) were carried forward. Settings are now written from a whitelist of the real user keys: Export always
+  renders from the canonical packaged `bico.settings`, appends any user setting the template is missing, and drops
+  derived/runtime and legacy keys (and a section header once all its settings are dropped). Save does the same in
+  place, so re-saving cleans an old settings file.
+- Fixed: the TUI **Test run** converted the first file matching the filename glob, ignoring the Start/End date and
+  minimum size. It now uses the same file set the real run would (glob + time range + min size), so it converts a
+  file that is actually in range.
+- Fixed: a variable defined in the settings but absent from the binary converts to all-missing values, making numpy
+  emit "Mean of empty slice" warnings to stderr. Under the TUI that stderr is the terminal Textual draws to, so the
+  warnings corrupted the live display. `ops.stats.calc` now reports such variables by name through the log (shown in
+  the TUI, saved to the run log) and silences the redundant raw numpy warning. Worker/TUI stderr is kept clean only
+  when a UI is attached; headless runs keep warnings visible. Added `tests/test_stats.py`.
+
 ## v2.0 | 27 Jun 2026
 
 ### New terminal UI (replaces the PyQt5 GUI)

@@ -1,4 +1,5 @@
 import ast
+import dataclasses
 import datetime as dt
 import fnmatch
 import os
@@ -6,6 +7,8 @@ import random
 from pathlib import Path
 
 import pandas as pd
+
+from bico.settings.model import UserSettings
 
 
 def search_glob_from_datetime_format(datetime_format: str) -> str:
@@ -300,37 +303,119 @@ DERIVED_SETTING_KEYS = {
     'dir_out_run_plots_hires', 'dir_out_run_plots_agg', 'dir_out_run_raw_data_ascii',
 }
 
+# The user-configurable settings, taken from the typed UserSettings model (the
+# single source of truth for what a setting is). When writing a settings file we
+# keep ONLY these keys, so a derived/runtime key (DERIVED_SETTING_KEYS) or a
+# legacy/removed one (e.g. file_ext, the reference-only dir_server_* entries) is
+# dropped instead of being carried forward as stale cruft.
+PERSISTABLE_KEYS = frozenset(f.name for f in dataclasses.fields(UserSettings))
+
+
+def _is_setting_line(line):
+    """A non-comment line that assigns a setting (``key=value``)."""
+    return ('=' in line) and (not line.startswith('#'))
+
+
+def _setting_key(line):
+    return line.split('=', 1)[0].strip()
+
+
+def _render_template_lines(lines, settings_dict):
+    """Filter/substitute template lines, dropping headers of emptied sections.
+
+    Returns ``(out_lines, written_keys)``. Only PERSISTABLE_KEYS are kept (with
+    current values substituted); derived/runtime and legacy/removed keys are
+    dropped. A run of comment lines that directly heads a block of settings is
+    dropped too when every setting under it is dropped, so removing a whole
+    section (e.g. the legacy ``# DIRECTORIES`` / ``dir_server_*`` block) does not
+    leave an orphan header. A comment run followed by a blank line (a standalone
+    section header that heads other content) is always kept.
+    """
+    out = []
+    written = set()
+    i, n = 0, len(lines)
+    while i < n:
+        line = lines[i]
+        if line.startswith('#'):
+            j = i
+            while j < n and lines[j].startswith('#'):
+                j += 1
+            comment_run = lines[i:j]
+            if j < n and _is_setting_line(lines[j]):
+                # Inline header: it owns the settings up to the next comment/blank.
+                k = j
+                while k < n and not lines[k].startswith('#') and lines[k].strip() != '':
+                    k += 1
+                segment = lines[j:k]
+                kept = [s for s in segment
+                        if not _is_setting_line(s) or _setting_key(s) in PERSISTABLE_KEYS]
+                if any(_is_setting_line(s) for s in kept):
+                    out.extend(comment_run)  # at least one setting survives -> keep header
+                for s in segment:
+                    if _is_setting_line(s):
+                        key = _setting_key(s)
+                        if key not in PERSISTABLE_KEYS:
+                            continue
+                        if key in settings_dict:
+                            s = f"{key}={settings_dict[key]}\n"
+                            written.add(key)
+                        out.append(s)
+                    else:
+                        out.append(s)  # stray non-setting line inside the block
+                i = k
+            else:
+                out.extend(comment_run)  # standalone header (blank/EOF follows) -> keep
+                i = j
+        elif _is_setting_line(line):
+            key = _setting_key(line)
+            if key in PERSISTABLE_KEYS:
+                if key in settings_dict:
+                    line = f"{key}={settings_dict[key]}\n"
+                    written.add(key)
+                out.append(line)
+            i += 1
+        else:
+            out.append(line)  # blank or other line, kept verbatim
+            i += 1
+    return out, written
+
 
 def _write_settings_from_template(template_path, dest_path, settings_dict):
     """Render a bico.settings file by substituting values into a template.
 
-    Each setting line in `template_path` gets its value replaced from
-    `settings_dict`; comments and section headers are preserved verbatim, and
-    DERIVED_SETTING_KEYS are dropped so the result never carries per-run values
-    or machine-specific paths. Written atomically (temp file + os.replace).
+    Each user-setting line in `template_path` gets its value replaced from
+    `settings_dict`; comments and section headers are preserved. Only
+    PERSISTABLE_KEYS are kept, so a derived/runtime key (run_id, dir_script, ...)
+    or a legacy/removed one (file_ext, the reference-only dir_server_* entries) is
+    dropped rather than carried forward — together with the section header when
+    that drops every setting under it. Written atomically (temp file + replace).
     """
     template_path = Path(template_path)
     dest_path = Path(dest_path)
     tmp_path = dest_path.with_name(f'{dest_path.name}Temp')
-    with open(template_path) as infile, open(tmp_path, 'w') as outfile:
-        for line in infile:  # cycle through all lines in settings file
-            if ('=' in line) and (not line.startswith('#')):  # identify lines that contain a setting
-                line_id = line.split('=', 1)[0].strip()
-                if line_id in DERIVED_SETTING_KEYS:
-                    continue  # never persist derived/runtime keys
-                if line_id in settings_dict:
-                    line = f"{line_id}={settings_dict[line_id]}\n"  # insert current value from dict
-            outfile.write(line)
+    lines = template_path.read_text().splitlines(keepends=True)
+    out_lines, written = _render_template_lines(lines, settings_dict)
+    # The template only updates lines it already has, so a stale or older template
+    # would silently drop settings it predates (e.g. num_processes). Append any
+    # user settings the template was missing so the written file is always
+    # complete and runnable (still limited to PERSISTABLE_KEYS).
+    missing = [k for k in settings_dict if k in PERSISTABLE_KEYS and k not in written]
+    if missing:
+        out_lines.append('\n# Settings not present in the template, added by bico\n')
+        out_lines.extend(f"{k}={settings_dict[k]}\n" for k in missing)
+    with open(tmp_path, 'w') as outfile:
+        outfile.writelines(out_lines)
     os.replace(tmp_path, dest_path)  # atomic replace, no .settingsOld churn
 
 
 def save_settings_to_file(settings_dict):
     """Persist user settings back to the source bico.settings file.
 
-    Only user-configurable settings are written; keys in DERIVED_SETTING_KEYS are
-    skipped (and dropped if an older file still contains them) so the file is not
-    polluted with per-run values or machine-specific paths. Comments and section
-    headers in the existing file are preserved. The file is replaced atomically.
+    Only PERSISTABLE_KEYS are written; derived/runtime keys and legacy/removed
+    ones (e.g. file_ext, dir_server_*) are dropped if an older file still
+    contains them, so the file is not polluted with per-run values, machine-
+    specific paths, or stale settings. Comments and section headers in the
+    existing file are preserved. The file is replaced atomically.
     """
     settings_path = Path(settings_dict['dir_settings']) / SETTINGS_FILENAME
     # The existing file is its own template, so its layout is preserved in place.

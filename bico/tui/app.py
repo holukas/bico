@@ -14,6 +14,7 @@ modal screens in ``screens.py``. They are imported (and re-exported) here so
 import datetime as dt
 import logging
 import threading
+import warnings
 from pathlib import Path
 
 from rich.text import Text
@@ -377,11 +378,11 @@ class BicoApp(App):
             if not dest.is_dir():
                 self.notify(f'Not a folder: {path}', severity='error')
                 return
-            # Prefer an existing bico.settings in the target as the template (keeps
-            # any local comments); otherwise use the canonical source file.
-            template = dest / bfile.SETTINGS_FILENAME
-            if not template.is_file():
-                template = SETTINGS_DIR / bfile.SETTINGS_FILENAME
+            # Always render from the canonical packaged bico.settings (current and
+            # complete), not whatever file may already sit in the target — a stale
+            # file there could be missing newer keys (e.g. num_processes) or carry
+            # old paths, producing an incomplete export.
+            template = SETTINGS_DIR / bfile.SETTINGS_FILENAME
             try:
                 out = bfile.export_settings_to_folder(settings, dest, template)
             except Exception as exc:
@@ -762,14 +763,20 @@ class BicoApp(App):
             fmt = settings['filename_datetime_format']
             file_glob = bfile.search_glob_from_datetime_format(fmt)
             qlog = self._quiet_logger()
-            matched = bfile.SearchAll.search_all(dir=settings['dir_source'],
-                                                 file_id=file_glob, logger=qlog)
-            if not matched:
-                write(Text(f'(!) No files match "{file_glob}" in {settings["dir_source"]}.',
-                           style='bold red'))
+            # Use the same file set the real run would: glob + time range + min
+            # size (file limit / random selection ignored), so the test converts
+            # a file that is actually in range — not just the first glob match.
+            probe = dict(settings)
+            probe['filename_datetime_parsing_string'] = bfile.datetime_parsing_string(fmt)
+            probe['file_limit'] = '0'
+            probe['select_random_files'] = '0'
+            valid = bfile.SearchAll(probe, qlog).keep_valid_files()
+            if not valid:
+                write(Text(f'(!) No files match "{file_glob}" within the time range and '
+                           f'≥ min size in {settings["dir_source"]}.', style='bold red'))
                 return
-            name = sorted(matched)[0]
-            path = matched[name]
+            name = sorted(valid)[0]
+            path = valid[name]
             write(Text(f'File: {name}'))
 
             dblocks_seq = [settings.get(f'instrument_{i}') for i in (1, 2, 3)]
@@ -982,4 +989,9 @@ class BicoApp(App):
 
 
 def run_tui() -> None:
+    # Textual owns the terminal; anything written to stderr (e.g. numpy
+    # RuntimeWarnings from stats on all-missing files, in this process for the
+    # sequential path) bypasses the screen buffer and corrupts the live display.
+    # Workers are silenced separately via ``parallel.init_worker``.
+    warnings.simplefilter('ignore', RuntimeWarning)
     BicoApp().run()

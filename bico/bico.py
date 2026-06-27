@@ -274,15 +274,22 @@ class BicoEngine:
         # Workers report live progress (and live plot data) through a picklable
         # manager queue, set up only when a UI asked for per-file progress or a
         # live plot, to avoid the manager overhead otherwise.
+        has_ui = self.file_progress_callback is not None or self.plot_callback is not None
         manager = progress_queue = None
-        if self.file_progress_callback is not None or self.plot_callback is not None:
+        if has_ui:
             manager = multiprocessing.Manager()
             progress_queue = manager.Queue()
             for task in tasks:
                 task['progress_queue'] = progress_queue
+        # Under a UI (the TUI), a worker's inherited stderr is the terminal
+        # Textual is drawing to, so keep stray RuntimeWarnings off it (they would
+        # corrupt the live display). Headless runs have a normal terminal, so
+        # leave worker warnings visible there.
+        initializer = parallel.init_worker if has_ui else None
         done = 0
         try:
-            with ProcessPoolExecutor(max_workers=n_workers) as executor:
+            with ProcessPoolExecutor(max_workers=n_workers,
+                                     initializer=initializer) as executor:
                 future_to_index = {executor.submit(parallel.process_file, task): i
                                    for i, task in enumerate(tasks)}
                 remaining = set(future_to_index)
