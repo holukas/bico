@@ -1,5 +1,16 @@
 # BICO Changelog
 
+## v2.0.1 | XX
+
+- Fixed: the TUI **Test run** converted the first file matching the filename glob, ignoring the Start/End date and
+  minimum size. It now uses the same file set the real run would (glob + time range + min size), so it converts a
+  file that is actually in range.
+- Fixed: a variable defined in the settings but absent from the binary converts to all-missing values, making numpy
+  emit "Mean of empty slice" warnings to stderr. Under the TUI that stderr is the terminal Textual draws to, so the
+  warnings corrupted the live display. `ops.stats.calc` now reports such variables by name through the log (shown in
+  the TUI, saved to the run log) and silences the redundant raw numpy warning. Worker/TUI stderr is kept clean only
+  when a UI is attached; headless runs keep warnings visible. Added `tests/test_stats.py`.
+
 ## v2.0 | 27 Jun 2026
 
 ### New terminal UI (replaces the PyQt5 GUI)

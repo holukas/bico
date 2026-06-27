@@ -763,14 +763,20 @@ class BicoApp(App):
             fmt = settings['filename_datetime_format']
             file_glob = bfile.search_glob_from_datetime_format(fmt)
             qlog = self._quiet_logger()
-            matched = bfile.SearchAll.search_all(dir=settings['dir_source'],
-                                                 file_id=file_glob, logger=qlog)
-            if not matched:
-                write(Text(f'(!) No files match "{file_glob}" in {settings["dir_source"]}.',
-                           style='bold red'))
+            # Use the same file set the real run would: glob + time range + min
+            # size (file limit / random selection ignored), so the test converts
+            # a file that is actually in range — not just the first glob match.
+            probe = dict(settings)
+            probe['filename_datetime_parsing_string'] = bfile.datetime_parsing_string(fmt)
+            probe['file_limit'] = '0'
+            probe['select_random_files'] = '0'
+            valid = bfile.SearchAll(probe, qlog).keep_valid_files()
+            if not valid:
+                write(Text(f'(!) No files match "{file_glob}" within the time range and '
+                           f'≥ min size in {settings["dir_source"]}.', style='bold red'))
                 return
-            name = sorted(matched)[0]
-            path = matched[name]
+            name = sorted(valid)[0]
+            path = valid[name]
             write(Text(f'File: {name}'))
 
             dblocks_seq = [settings.get(f'instrument_{i}') for i in (1, 2, 3)]
