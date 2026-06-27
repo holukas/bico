@@ -39,9 +39,9 @@ def test_one_line_per_inprogress_file():
     three, two, remaining = _scenario()
     lines3 = three.splitlines()
     assert len(lines3) == 3
-    assert any('a.X00' in l and '30%' in l for l in lines3)
-    assert any('b.X00' in l and '55%' in l for l in lines3)
-    assert any('c.X00' in l and 'Saving CSV' in l for l in lines3)
+    assert any('a.X00' in line and '30%' in line for line in lines3)
+    assert any('b.X00' in line and '55%' in line for line in lines3)
+    assert any('c.X00' in line and 'Saving CSV' in line for line in lines3)
     # After b finishes, only a and c remain, on their own lines.
     assert len(two.splitlines()) == 2
     assert 'b.X00' not in two

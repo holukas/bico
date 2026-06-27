@@ -14,7 +14,10 @@ import traceback
 
 import pandas as pd
 
-from bico.ops import bin as bbin, file as bfile, stats as bstats, vis
+from bico.ops import bin as bbin
+from bico.ops import file as bfile
+from bico.ops import stats as bstats
+from bico.ops import vis
 from bico.ops.logger import get_formatter
 
 
@@ -174,7 +177,7 @@ def process_file(task):
                 result['plot_series'] = None
 
         report('Saving CSV', 0.90)
-        ascii_filepath = bfile.export_raw_data_ascii(
+        bfile.export_raw_data_ascii(
             df=ascii_df, outdir=task['dir_raw_data_ascii'], outfilename=task['ascii_filename'],
             logger=logger, compression=task['compression'],
         )

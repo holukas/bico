@@ -9,10 +9,10 @@ the test environment without launching the TUI.
 import datetime as dt
 
 import pandas as pd
+from conftest import DATA_DIR, PACKAGE_DIR
 
-from conftest import PACKAGE_DIR, DATA_DIR
-
-from bico.ops import file as bfile, parallel
+from bico.ops import file as bfile
+from bico.ops import parallel
 from bico.ops.parallel import _extract_plot_series
 from bico.tui.plot import render_braille_plot
 

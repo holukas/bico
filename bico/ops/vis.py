@@ -2,6 +2,7 @@ import datetime as dt
 import os
 
 import matplotlib
+
 matplotlib.use("Agg")  # plots are only saved to files (never shown); works head-less and in worker processes
 
 import matplotlib.dates as mdates
@@ -88,7 +89,7 @@ def availability_heatmap(bin_found_files_dict, bin_file_datefrmt, root_outdir, l
     ax.tick_params(which="minor", bottom=False, left=False)
 
     # Save
-    out_file = root_outdir / f"file_availability_heatmap"
+    out_file = root_outdir / "file_availability_heatmap"
     plt.savefig(f"{out_file}.png", dpi=PLOT_DPI, bbox_inches='tight')
     plt.close()
 
@@ -169,7 +170,6 @@ def high_res_histogram(df, outfile, outdir, logger):
         [li.append(x) for x in df.columns if x[2] == dblock]  # Search datablock cols
         dblock_df = df[li]  # Keep datablock cols
         num_plots = len(dblock_df.columns)
-        cols = dblock_df.columns
 
         gs = gridspec.GridSpec(num_plots, 1)  # rows, cols
         gs.update(wspace=0.1, hspace=0.3, left=0.03, right=0.99, top=0.99, bottom=0.01)
@@ -233,7 +233,6 @@ def high_res_ts(df, outfile, outdir, logger):
         [li.append(x) for x in df.columns if x[2] == dblock]  # Search datablock cols
         dblock_df = df[li]  # Keep datablock cols
         num_plots = len(dblock_df.columns)
-        cols = dblock_df.columns
 
         # Gridspec and axes
         gs = gridspec.GridSpec(num_plots, 1)  # rows, cols
@@ -299,7 +298,7 @@ def high_res_ts(df, outfile, outdir, logger):
 
 def check_plot_data(ax, df, col):
     dataok = False
-    isnumeric = False if df[col].dtypes == object else True
+    isnumeric = not pd.api.types.is_object_dtype(df[col])
     ishex = False if 'hexadecimal_value' not in col[1] else True
     # isoctal = False if 'status_code_irga' not in col[1] else True
     isemtpy = False if not df[col].dropna().empty else True

@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 
 from bico.settings.data_blocks.header import wecom3
+
 from . import bin_conversion_exceptions as bce
 
 
@@ -117,7 +118,7 @@ class ConvertData:
         return pd.DataFrame(self.file_data_rows, columns=columns)
 
     def convert_to_ascii(self):
-        self.logger.info(f"    Reading file data, converting to ASCII ...")
+        self.logger.info("    Reading file data, converting to ASCII ...")
         end_of_data_reached = False  # Reset for each file
 
         # File header
@@ -155,7 +156,7 @@ class ConvertData:
 
         self.open_binary.close()
 
-        self.logger.info(f"    Finished conversion to ASCII.")
+        self.logger.info("    Finished conversion to ASCII.")
         self.file_speedstats()
 
     def _prepare_plans(self, dblocks):
@@ -530,7 +531,7 @@ class ConvertData:
                     val = int(str(val), 2)  # Convert binary string to integer with base 2
                     val = val * bit_map_props['apply_gain']
                     val = val + bit_map_props['add_offset']
-                except ValueError as e:
+                except ValueError:
                     val = -9999
                 bit_map_vals.append(val)
         # print(bit_map_vals)
@@ -578,7 +579,7 @@ class ConvertData:
         size = os.path.getsize(binary_filename)
         fd = os.open(binary_filename, os.O_RDONLY)
         open_binary = mmap.mmap(fd, size, access=mmap.ACCESS_READ)
-        logger.info(f"    Done reading file to memory.")
+        logger.info("    Done reading file to memory.")
         return open_binary
 
     def file_speedstats(self):

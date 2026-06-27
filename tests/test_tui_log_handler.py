@@ -11,8 +11,7 @@ test needs no running event loop.
 """
 import logging
 
-from bico.tui.log_handler import (make_tui_handler, _WidgetStream, _style_for_line,
-                                   format_log_line)
+from bico.tui.log_handler import _style_for_line, _WidgetStream, format_log_line, make_tui_handler
 
 
 class _FakeRichLog:

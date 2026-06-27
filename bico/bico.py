@@ -3,15 +3,16 @@ import multiprocessing
 import os
 import queue as _queue
 import sys
-from concurrent.futures import ProcessPoolExecutor, FIRST_COMPLETED, wait
+from concurrent.futures import FIRST_COMPLETED, ProcessPoolExecutor, wait
 from pathlib import Path
 
 import pandas as pd
 
-from bico.ops import bin, vis, file, cli, parallel
-from bico.ops import logger as ops_logger, setup as ops_setup, log_report
+from bico.ops import bin, cli, file, log_report, parallel, vis
+from bico.ops import logger as ops_logger
+from bico.ops import setup as ops_setup
 from bico.settings import _version
-from bico.settings.model import UserSettings, RunContext
+from bico.settings.model import RunContext, UserSettings
 
 
 class BicoEngine:
@@ -140,7 +141,7 @@ class BicoEngine:
             self.logger.info("(!) Aggregated plots not generated because aggregated stats are empty.")
             self.logger.info(f"    This can happen if CLI flag `-a` to avoid"
                              f" duplicates in {self.settings_dict['dir_out']} is set and ")
-            self.logger.info(f"    *all* files that should be converted in this run")
+            self.logger.info("    *all* files that should be converted in this run")
             self.logger.info(f"    are already available in {self.settings_dict['dir_out']}")
 
         self._log_bicofinish()
@@ -172,7 +173,7 @@ class BicoEngine:
         """Log that file loop finished"""
         self.logger.info("")
         self.logger.info("=" * 20)
-        self.logger.info(f"File loop finished.")
+        self.logger.info("File loop finished.")
         self.logger.info("=" * 20)
         self.logger.info("")
 

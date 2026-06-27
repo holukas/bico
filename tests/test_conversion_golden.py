@@ -14,13 +14,13 @@ Cases (see tests/data/):
 """
 import io
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 import pytest
+from conftest import DATA_DIR, PACKAGE_DIR
 
-from conftest import PACKAGE_DIR, DATA_DIR
-
-from bico.ops import bin as bbin, file as bfile
+from bico.ops import bin as bbin
+from bico.ops import file as bfile
 
 HEADER_SIZE = 29  # WECOM3 header
 N_HEADER_ROWS = 3  # variable name / units / data block

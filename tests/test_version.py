@@ -7,7 +7,6 @@ if they drift apart, so a forgotten update is caught instead of shipping a
 wrong version number.
 """
 import tomllib
-from pathlib import Path
 
 from conftest import PACKAGE_DIR
 

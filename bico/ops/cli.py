@@ -1,5 +1,4 @@
 import argparse
-from pathlib import Path
 
 
 def validate_args(args):

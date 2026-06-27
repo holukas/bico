@@ -8,10 +8,10 @@ the live run path cannot break a run.
 import datetime as dt
 from pathlib import Path
 
-from bico.ops import setup as ops_setup
-from bico.settings.model import UserSettings, RunContext
-
 from conftest import PACKAGE_DIR
+
+from bico.ops import setup as ops_setup
+from bico.settings.model import RunContext, UserSettings
 
 
 def _real_raw() -> dict:

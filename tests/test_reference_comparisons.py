@@ -143,7 +143,8 @@ def convert_and_hash(root: Path, name: str) -> dict[str, str]:
     with tempfile.TemporaryDirectory(prefix=f"bico_{name}_") as tmp:
         tmp = Path(tmp)
         cfg, out = tmp / "cfg", tmp / "out"
-        cfg.mkdir(); out.mkdir()
+        cfg.mkdir()
+        out.mkdir()
         (cfg / "bico.settings").write_text(_settings_text(CASES[name], src, out), encoding="utf-8")
         subprocess.run([sys.executable, "-m", "bico", "-f", str(cfg)],
                        check=True, capture_output=True, text=True)

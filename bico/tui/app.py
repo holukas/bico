@@ -5,546 +5,72 @@ CLI exposes (recent-days window, avoid-duplicates). Right column: a live Rich
 console showing the run log. The same conversion engine (``BicoEngine``) used by
 the headless CLI does the work, driven here from a worker thread so the UI stays
 responsive.
+
+The supporting pieces live in sibling modules: form/option constants and the
+help text in ``constants.py``, the custom widgets in ``widgets.py``, and the
+modal screens in ``screens.py``. They are imported (and re-exported) here so
+``bico.tui.app`` stays the single public surface.
 """
 import datetime as dt
 import logging
 import threading
 from pathlib import Path
 
-from rich.style import Style
 from rich.text import Text
-from textual import events, on, work
+from textual import on, work
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal, Vertical, VerticalScroll
-from textual.screen import ModalScreen
-from textual.strip import Strip
 from textual.validation import Integer, Regex
-from textual.widgets import (Button, DirectoryTree, Footer, Header, Input, Label,
-                             Markdown, ProgressBar, RichLog, Select, Static, Switch)
+from textual.widgets import (
+    Button,
+    Footer,
+    Header,
+    Input,
+    Label,
+    ProgressBar,
+    RichLog,
+    Select,
+    Static,
+    Switch,
+)
 
-import bico
 from bico.bico import BicoEngine
-from bico.ops import bin as bbin, file as bfile, setup as ops_setup
+from bico.ops import bin as bbin
+from bico.ops import file as bfile
+from bico.ops import setup as ops_setup
 from bico.settings import _version as info
+from bico.tui.constants import (
+    DATE_PATTERN,
+    FIELD_HINTS,
+    FIELD_KIND,
+    FIELD_PLACEHOLDERS,
+    INSTRUMENT_FIELDS,
+    OUTPUT_FIELDS,
+    PACKAGE_DIR,
+    RAWDATA_FIELDS,
+    RUN_FIELDS,
+    SETTINGS_DIR,
+    TEST_RUN_ROWS,
+    _field_id,
+)
 from bico.tui.log_handler import make_tui_handler
-from bico.tui.plot import render_braille_plot, PLOT_COLORS
+from bico.tui.plot import PLOT_COLORS, render_braille_plot
+from bico.tui.screens import DirectoryPickerScreen, FilePickerScreen, HelpScreen
+from bico.tui.widgets import PathDropInput, SelectableRichLog
 
-# Rows converted for a test run (a quick dry conversion of the first file).
-TEST_RUN_ROWS = 20
-# Date inputs must look like 2025-12-31 23:59
-DATE_PATTERN = r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}'
-
-# Package locations, resolved independently of the working directory.
-PACKAGE_DIR = Path(bico.__file__).resolve().parent
-SETTINGS_DIR = PACKAGE_DIR / 'settings'
-
-# Option lists (kept in step with the data-block specs in settings/data_blocks).
-SITES = ['CH-AES', 'CH-AWS', 'CH-CHA', 'CH-DAE', 'CH-DAV', 'CH-DAS', 'CH-FOR',
-         'CH-FRU', 'CH-HON', 'CH-INO', 'CH-LAE', 'CH-LAS', 'CH-OE2', 'CH-TAN']
-HEADERS = ['WECOM3']
-SONIC_ANEMOMETERS = ['HS50-A', 'HS50-B', 'HS100-A', 'R2-A', 'R350-A', 'R350-B', '-None-']
-GAS_ANALYZERS = ['IRGA72-A', 'IRGA72-A-GN1', 'IRGA72-B', 'IRGA72-B-GN1', 'IRGA75-A',
-                 'IRGA75-A-GN1', 'LGR-A', 'QCL-A', 'QCL-A2', 'QCL-A3', 'QCL-A4', 'QCL-B',
-                 'QCL-C', 'QCL-C2', 'QCL-C3', 'QCL-D', 'QCL-ISO', 'QCL-L', 'QCL-L2', '-None-']
-COMPRESSION = ['gzip', 'None']
-
-# Field spec: (key, label, kind, options). `kind` is 'select' | 'input' |
-# 'int' | 'switch'. Keys match bico.settings keys, except the run-only options
-# 'days' and 'avoidduplicates', which are not persisted to the settings file.
-INSTRUMENT_FIELDS = [
-    ('site', 'Site', 'select', SITES),
-    ('header', 'Header', 'select', HEADERS),
-    ('instrument_1', 'Instr 1 (sonic)', 'select', SONIC_ANEMOMETERS),
-    ('instrument_2', 'Instr 2 (gas)', 'select', GAS_ANALYZERS),
-    ('instrument_3', 'Instr 3 (gas)', 'select', GAS_ANALYZERS),
+# Re-exported so ``bico.tui.app`` stays the public surface (tests and callers
+# import these names from here).
+__all__ = [
+    'BicoApp',
+    'run_tui',
+    'PathDropInput',
+    'SelectableRichLog',
+    'HelpScreen',
+    'DirectoryPickerScreen',
+    'FilePickerScreen',
+    '_field_id',
 ]
-RAWDATA_FIELDS = [
-    ('dir_source', 'Source folder', 'path', None),
-    ('start_date', 'Start date', 'input', None),
-    ('end_date', 'End date', 'input', None),
-    ('filename_datetime_format', 'Filename dt format', 'input', None),
-    ('file_size_min', 'Min size (bytes)', 'int', None),
-    ('file_limit', 'File limit (0=all)', 'int', None),
-    ('row_limit', 'Row limit (0=all)', 'int', None),
-    ('select_random_files', 'Random files (0=no)', 'int', None),
-]
-OUTPUT_FIELDS = [
-    ('dir_out', 'Output folder', 'path', None),
-    ('output_folder_name_prefix', 'Folder prefix', 'input', None),
-    ('file_compression', 'Compression', 'select', COMPRESSION),
-    ('num_processes', 'Processes (0=auto)', 'int', None),
-    ('add_instr_to_varname', 'Instr in varname', 'switch', None),
-    ('plot_file_availability', 'Plot availability', 'switch', None),
-    ('plot_ts_hires', 'Plot hi-res series', 'switch', None),
-    ('plot_histogram_hires', 'Plot hi-res histo', 'switch', None),
-    ('plot_ts_agg', 'Plot agg series', 'switch', None),
-]
-RUN_FIELDS = [
-    ('days', 'Recent days (0=range)', 'int', None),
-    ('avoidduplicates', 'Avoid duplicates', 'switch', None),
-]
-
-ALL_FIELDS = INSTRUMENT_FIELDS + RAWDATA_FIELDS + OUTPUT_FIELDS + RUN_FIELDS
-FIELD_KIND = {key: kind for key, _, kind, _ in ALL_FIELDS}
-
-# Full explanations shown on hover (labels are abbreviated for the compact layout).
-FIELD_HINTS = {
-    'start_date': 'Range start, INCLUSIVE. Format: 2025-12-31 23:59 (YYYY-MM-DD HH:MM)',
-    'end_date': 'Range end, INCLUSIVE. Format: 2025-12-31 23:59 (YYYY-MM-DD HH:MM)',
-    'filename_datetime_format': 'Datetime pattern in the binary filenames, incl. extension, '
-                                'e.g. yyyymmddHH.CMM. Also determines which files are searched.',
-    'file_size_min': 'Minimum file size in bytes; smaller files are skipped',
-    'file_limit': 'Maximum number of files to convert (0 = no limit)',
-    'row_limit': 'Maximum rows read per file (0 = no limit)',
-    'select_random_files': 'Convert this many randomly chosen files (0 = no)',
-    'output_folder_name_prefix': 'Prefix for the run output folder name',
-    'num_processes': 'Worker processes for parallel conversion (0 = auto: cpu_count - 1)',
-    'add_instr_to_varname': 'Append the instrument name to each variable name',
-    'plot_file_availability': 'Plot the file-availability heatmap',
-    'plot_ts_hires': 'Plot high-resolution time series per file',
-    'plot_histogram_hires': 'Plot high-resolution histograms per file',
-    'plot_ts_agg': 'Plot aggregated time series across files',
-    'days': 'Convert only the most recent N days (0 = use the start/end date range)',
-    'avoidduplicates': 'Skip files already present in the output folder',
-}
-# Placeholder text for free-text inputs (shown when the field is empty).
-FIELD_PLACEHOLDERS = {
-    'start_date': 'YYYY-MM-DD HH:MM',  # HH:MM is required, not optional
-    'end_date': 'YYYY-MM-DD HH:MM',
-    'filename_datetime_format': 'yyyymmddHH.CMM',
-}
-# Keys that are persisted to bico.settings (everything but the run-only options).
-PERSISTED_KEYS = [key for key, _, _, _ in INSTRUMENT_FIELDS + RAWDATA_FIELDS + OUTPUT_FIELDS]
-
-
-def _field_id(key: str) -> str:
-    return f'field-{key}'
-
-
-def _parse_dropped_path(text: str):
-    """Parse pasted/dropped text into a filesystem Path, or None.
-
-    Terminals deliver a dragged-in file or folder as pasted text: its path,
-    often wrapped in quotes or given as a file:// URI. Returns None for empty or
-    multi-line text, so ordinary pastes are left untouched.
-    """
-    candidate = (text or '').strip().strip('"').strip("'").strip()
-    if not candidate or '\n' in candidate:
-        return None
-    if candidate.startswith('file://'):
-        from urllib.parse import unquote, urlparse
-        candidate = unquote(urlparse(candidate).path)
-        # file:///C:/... → strip the leading slash before the drive letter
-        if len(candidate) > 2 and candidate[0] == '/' and candidate[2] == ':':
-            candidate = candidate[1:]
-    return Path(candidate)
-
-
-def _dropped_folder(text: str):
-    """Resolve dropped text to a folder path string (a dropped file yields its
-    parent folder), or None if the text is not an existing path."""
-    path = _parse_dropped_path(text)
-    if path is None:
-        return None
-    if path.is_dir():
-        return str(path)
-    if path.is_file():
-        return str(path.parent)
-    return None
-
-
-class PathDropInput(Input):
-    """A path field that fills itself from a dragged-in file or folder.
-
-    Most terminals paste a dropped file/folder as its path; when the pasted text
-    is a real path this sets the field to the folder (a dropped file yields its
-    parent folder), so source/output folders can be set by dropping instead of
-    browsing. Any other paste behaves like a normal Input paste.
-
-    A terminal routes a dropped path to the *focused* widget, so click (focus) the
-    field before dropping onto it.
-    """
-
-    def _on_paste(self, event: events.Paste) -> None:
-        folder = _dropped_folder(event.text)
-        if folder is not None:
-            self.value = folder
-            self.cursor_position = len(folder)
-            # Textual dispatches `_on_paste` for every class in the MRO; only
-            # prevent_default() stops Input's own handler from then inserting the
-            # raw path. stop() keeps it from bubbling to the app paste handler.
-            event.prevent_default()
-            event.stop()
-        # Otherwise do nothing: Textual still calls Input._on_paste (normal paste).
-
-
-class SelectableRichLog(RichLog):
-    """A ``RichLog`` whose text can be selected with the mouse and copied.
-
-    Plain ``RichLog`` (Textual 8.2) renders pre-styled strips and never attaches
-    the per-cell content offsets the screen uses to map a mouse drag to text, nor
-    does it draw the selection or expose the selected text — so dragging over it
-    selects nothing. This subclass adds the three missing pieces: it stamps each
-    rendered line with its content offset (so a drag forms a selection), paints
-    the selection highlight, and returns the selected text for copy (Ctrl+C).
-    """
-
-    def _selection_style(self) -> Style:
-        """Selection highlight: only a background colour, so the text keeps its own
-        colour and stays readable. (The theme's ``screen--selection`` foreground is
-        ``transparent`` = "keep existing", which, applied as a base style, would turn
-        plain text invisible — so we take just its background.)"""
-        comp = self.screen.get_component_rich_style('screen--selection')
-        return Style(bgcolor=comp.bgcolor) if comp.bgcolor else Style(reverse=True)
-
-    @staticmethod
-    def _highlight_span(line: Strip, start: int, end: int, style: Style) -> Strip:
-        """Return `line` with the background of cells [start, end) set to `style`."""
-        start = max(0, start)
-        end = min(end, line.cell_length)
-        if end <= start:
-            return line
-        before, selected, after = line.divide([start, end, line.cell_length])
-        return Strip.join([before, selected.apply_style(style), after])
-
-    def render_line(self, y: int) -> Strip:
-        scroll_x, scroll_y = self.scroll_offset
-        content_y = scroll_y + y
-        selection = self.text_selection
-        if selection is None:
-            # No selection: keep the base (cached) rendering, but stamp offsets so
-            # a future drag can resolve the cell under the mouse to content text.
-            return super().render_line(y).apply_offsets(scroll_x, content_y)
-        width = self.scrollable_content_region.width
-        if content_y >= len(self.lines):
-            return Strip.blank(width, self.rich_style).apply_offsets(scroll_x, content_y)
-        line = self.lines[content_y]
-        span = selection.get_span(content_y)
-        if span is not None:
-            start, end = span
-            if end == -1:
-                end = line.cell_length
-            line = self._highlight_span(line, start, end, self._selection_style())
-        line = line.crop_extend(scroll_x, scroll_x + width, self.rich_style)
-        line = line.apply_style(self.rich_style)
-        return line.apply_offsets(scroll_x, content_y)
-
-    def get_selection(self, selection):
-        text = '\n'.join(strip.text for strip in self.lines)
-        return selection.extract(text), '\n'
-
-    def selection_updated(self, selection) -> None:
-        self.refresh()
-
-
-HELP_MD = """\
-# bico help
-
-bico converts ETH eddy-covariance raw binary files to ASCII CSV for EddyPro.
-Set up the run in the settings panel on the left. The console on the right shows
-validation results and the live run log.
-
-## Workflow
-1. Set the options (Instruments, Raw data, Output, Run options).
-2. Press **Validate** (`v`). It checks every field, shows the settings the run
-   will use, and counts the matching files in the source folder.
-3. Press **Run** (`r`). Run stays off until Validate passes, and editing any
-   field switches it off again, so you always run exactly what you validated.
-   The live plot (top-right) fills in automatically as files convert.
-
-## Settings files
-The TUI opens with the settings you last saved (`s`) to the source `bico.settings`.
-Each run also drops a `bico.settings` snapshot into its output folder. Three
-buttons manage settings files (none of them changes the source file until you
-Save):
-- **Save** (`s`): write the current form back to the source `bico.settings`.
-- **Load…** (`l`): read a `bico.settings` you pick — e.g. a previous run's
-  snapshot — into the form. (To *reuse* an earlier run's settings, Load its
-  snapshot; dragging a file onto the TUI only fills folder fields, see below.)
-- **Export…** (`e`): write the current form as a `bico.settings` into a folder
-  you choose, e.g. to seed a headless run folder.
-
-## Drag and drop folders
-Instead of browsing, click the **Source folder** or **Output folder** field to
-focus it, then **drag and drop a file or folder onto the TUI** — the field is
-filled with the folder path (dropping a file uses the folder that contains it).
-Each folder field has a **…** button to browse and a **✕** button to empty it.
-
-## Progress
-While a run is going, the bar shows files done / total. Below it, each file being
-converted right now gets its own line with a per-file progress bar, a percentage,
-and the current step (Reading, Converting, Saving, …) — so with several worker
-processes you see every in-flight file at once. A file's line drops off when it
-finishes, and its detailed log appears in the console at that point.
-
-## Stopping a run
-Press **Stop** to end a running conversion early. The file being converted
-finishes (so its output is complete), then no further files are started and the
-run winds down normally. Files already converted are kept.
-
-## Live plot
-Top-right, beside the progress bars, bico plots the **first 100 values of the
-first three variables** (for a sonic that is U, V, W) as each file finishes
-converting. The three are overlaid on a shared min/max y-axis, each in its own
-colour, matching the variable names shown in the plot title (the legend). It
-starts automatically on Run — nothing to pick — and redraws for every file in
-completion order. Missing values (-9999) are skipped. Press **`p`** to show or
-hide the plot pane.
-
-## Copy from the log
-Drag with the mouse to select text in the console, then press **Ctrl+C** to copy
-it. Double-click selects a line.
-
-## Keys
-- `v`: validate the settings (turns on Run once everything is OK)
-- `d`: detect the time range from the source files (fills Start/End date)
-- `t`: test run, converting the first rows of the first file and writing nothing
-- `r`: run the conversion
-- `s`: save settings to the source `bico.settings`
-- `l`: load settings from a `bico.settings` file you pick into the form
-- `e`: export the current settings as a `bico.settings` into a folder you choose
-  (e.g. a headless run folder); the source `bico.settings` is left unchanged
-- `f`: show or hide the settings panel
-- `p`: show or hide the live plot pane
-- `ctrl+l`: clear the console
-- `h`: this help
-- `q`: quit
-
-## Settings
-
-**Instruments.** Site, logger header, and up to three instrument data blocks
-(sonic and gas analyzers), in order.
-
-**Raw data**
-- *Source folder*: where binary files are read from (Browse… or type a path).
-- *Start / End date*: `YYYY-MM-DD HH:MM`. Both ends are inclusive. Use
-  **Detect dates from source files** (`d`) to fill these from the earliest and
-  latest file in the source folder (parsed with the filename datetime format);
-  this also resets *Recent days* to 0 so the range is used. Adjust afterwards.
-- *Filename dt format*: the datetime pattern in the filenames, including the
-  extension (e.g. `yyyymmddHH.CMM`). It also sets which files are searched, so
-  there is no separate file-extension setting.
-- *Min size*: files smaller than this many bytes are skipped.
-- *File limit* and *Row limit*: `0` means no limit.
-- *Random files*: `0` means no random selection.
-
-**Output**
-- *Output folder*: where converted files are written.
-- *Folder prefix*: goes in front of the run output folder name.
-- *Compression*: `gzip` writes `.csv.gz`, `None` writes `.csv`.
-- *Processes*: number of parallel workers. `0` picks it automatically
-  (cpu_count minus 1).
-- *Instr in varname*: adds the instrument name to each variable.
-- *Plots*: which figures to generate.
-
-**Run options**
-- *Recent days*: convert only the last N days. `0` uses the start/end range.
-- *Avoid duplicates*: skip files already present in the output folder.
-
-## Folder picker
-Browse the tree, use **Up** for the parent folder, or type or paste a path into
-the field and press Enter to jump there. **Select folder** confirms.
-
-## How bico works
-
-bico turns ETH eddy-covariance raw binary files into uncompressed ASCII CSV that
-EddyPro and other tools can read.
-
-**Data blocks.** Each instrument writes its measurements as a data block, a fixed
-binary layout of variables. A sonic anemometer writes wind components and sonic
-temperature. A gas analyzer writes CO₂/H₂O concentrations, diagnostics, and cell
-temperature and pressure, among others. A logger *file* starts with a header.
-Each *record* (one timestamp) then holds only the data blocks of the configured
-instruments, one after another. The layout of every block is described by a spec
-file (`bico/settings/data_blocks/*.dblock`), so supporting a new instrument means
-adding a spec rather than changing code. The **Instruments** settings (header
-plus Instrument 1 to 3) tell bico which blocks to expect and in what order.
-
-## The run pipeline
-1. *Find files.* Search the source folder for names that match the filename
-   datetime format. The same format gives both the search pattern and each
-   file's timestamp.
-2. *Filter.* Keep files inside the start/end date range, above the minimum size,
-   and within the file limit. Optionally take a random subset.
-3. *Convert.* For each file, read the binary with the data-block specs and decode
-   every record into rows of named variables. Files convert in parallel, one
-   process per file, up to the number of workers set by *Processes*. A bad file
-   is skipped instead of stopping the run.
-4. *Write.* Save each file as ASCII CSV, either gzipped (`.csv.gz`) or plain
-   (`.csv`), and optionally add the instrument name to each variable.
-5. *Summarise.* Compute per-file and aggregated statistics, and render the
-   availability heatmap, the high-resolution time series and histograms, and the
-   aggregated time series when those plots are enabled.
-
-**Output.** Each run makes a timestamped folder under the output folder, named
-from the *Folder prefix* and the run id. It holds `raw_data_ascii/` with the
-converted files, `plots/`, a `log/` with the full run log, and a snapshot of the
-exact settings used. A run never changes the source `bico.settings`.
-
-**Same engine everywhere.** The TUI (`bico -t`) and the headless CLI
-(`bico -f <folder> -d <days> -a`, used for scheduled jobs) run the same
-conversion engine, so the output is the same however you start a run.
-"""
-
-
-class HelpScreen(ModalScreen):
-    """Scrollable help overlay explaining the TUI."""
-
-    BINDINGS = [('escape', 'close', 'Close'), ('q', 'close', 'Close'), ('h', 'close', 'Close')]
-
-    def compose(self) -> ComposeResult:
-        with Vertical(id='help'):
-            yield Static('bico — help   (esc to close)', classes='help-title')
-            with VerticalScroll(id='help-body'):
-                yield Markdown(HELP_MD)
-            with Horizontal(id='help-actions'):
-                yield Button('Close', id='help-close', variant='primary')
-
-    @on(Button.Pressed, '#help-close')
-    def _close(self) -> None:
-        self.dismiss()
-
-    def action_close(self) -> None:
-        self.dismiss()
-
-
-class _PickerScreen(ModalScreen[str]):
-    """Shared modal browser: an editable path field over a ``DirectoryTree``.
-
-    Subclasses supply the title/labels (``compose``) and decide what counts as a
-    valid pick (the tree-selection, path-submit and OK handlers). Dismisses with
-    the chosen path string, or None if cancelled.
-
-    Only the handlers common to every picker live here. Textual dispatches every
-    ``@on`` handler found across the MRO (deduped by function, not by name), so an
-    override in a subclass would *also* run the base version — the differing
-    handlers must therefore stay in the subclasses, not here.
-    """
-
-    BINDINGS = [('escape', 'cancel', 'Cancel')]
-
-    def __init__(self, start_path: str):
-        super().__init__()
-        path = Path(start_path) if start_path else Path.home()
-        # Fall back gracefully if the configured path no longer exists.
-        while not path.is_dir() and path != path.parent:
-            path = path.parent
-        if not path.is_dir():
-            path = Path.home()
-        self._root = path
-        self._selected = str(path)
-
-    def _set_selected(self, path) -> None:
-        """Update the selected path and reflect it in the editable path field."""
-        self._selected = str(path)
-        self.query_one('#picker-path', Input).value = self._selected
-
-    def _goto(self, path) -> None:
-        """Re-root the tree at path (if it is a directory) and select it."""
-        path = Path(path)
-        if path.is_dir():
-            self.query_one('#picker-tree', DirectoryTree).path = str(path)
-            self._set_selected(path)
-            return True
-        return False
-
-    @on(Button.Pressed, '#picker-up')
-    def _on_up(self) -> None:
-        tree = self.query_one('#picker-tree', DirectoryTree)
-        self._goto(Path(tree.path).parent)
-
-    @on(Button.Pressed, '#picker-cancel')
-    def _on_cancel(self) -> None:
-        self.dismiss(None)
-
-    def action_cancel(self) -> None:
-        self.dismiss(None)
-
-
-class DirectoryPickerScreen(_PickerScreen):
-    """Modal folder browser. Dismisses with the chosen folder, or None if cancelled."""
-
-    def compose(self) -> ComposeResult:
-        with Vertical(id='picker'):
-            yield Static('Select a folder (type or paste a path, then Enter)',
-                         classes='picker-title')
-            yield Input(self._selected, id='picker-path',
-                        placeholder='Paste a folder path and press Enter')
-            yield DirectoryTree(str(self._root), id='picker-tree')
-            with Horizontal(id='picker-actions'):
-                yield Button('Up', id='picker-up')
-                yield Button('Select folder', id='picker-ok', variant='success')
-                yield Button('Cancel', id='picker-cancel')
-
-    @on(DirectoryTree.DirectorySelected)
-    def _on_dir_selected(self, event: DirectoryTree.DirectorySelected) -> None:
-        self._set_selected(event.path)
-
-    @on(Input.Submitted, '#picker-path')
-    def _on_path_submitted(self, event: Input.Submitted) -> None:
-        # Jump the tree to a typed/pasted path.
-        if not self._goto(event.value.strip()):
-            self.notify(f'Not a folder: {event.value}', severity='warning')
-
-    @on(Button.Pressed, '#picker-ok')
-    def _on_ok(self) -> None:
-        # The editable path field is the source of truth.
-        self.dismiss(self.query_one('#picker-path', Input).value.strip())
-
-
-class FilePickerScreen(_PickerScreen):
-    """Modal file browser. Dismisses with the chosen file path, or None if cancelled.
-
-    Clicking a folder expands it; clicking a file selects it; OK is gated on the
-    path field naming an existing file. When the start path is a file, the tree
-    opens at its folder with that file pre-selected.
-    """
-
-    def __init__(self, start_path: str, title: str = 'Select a file'):
-        self._title = title
-        start = Path(start_path) if start_path else None
-        self._initial_file = str(start) if start and start.is_file() else ''
-        # Root the tree at the file's folder when a file path is given.
-        super().__init__(str(start.parent) if self._initial_file else start_path)
-        if self._initial_file:
-            self._selected = self._initial_file
-
-    def compose(self) -> ComposeResult:
-        with Vertical(id='picker'):
-            yield Static(f'{self._title} (type or paste a path, then Enter)',
-                         classes='picker-title')
-            yield Input(self._selected, id='picker-path',
-                        placeholder='Paste a file path and press Enter')
-            yield DirectoryTree(str(self._root), id='picker-tree')
-            with Horizontal(id='picker-actions'):
-                yield Button('Up', id='picker-up')
-                yield Button('Select file', id='picker-ok', variant='success')
-                yield Button('Cancel', id='picker-cancel')
-
-    @on(DirectoryTree.FileSelected)
-    def _on_file_selected(self, event: DirectoryTree.FileSelected) -> None:
-        self._set_selected(event.path)
-
-    @on(Input.Submitted, '#picker-path')
-    def _on_path_submitted(self, event: Input.Submitted) -> None:
-        # A typed file path selects it (opening the tree at its folder); a folder
-        # path re-roots the tree there.
-        value = event.value.strip()
-        path = Path(value)
-        if path.is_file():
-            self._goto(path.parent)
-            self._set_selected(path)
-        elif not self._goto(value):
-            self.notify(f'Not a file or folder: {value}', severity='warning')
-
-    @on(Button.Pressed, '#picker-ok')
-    def _on_ok(self) -> None:
-        value = self.query_one('#picker-path', Input).value.strip()
-        if not Path(value).is_file():
-            self.notify(f'Not a file: {value}', severity='warning')
-            return
-        self.dismiss(value)
 
 
 class BicoApp(App):
@@ -950,7 +476,9 @@ class BicoApp(App):
     def _count_files(self, settings: dict) -> None:
         """Count files matching the settings in the source folder (off the UI thread)."""
         console = self.query_one('#console', RichLog)
-        write = lambda renderable: self.call_from_thread(console.write, renderable)
+        def write(renderable):
+            self.call_from_thread(console.write, renderable)
+
         write(Text('  Checking source folder…', style='dim'))
         try:
             fmt = settings['filename_datetime_format']
@@ -1004,7 +532,9 @@ class BicoApp(App):
     def _detect_dates(self, src: str, fmt: str) -> None:
         """Scan the source folder and set the date range to the file date span."""
         console = self.query_one('#console', RichLog)
-        write = lambda renderable: self.call_from_thread(console.write, renderable)
+        def write(renderable):
+            self.call_from_thread(console.write, renderable)
+
         write(Text('─' * 40, style='dim'))
         write(Text('Detecting time range from source files…', style='bold cyan'))
         try:
@@ -1049,8 +579,11 @@ class BicoApp(App):
     def _validate(self, settings: dict, days):
         """Return a list of (level, message); level is 'error' or 'warning'."""
         problems = []
-        err = lambda m: problems.append(('error', m))
-        warn = lambda m: problems.append(('warning', m))
+        def err(m):
+            problems.append(('error', m))
+
+        def warn(m):
+            problems.append(('warning', m))
 
         if not settings.get('site'):
             err('No site selected.')
@@ -1201,7 +734,9 @@ class BicoApp(App):
     @work(thread=True, exclusive=True, group='bico-run')
     def _test_run(self, settings: dict) -> None:
         console = self.query_one('#console', RichLog)
-        write = lambda renderable: self.call_from_thread(console.write, renderable)
+        def write(renderable):
+            self.call_from_thread(console.write, renderable)
+
         try:
             write(Text('─' * 40, style='dim'))
             write(Text(f'Test run — converting the first {TEST_RUN_ROWS} rows of the first file',

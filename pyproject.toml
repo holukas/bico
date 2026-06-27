@@ -28,6 +28,7 @@ packages = ["bico"]
 [dependency-groups]
 dev = [
     "pytest>=9.1.1",
+    "ruff>=0.9.0",
 ]
 
 [tool.pytest.ini_options]
@@ -35,4 +36,17 @@ testpaths = ["tests"]
 addopts = "-m 'not slow'"
 markers = [
     "slow: deselected by default; run with `-m slow` (e.g. the reference comparisons)",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+extend-exclude = ["bico/settings/data_blocks"]
+
+[tool.ruff.lint]
+# Start conservative: pyflakes (F) and a subset of pycodestyle (E) errors.
+# Widen the selection over time once the codebase is clean.
+select = ["E", "F", "W", "I"]
+ignore = [
+    "E501",  # line length is handled by the formatter, not the linter
 ]
