@@ -14,11 +14,11 @@ instrument_3=QCL-C2
 # ========
 
 # Source Folder
-dir_source=F:\tmp\IN
+dir_source=
 
 # Time Range
 start_date=2026-06-24 07:00
-end_date=2026-06-26 13:00
+end_date=2026-06-25 07:00
 
 # File Settings
 filename_datetime_format=yyyymmddHH.XMM
@@ -31,11 +31,11 @@ select_random_files=0
 
 # OUTPUT
 # ======
-dir_out=F:\tmp\OUT
+dir_out=
 
 output_folder_name_prefix=test
 file_compression=gzip
-num_processes=5
+num_processes=1
 
 add_instr_to_varname=1
 
@@ -43,20 +43,3 @@ plot_file_availability=1
 plot_ts_hires=1
 plot_histogram_hires=0
 plot_ts_agg=1
-
-# SITE SERVER PATHS (reference only; not used by the code)
-# =======================================================
-dir_server_CH-AES=
-dir_server_CH-AWS=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-AWS_CrapAlv\20_sonic_ghg
-dir_server_CH-CHA=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-CHA_Chamau\20_sonic_ghg
-dir_server_CH-DAE=
-dir_server_CH-DAV=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-DAV_Davos\20_sonic_ghg
-dir_server_CH-FOR=
-dir_server_CH-FRU=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-FRU_Fruebuel\20_sonic_ghg
-dir_server_CH-HON=
-dir_server_CH-INO=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-INO_InnoFarm\20_sonic_ghg
-dir_server_CH-LAE=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-LAE_Laegeren\20_sonic_ghg
-dir_server_CH-LAS=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-LAS_Lae-Subcanopy\20_sonic_ghg
-dir_server_CH-OE2=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-OE2_Oensingen\20_sonic_ghg
-dir_server_CH-TAN=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\CH-TAN_Taenikon\20_sonic_ghg
-dir_server_CH-TWE=\\green.ethz.ch\share-green-gl-archive-1-$\FluxData\US-TWE_ToolikWetland\20_sonic_ghg

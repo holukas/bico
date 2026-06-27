@@ -2,7 +2,7 @@
 # __version__ = get_version(__name__, Path(__file__).parent.parent.parent)  # Single source of truth for version
 
 __version__ = "2.0"
-__date__ = ""
+__date__ = "27 Jun 2026"
 __link_changelog__ = "https://github.com/holukas/bico/blob/master/CHANGELOG.md"
 __link_readme__ = "https://github.com/holukas/bico/blob/master/README.md"
 __link_source_code__ = "https://github.com/holukas/bico"

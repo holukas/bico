@@ -1,6 +1,6 @@
 # BICO Changelog
 
-## v2.0 | XX XXX 2026
+## v2.0 | 27 Jun 2026
 
 ### New terminal UI (replaces the PyQt5 GUI)
 

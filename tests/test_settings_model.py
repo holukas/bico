@@ -6,7 +6,6 @@ that it stays lenient (a partial/empty dict must not raise) so wiring it into
 the live run path cannot break a run.
 """
 import datetime as dt
-from pathlib import Path
 
 from conftest import PACKAGE_DIR
 
@@ -41,8 +40,12 @@ def test_from_raw_parses_packaged_settings():
     assert s.plot_histogram_hires is False
     assert isinstance(s.select_random_files, bool)
 
-    # paths and dates are parsed
-    assert isinstance(s.dir_source, Path)
+    # the shipped file has empty source/output paths (no machine paths leak);
+    # Path coercion of a real path is covered by test_run_context_derives_paths
+    assert s.dir_source is None
+    assert s.dir_out is None
+
+    # dates are example values and still parse to datetime
     assert isinstance(s.start_date, dt.datetime)
     assert isinstance(s.end_date, dt.datetime)
 
