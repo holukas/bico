@@ -1,0 +1,290 @@
+/* Modern dark look. Colors come from Textual's design tokens so the UI stays
+   coherent and adapts to the (dark) theme. Layout is fluid: the settings pane
+   takes a clamped share of the width and the console fills the rest, so it
+   reads well full-screen and when the terminal is small. */
+
+Screen {
+    layout: vertical;
+    background: $background;
+}
+
+#body {
+    height: 1fr;
+}
+
+/* ---- settings (left) ----
+   Single wide column, one row per field (label + control on the same line,
+   one cell tall). Borders are stripped from inputs to keep each field exactly
+   one row high. The pane takes a generous, scaling share of the width so paths
+   stay readable; the console fills the rest. */
+
+#settings {
+    width: 38%;
+    min-width: 40;
+    max-width: 100;
+    height: 1fr;
+    padding: 0 1;
+    background: $surface;
+    border-right: tall $primary 40%;
+}
+
+#settings-fields {
+    width: 1fr;
+    height: 1fr;
+    padding: 0 1;
+}
+
+.section {
+    height: 1;
+    margin: 1 0 0 0;
+    color: $accent;
+    text-style: bold;
+}
+
+.field {
+    height: 1;
+    align: left middle;
+}
+
+.field-label {
+    width: 16;
+    height: 1;
+    color: $text-muted;
+}
+
+.field Input,
+.field Select {
+    width: 1fr;
+    height: 1;
+    border: none;
+    padding: 0 1;
+}
+
+/* text fields: subtle tint, distinct from the pane */
+.field Input {
+    background: $boost;
+}
+
+/* dropdowns: a distinct accent tint so they stand out more */
+.field Select,
+.field Select SelectCurrent {
+    background: $primary 25%;
+}
+
+/* invalid input (e.g. a non-number in a numeric field) turns red */
+.field Input.-invalid {
+    background: $error 30%;
+}
+
+.field Select SelectCurrent {
+    border: none;
+    padding: 0;
+}
+
+/* The dropdown overlay floats above everything, so let it size to its longest
+   option instead of the narrow field width (otherwise option labels wrap). */
+.field Select SelectOverlay {
+    width: auto;
+    min-width: 24;
+    max-width: 40;
+}
+
+.field Switch {
+    height: 1;
+    border: none;
+    padding: 0;
+    background: $boost;
+}
+
+.browse-btn,
+.clear-btn {
+    width: 3;
+    min-width: 3;
+    height: 1;
+    margin: 0;
+    border: none;
+}
+
+/* the clear (✕) button: muted by default, red on hover to signal it empties */
+.clear-btn {
+    color: $text-muted;
+}
+.clear-btn:hover {
+    background: $error 40%;
+}
+
+/* full-width helper button under the Raw data section (auto-detect date range) */
+.detect-row-btn {
+    width: 1fr;
+    height: 1;
+    margin: 1 0 0 0;
+    border: none;
+    background: $boost;
+    color: $accent;
+}
+.detect-row-btn:hover {
+    background: $primary 40%;
+}
+
+/* Pinned to the bottom of the settings pane so it always reserves its own row
+   and never overlaps the scrollable fields (which otherwise hid the lower
+   fields, e.g. the output folder, on short terminals). A 4-column grid so the
+   seven buttons wrap onto two rows and all stay visible even on a narrow pane
+   (a single row clipped the last button, "Stop"). */
+#actions {
+    dock: bottom;
+    height: auto;
+    padding: 1 0 0 0;
+    layout: grid;
+    grid-size: 4;
+    grid-gutter: 0 1;
+    background: $surface;
+}
+
+#actions Button {
+    width: 1fr;
+    height: 1;
+    min-width: 0;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* ---- console (right) ---- */
+
+#console-pane {
+    width: 1fr;
+    padding: 1 2 1 2;
+}
+
+.pane-title {
+    color: $accent;
+    text-style: bold;
+    padding: 0 0 1 1;
+}
+
+/* Top row of the console pane: progress bars (left) and the live plot (right),
+   side by side at the same height. */
+#top-row {
+    height: auto;
+    margin: 0 0 1 0;
+}
+
+#progress-area {
+    width: 1fr;
+    height: auto;
+}
+
+#run-status {
+    height: auto;          /* one line per in-progress file (parallel runs) */
+    padding: 0 1;
+    margin: 0;
+    color: $text;
+}
+
+#console {
+    height: 1fr;
+    background: $panel;
+    border: round $primary 50%;
+    padding: 0 1;
+    scrollbar-gutter: stable;
+}
+
+/* ---- live plot (top-right, beside the progress bars) ---- */
+
+#plot-pane {
+    width: 60;
+    height: auto;
+    margin: 0 0 0 2;
+}
+
+.plot-title {
+    height: 1;
+    color: $text;
+    padding: 0 0 0 1;
+}
+
+/* minimal: transparent background, no border — just the points and the axes */
+#plot-canvas {
+    height: auto;
+    padding: 0 1;
+    background: transparent;
+}
+
+/* ---- help modal ---- */
+
+HelpScreen {
+    align: center middle;
+    background: $background 60%;
+}
+
+#help {
+    width: 84;
+    max-width: 92%;
+    height: 86%;
+    padding: 1 2;
+    background: $surface;
+    border: thick $primary;
+}
+
+.help-title {
+    color: $accent;
+    text-style: bold;
+    padding: 0 0 1 0;
+}
+
+#help-body {
+    height: 1fr;
+    padding: 0 1;
+    background: $panel;
+    border: round $primary 50%;
+}
+
+#help-actions {
+    height: auto;
+    margin: 1 0 0 0;
+    align: center middle;
+}
+
+/* ---- directory picker modal ---- */
+
+DirectoryPickerScreen {
+    align: center middle;
+    background: $background 60%;
+}
+
+#picker {
+    width: 70%;
+    height: 80%;
+    min-width: 40;
+    padding: 1 2;
+    background: $surface;
+    border: thick $primary;
+}
+
+.picker-title {
+    color: $accent;
+    text-style: bold;
+    padding: 0 0 1 0;
+}
+
+#picker-path {
+    width: 1fr;
+    margin: 0 0 1 0;
+}
+
+#picker-tree {
+    height: 1fr;
+    background: $panel;
+    border: round $primary 50%;
+}
+
+#picker-actions {
+    height: auto;
+    margin: 1 0 0 0;
+    align: center middle;
+}
+
+#picker-actions Button {
+    margin: 0 1;
+}

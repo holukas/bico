@@ -6,6 +6,15 @@
 /_tests/
 start BICO.lnk
 
+# bico settings backups / temp churn (not the tracked bico.settings template)
+bico.settingsOld
+bico.settingsTemp
+bico.settings.BAK
+# legacy uppercase names from older versions
+BICO.settingsOld
+BICO.settingsTemp
+BICO.settings.BAK
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

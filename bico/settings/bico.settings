@@ -1,0 +1,45 @@
+# INSTRUMENTS
+# ===========
+
+# Site
+site=CH-DAV
+
+# Data Blocks
+header=WECOM3
+instrument_1=HS50-A
+instrument_2=IRGA72-A
+instrument_3=QCL-C2
+
+# RAW DATA
+# ========
+
+# Source Folder
+dir_source=
+
+# Time Range
+start_date=2026-06-24 07:00
+end_date=2026-06-25 07:00
+
+# File Settings
+filename_datetime_format=yyyymmddHH.XMM
+file_size_min=900
+file_limit=0
+row_limit=0
+
+# Special
+select_random_files=0
+
+# OUTPUT
+# ======
+dir_out=
+
+output_folder_name_prefix=test
+file_compression=gzip
+num_processes=1
+
+add_instr_to_varname=1
+
+plot_file_availability=1
+plot_ts_hires=1
+plot_histogram_hires=0
+plot_ts_agg=1

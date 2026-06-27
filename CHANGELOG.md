@@ -1,5 +1,58 @@
 # BICO Changelog
 
+## v2.0 | 27 Jun 2026
+
+### New terminal UI (replaces the PyQt5 GUI)
+
+- Replaced the PyQt5 GUI with a [Textual](https://textual.textualize.io/) terminal UI. Dropped `pyqt5`/`pyqt5-qt5`,
+  added `textual`. It needs no display server, so it works over SSH. Start with `uv run bico -t` (or `uv run bico`);
+  the headless CLI (`-f`/`-d`/`-a`) is unchanged. UI code lives in `bico/tui/` and loads lazily, so the core and
+  tests stay UI-free.
+- Settings panel (Instruments / Raw data / Output / Run) on the left, live console on the right, in a dark,
+  scroll-free layout that adapts to terminal size. During a run, a progress bar, per-file status lines, and a live
+  plot update as each file finishes.
+- Workflow: **Validate** (`v`) gates **Run** (`r`), **Test run** (`t`) does a dry conversion of the first file, and
+  **Detect dates** (`d`) fills the date range from the source files. Folder pickers, drag-and-drop, and an in-app
+  help overlay (`h`) round it out. Full key bindings are in the
+  [README](README.md#start-the-tui-terminal-ui).
+
+### Faster, parallel conversion
+
+- Conversion is ~2.7x faster (432k rows in ~7.6s instead of ~20.8s) via a precomputed per-datablock plan and
+  `int.from_bytes`. Output is byte-for-byte identical to known-good earlier bico releases (around 1.6.0), verified
+  across 7 cases (24 files) spanning 6 sites: CH-DAV, CH-AWS, CH-CHA, CH-DAS, CH-LAE, CH-OE2.
+- Files now convert in parallel, one per worker up to about the CPU count; single-file or single-worker runs fall
+  back to sequential, and a failing file no longer aborts the run. `num_processes` overrides the worker count.
+
+### Tooling: `uv` and Python 3.12
+
+- Moved dependency management from `poetry` to [`uv`](https://docs.astral.sh/uv/): PEP 621 `pyproject.toml`,
+  `uv.lock` replaces `poetry.lock`. Set up with `uv sync`.
+- Minimum Python is now 3.12 (was 3.9). Updated `pandas` (1.3.4 -> 2.x), `numpy` (1.21.2 -> 1.26.x),
+  `matplotlib` (3.5.0 -> 3.8+), `pytz` (2021.3 -> 2024+).
+- Fixed pandas 2.x compatibility: `DataFrame.append()` -> `pd.concat()` in `ops.stats.calc`, keyword-only
+  `DataFrame.pivot()` in `ops.vis.availability_heatmap`, and removed deprecated `pd.read_csv` arguments.
+- Fixed matplotlib compatibility: `Axes.plot_date()` -> `Axes.plot()` and `Tick.label` -> `tick_params(labelsize=...)`
+  in `ops.vis`.
+- Added a `pytest` suite (`tests/`): a golden-file conversion test, the short/missing data-block fill case (IRGA72
+  16-vs-26-byte), and a version-sync check between `pyproject.toml` and `bico/settings/_version.py`. Run with
+  `uv run pytest`.
+
+### Settings, files, and project layout
+
+- Removed the separate "file extension" setting; the search pattern now comes from the filename datetime format. A
+  name that matches the pattern but not the format is skipped instead of aborting the run. Start/end dates are
+  inclusive on both ends. Default `num_processes` is now `1`.
+- The source folder is searched recursively (subfolders included). If the same filename turns up in more than one
+  subfolder, the larger file is converted and the duplicate is logged and skipped.
+- Log files use an aligned `time | LEVEL | message` format, and the logger resets per run so each run gets its own
+  file.
+- The settings file is now lowercase `bico.settings` (was `BICO.settings`); the headless CLI still finds a legacy
+  `BICO.settings` case-insensitively. A run no longer rewrites the source settings file; it writes a snapshot into
+  the output folder, and saving no longer persists derived/runtime keys.
+- Source moved from `src/` to an installed `bico/` package with a `bico` console entry point. Run `uv run bico`
+  (or `uv run python -m bico`) instead of `python src/bico.py`. **This changes how scheduled jobs invoke bico.**
+
 ## v1.6.11 | 20 Nov 2025
 
 - Added: new datablock `HS50-R1` from the `rECord` logging script, used at site CH-AWS in 2025, and at CH-CHA since Aug
