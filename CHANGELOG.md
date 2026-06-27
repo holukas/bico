@@ -1,6 +1,6 @@
 # BICO Changelog
 
-## v2.0.1 | XX
+## v2.0.1 | 28 Jun 2026
 
 - Fixed: the TUI **Export…** could write an incomplete or stale `bico.settings`. It updated only keys already present
   in the template and preferred a (possibly old) settings file in the destination, so newer keys such as
