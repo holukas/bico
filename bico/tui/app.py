@@ -14,6 +14,7 @@ modal screens in ``screens.py``. They are imported (and re-exported) here so
 import datetime as dt
 import logging
 import threading
+import warnings
 from pathlib import Path
 
 from rich.text import Text
@@ -982,4 +983,9 @@ class BicoApp(App):
 
 
 def run_tui() -> None:
+    # Textual owns the terminal; anything written to stderr (e.g. numpy
+    # RuntimeWarnings from stats on all-missing files, in this process for the
+    # sequential path) bypasses the screen buffer and corrupts the live display.
+    # Workers are silenced separately via ``parallel.init_worker``.
+    warnings.simplefilter('ignore', RuntimeWarning)
     BicoApp().run()

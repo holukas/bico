@@ -11,6 +11,7 @@ import io
 import logging
 import os
 import traceback
+import warnings
 
 import pandas as pd
 
@@ -19,6 +20,18 @@ from bico.ops import file as bfile
 from bico.ops import stats as bstats
 from bico.ops import vis
 from bico.ops.logger import get_formatter
+
+
+def init_worker():
+    """Pool-worker initializer: keep numpy/pandas RuntimeWarnings off stderr.
+
+    A worker process inherits the parent's stderr, which under the TUI is the
+    terminal Textual is drawing to. Any warning written there (e.g. numpy's
+    "Mean of empty slice" from stats on all-missing files) bypasses the screen
+    buffer and corrupts the live display. Silencing them in the worker keeps the
+    inherited terminal clean. The captured-log path is unaffected.
+    """
+    warnings.simplefilter('ignore', RuntimeWarning)
 
 
 def _capture_logger(name):
