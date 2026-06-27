@@ -8,6 +8,12 @@
 uncompressed ASCII (human-readable). Converted files can then be used for flux
 calculations in EddyPro.
 
+This is not a general binary format. `bico` reads the binaries written by the
+[`sonicread`](docs/sonicread_20190503.pdf) logging script, which records and stores the
+raw data for the Grassland Sciences group at ETH Zurich. The data-block specs and
+defaults target that setup, so `bico` is built for the group's instruments and sites
+rather than as a general-purpose converter.
+
 ![bico terminal UI](images/gui_v2.0.0.png)
 
 ## How bico works
