@@ -52,7 +52,7 @@ uv run python tests/test_reference_comparisons.py --update
 
 ## Results
 
-Last run 2026-06-26 — **7 cases, 24 files, all PASS** (byte-identical decompressed CSV).
+Last run 2026-06-27 — **7 cases, 24 files, all PASS** (byte-identical decompressed CSV).
 
 | Test | Site | Header / instruments | Format | Files | Result |
 |------|------|----------------------|--------|-------|--------|

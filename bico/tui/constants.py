@@ -7,6 +7,7 @@ a circular dependency. ``app.py`` re-exports the names tests rely on.
 from pathlib import Path
 
 import bico
+from bico.settings import _version as info
 
 # Rows converted for a test run (a quick dry conversion of the first file).
 TEST_RUN_ROWS = 20
@@ -68,6 +69,8 @@ FIELD_KIND = {key: kind for key, _, kind, _ in ALL_FIELDS}
 
 # Full explanations shown on hover (labels are abbreviated for the compact layout).
 FIELD_HINTS = {
+    'dir_source': 'Folder with the binary files. Searched recursively, so files in '
+                  'subfolders are found too (not only this folder).',
     'start_date': 'Range start, INCLUSIVE. Format: 2025-12-31 23:59 (YYYY-MM-DD HH:MM)',
     'end_date': 'Range end, INCLUSIVE. Format: 2025-12-31 23:59 (YYYY-MM-DD HH:MM)',
     'filename_datetime_format': 'Datetime pattern in the binary filenames, incl. extension, '
@@ -212,6 +215,8 @@ it. Double-click selects a line.
 
 **Raw data**
 - *Source folder*: where binary files are read from (Browse… or type a path).
+  Searched **recursively** — files in subfolders are found too, not only the
+  folder you pick.
 - *Start / End date*: `YYYY-MM-DD HH:MM`. Both ends are inclusive. Use
   **Detect dates from source files** (`d`) to fill these from the earliest and
   latest file in the source folder (parsed with the filename datetime format);
@@ -256,9 +261,9 @@ adding a spec rather than changing code. The **Instruments** settings (header
 plus Instrument 1 to 3) tell bico which blocks to expect and in what order.
 
 ## The run pipeline
-1. *Find files.* Search the source folder for names that match the filename
-   datetime format. The same format gives both the search pattern and each
-   file's timestamp.
+1. *Find files.* Search the source folder, **including all subfolders**, for
+   names that match the filename datetime format. The same format gives both the
+   search pattern and each file's timestamp.
 2. *Filter.* Keep files inside the start/end date range, above the minimum size,
    and within the file limit. Optionally take a random subset.
 3. *Convert.* For each file, read the binary with the data-block specs and decode
@@ -279,4 +284,13 @@ exact settings used. A run never changes the source `bico.settings`.
 **Same engine everywhere.** The TUI (`bico -t`) and the headless CLI
 (`bico -f <folder> -d <days> -a`, used for scheduled jobs) run the same
 conversion engine, so the output is the same however you start a run.
+"""
+
+# Appended so the URLs stay in one place (bico.settings._version). Links are
+# clickable in the help overlay (HelpScreen opens them in the browser).
+HELP_MD += f"""
+## Links
+- [Source code (GitHub repo)]({info.__link_source_code__})
+- [README]({info.__link_readme__})
+- [Changelog]({info.__link_changelog__})
 """

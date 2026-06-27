@@ -77,8 +77,10 @@ class BicoApp(App):
     """bico — binary converter, as a terminal UI."""
 
     CSS_PATH = 'app.tcss'
-    TITLE = 'bico'
-    SUB_TITLE = f'binary converter  ·  v{info.__version__}'
+    # Version goes in the title so it stays visible even while the subtitle
+    # carries transient run status ("running…", "stopping…", …).
+    TITLE = f'bico  v{info.__version__}'
+    SUB_TITLE = 'binary converter'
 
     BINDINGS = [
         ('r', 'run_conversion', 'Run'),
@@ -136,7 +138,11 @@ class BicoApp(App):
                     yield from self._section('Output', OUTPUT_FIELDS)
                     yield from self._section('Run options', RUN_FIELDS)
                 with Horizontal(id='actions'):
-                    yield Button('Save', id='btn-save', variant='primary')
+                    save = Button('Save', id='btn-save', variant='primary')
+                    save.tooltip = ('Save the current form values to the source bico.settings, so '
+                                    'the TUI reopens with them next time. Run-only options are not '
+                                    'persisted.')
+                    yield save
                     load = Button('Load…', id='btn-load')
                     load.tooltip = ('Load a bico.settings from a folder you choose into the '
                                     'form. The source bico.settings is not changed until you Save.')
@@ -146,12 +152,24 @@ class BicoApp(App):
                                       'folder you choose — e.g. a headless run folder. The source '
                                       'bico.settings is not changed.')
                     yield export
-                    yield Button('Validate', id='btn-validate')
-                    yield Button('Test', id='btn-test')
+                    validate = Button('Validate', id='btn-validate')
+                    validate.tooltip = ('Check every field, print the exact settings the run will '
+                                        'use, and count the matching files. Run stays disabled '
+                                        'until validation passes.')
+                    yield validate
+                    test = Button('Test', id='btn-test')
+                    test.tooltip = ('Dry-convert the first rows of the first matching file, writing '
+                                    'nothing, to confirm the settings produce a valid result.')
+                    yield test
                     # Run stays disabled until Validate confirms the settings are OK.
-                    yield Button('Run', id='btn-run', variant='success', disabled=True)
+                    run = Button('Run', id='btn-run', variant='success', disabled=True)
+                    run.tooltip = 'Convert all matching files. Enabled only after Validate passes.'
+                    yield run
                     # Stop is enabled only while a conversion is running.
-                    yield Button('Stop', id='btn-stop', variant='error', disabled=True)
+                    stop = Button('Stop', id='btn-stop', variant='error', disabled=True)
+                    stop.tooltip = ('Stop a running conversion early. The current file finishes, no '
+                                    'further files start, and already-converted files are kept.')
+                    yield stop
             with Vertical(id='console-pane'):
                 yield Static('Console', classes='pane-title')
                 # Top row: progress bars on the left, the live plot to their right
@@ -960,7 +978,7 @@ class BicoApp(App):
         self._refresh_run_enabled()  # Run stays gated by validation state
         self.query_one('#progress', ProgressBar).display = False
         self.query_one('#run-status', Static).display = False
-        self.sub_title = f'binary converter  ·  v{info.__version__}'
+        self.sub_title = 'binary converter'
 
 
 def run_tui() -> None:

@@ -26,11 +26,18 @@ class HelpScreen(ModalScreen):
             with VerticalScroll(id='help-body'):
                 yield Markdown(HELP_MD)
             with Horizontal(id='help-actions'):
-                yield Button('Close', id='help-close', variant='primary')
+                close = Button('Close', id='help-close', variant='primary')
+                close.tooltip = 'Close this help (or press Esc)'
+                yield close
 
     @on(Button.Pressed, '#help-close')
     def _close(self) -> None:
         self.dismiss()
+
+    @on(Markdown.LinkClicked)
+    def _open_link(self, event: Markdown.LinkClicked) -> None:
+        # Markdown does not follow links itself; open them in the browser.
+        self.app.open_url(event.href)
 
     def action_close(self) -> None:
         self.dismiss()
@@ -100,9 +107,15 @@ class DirectoryPickerScreen(_PickerScreen):
                         placeholder='Paste a folder path and press Enter')
             yield DirectoryTree(str(self._root), id='picker-tree')
             with Horizontal(id='picker-actions'):
-                yield Button('Up', id='picker-up')
-                yield Button('Select folder', id='picker-ok', variant='success')
-                yield Button('Cancel', id='picker-cancel')
+                up = Button('Up', id='picker-up')
+                up.tooltip = 'Go to the parent folder'
+                yield up
+                ok = Button('Select folder', id='picker-ok', variant='success')
+                ok.tooltip = 'Use the folder in the path field above'
+                yield ok
+                cancel = Button('Cancel', id='picker-cancel')
+                cancel.tooltip = 'Close without choosing'
+                yield cancel
 
     @on(DirectoryTree.DirectorySelected)
     def _on_dir_selected(self, event: DirectoryTree.DirectorySelected) -> None:
@@ -145,9 +158,15 @@ class FilePickerScreen(_PickerScreen):
                         placeholder='Paste a file path and press Enter')
             yield DirectoryTree(str(self._root), id='picker-tree')
             with Horizontal(id='picker-actions'):
-                yield Button('Up', id='picker-up')
-                yield Button('Select file', id='picker-ok', variant='success')
-                yield Button('Cancel', id='picker-cancel')
+                up = Button('Up', id='picker-up')
+                up.tooltip = 'Go to the parent folder'
+                yield up
+                ok = Button('Select file', id='picker-ok', variant='success')
+                ok.tooltip = 'Use the file in the path field above'
+                yield ok
+                cancel = Button('Cancel', id='picker-cancel')
+                cancel.tooltip = 'Close without choosing'
+                yield cancel
 
     @on(DirectoryTree.FileSelected)
     def _on_file_selected(self, event: DirectoryTree.FileSelected) -> None:

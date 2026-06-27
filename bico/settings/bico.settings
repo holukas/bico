@@ -14,11 +14,11 @@ instrument_3=QCL-C2
 # ========
 
 # Source Folder
-dir_source=F:\Sync\luhk_work\dev-data\flux-data\bico-data\tmp
+dir_source=F:\tmp\IN
 
 # Time Range
 start_date=2026-06-24 07:00
-end_date=2026-06-25 07:00
+end_date=2026-06-26 13:00
 
 # File Settings
 filename_datetime_format=yyyymmddHH.XMM
@@ -31,11 +31,11 @@ select_random_files=0
 
 # OUTPUT
 # ======
-dir_out=F:\Sync\luhk_work\dev-data\flux-data\bico-data\tmp
+dir_out=F:\tmp\OUT
 
 output_folder_name_prefix=test
 file_compression=gzip
-num_processes=1
+num_processes=5
 
 add_instr_to_varname=1
 

@@ -121,14 +121,32 @@ class SearchAll():
 
     @staticmethod
     def search_all(dir, file_id, logger):
-        """Search all files in dir that match file id"""
+        """Search all files in dir (recursively) that match file id.
+
+        The result is keyed by filename, so the same name appearing in two
+        subfolders collides. When that happens, keep the larger file (assumed to
+        be the more complete one); equal sizes are interchangeable, so the choice
+        does not matter.
+        """
         logger.info(f"Searching for {file_id} files ...")
         valid_files_dict = {}
         for root, dirs, found_files in os.walk(dir):
-            for idx, file in enumerate(found_files):
-                if fnmatch.fnmatchcase(file, file_id):
-                    filepath = Path(root) / file
+            for file in found_files:
+                if not fnmatch.fnmatchcase(file, file_id):
+                    continue
+                filepath = Path(root) / file
+                existing = valid_files_dict.get(file)
+                if existing is None:
                     valid_files_dict[file] = filepath
+                    continue
+                new_size = filepath.stat().st_size
+                old_size = existing.stat().st_size
+                keep, drop = (filepath, existing) if new_size > old_size else (existing, filepath)
+                valid_files_dict[file] = keep
+                logger.info(
+                    f"(!) Duplicate filename '{file}' found in subfolders: keeping the larger "
+                    f"file {keep} ({max(new_size, old_size)} bytes), ignoring {drop} "
+                    f"({min(new_size, old_size)} bytes).")
         logger.info(f"Found {len(valid_files_dict)} files matching {file_id} in {dir}")
         return valid_files_dict
 

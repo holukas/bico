@@ -8,6 +8,8 @@
 uncompressed ASCII (human-readable). Converted files can then be used for flux
 calculations in EddyPro.
 
+![bico terminal UI](images/gui_v2.0.0.png)
+
 ## How bico works
 
 Eddy covariance loggers store each measurement as a stream of **data blocks**. One
@@ -115,10 +117,11 @@ no display server, so it also works over SSH.
 
 - **Instruments**: site, logger header, and up to three instrument data blocks (sonic
   and gas analyzers).
-- **Raw data**: source folder; start/end date (`YYYY-MM-DD HH:MM`, both ends inclusive);
-  the filename datetime format (which includes the extension and also determines which
-  files are searched, so there is no separate file-extension setting); and file-selection
-  settings (`0` = no limit for the file/row limits).
+- **Raw data**: source folder (searched recursively, so files in subfolders are found
+  too, not only the folder itself); start/end date (`YYYY-MM-DD HH:MM`, both ends
+  inclusive); the filename datetime format (which includes the extension and also
+  determines which files are searched, so there is no separate file-extension setting);
+  and file-selection settings (`0` = no limit for the file/row limits).
 - **Output**: output folder, folder-name prefix, compression, worker processes
   (`0` = auto), and which plots to produce.
 - **Run options**: convert only the most recent *N* days (`0` = use the date range), and
@@ -215,7 +218,7 @@ For a headless run, the folder you pass with `-f` must contain:
     - `site`, `header`, `instrument_1..3` — the site and which instrument data blocks to
       decode.
     - `dir_source` — where the raw binary files are. This can be the run folder itself or
-      another path.
+      another path. It is searched recursively, so files in subfolders are found too.
     - `dir_out` — where converted output is written.
     - `start_date` / `end_date` — the time range to convert (used when `-d` is not given).
     - `filename_datetime_format` — the datetime pattern in the raw filenames. It determines
@@ -238,7 +241,7 @@ and the requested plots into `dir_out`.
   variable property used inside a `.dblock` file.
 - [Reference comparisons](tests/reference_comparisons.md): regression tests that assert
   byte-identical converted output against a known-good (bico-1.6.0) reference across
-  several sites.
+  7 cases (24 files) spanning 6 sites.
 - [Changelog](CHANGELOG.md): release history and notable changes.
 
 ## Testing

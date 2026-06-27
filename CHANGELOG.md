@@ -2,82 +2,56 @@
 
 ## v2.0 | XX XXX 2026
 
-### Terminal UI (TUI) replaces the PyQt5 GUI
+### New terminal UI (replaces the PyQt5 GUI)
 
-- Changed: the PyQt5 GUI was removed and replaced by a [Textual](https://textual.textualize.io/) terminal UI.
-  `pyqt5`/`pyqt5-qt5` were dropped from the dependencies and `textual` added. The TUI needs no display server,
-  so it also works over SSH. Start it with `uv run bico -t` (or just `uv run bico`); the headless CLI
-  (`-f`/`-d`/`-a`) is unchanged. The new code lives in `bico/tui/` and is imported lazily, so the conversion
-  core and tests never pull in the UI.
-- Added: a settings panel (Instruments / Raw data / Output / Run options) on the left and a live Rich console on
-  the right, in a compact, scroll-free, modern-dark layout that fills the terminal and adapts to smaller sizes.
-  The settings panel can be hidden (`f`) so the console fills the width.
-- Added: a **Validate** step (`v`) that checks every field, prints the exact settings the run will use (each with
-  a short explanatory note), and counts the matching files in the source folder. **Run is disabled until
-  validation passes**, and any settings edit disables it again, so a run always matches what was validated.
-- Added: a **Test run** (`t`) that dry-converts the first rows of the first matching file (writing nothing), to
-  confirm the settings produce a valid result before a full run; and a progress bar with estimated remaining time
-  shown during a run.
-- Added: a folder picker for the source/output paths (browse, go up, or type/paste a path and press Enter), an
-  in-app help overlay (`h`), and live format validation of the start/end date fields.
-- Changed: the separate "file extension" setting was removed. The search pattern is now derived from the filename
-  datetime format (which already includes the extension), and a file whose name matches the pattern but not the
-  datetime format is skipped instead of aborting the run. Start/end dates are documented as inclusive on both
-  ends. The default `num_processes` is now `1`.
-- Changed: log files use an aligned `time | LEVEL | message` format, and the run logger is reset per run so each
-  run writes to its own log file.
-- Changed: the settings file is now lowercase `bico.settings` (was `BICO.settings`). The headless CLI still finds
-  a legacy `BICO.settings` in a folder (matched case-insensitively via `file.find_settings_file`), so existing
-  output folders keep working. Each run continues to drop a `bico.settings` snapshot into its output folder.
-- Added: the TUI loads the last-saved `bico.settings` on startup, so it always opens where you left off. You can
-  also **drag and drop a `bico.settings` file anywhere onto the TUI** (e.g. a previous run's snapshot) to load
-  those settings into the form.
-- Added: **drag and drop a file or folder onto the Source folder or Output folder field** to fill it with the
-  folder path (dropping a file uses its containing folder), so the paths can be set without browsing. Each folder
-  field also gained a **✕** button to clear it (next to the **…** browse button).
-- Added: a **Detect dates from source files** button (`d`) that scans the source folder, parses every file's date
-  with the filename datetime format, and sets Start/End date to the earliest/latest file (and resets "recent days"
-  to 0). The range can still be adjusted afterwards.
+- Replaced the PyQt5 GUI with a [Textual](https://textual.textualize.io/) terminal UI. Dropped `pyqt5`/`pyqt5-qt5`,
+  added `textual`. It needs no display server, so it works over SSH. Start with `uv run bico -t` (or `uv run bico`);
+  the headless CLI (`-f`/`-d`/`-a`) is unchanged. UI code lives in `bico/tui/` and loads lazily, so the core and
+  tests stay UI-free.
+- Settings panel (Instruments / Raw data / Output / Run) on the left, live console on the right, in a dark,
+  scroll-free layout that adapts to terminal size. During a run, a progress bar, per-file status lines, and a live
+  plot update as each file finishes.
+- Workflow: **Validate** (`v`) gates **Run** (`r`), **Test run** (`t`) does a dry conversion of the first file, and
+  **Detect dates** (`d`) fills the date range from the source files. Folder pickers, drag-and-drop, and an in-app
+  help overlay (`h`) round it out. Full key bindings are in the
+  [README](README.md#start-the-tui-terminal-ui).
 
-### Migration to `uv` and Python 3.12
+### Faster, parallel conversion
 
-- Changed: dependency management moved from `poetry` to [`uv`](https://docs.astral.sh/uv/). The `pyproject.toml`
-  now uses the standard PEP 621 `[project]` table, `poetry.lock` was removed and replaced by `uv.lock`. Create the
-  environment with `uv sync` (see `README.md`).
-- Changed: minimum Python version is now 3.12 (was 3.9). Dependencies were updated to versions that support
-  Python 3.12: `pandas` (1.3.4 -> 2.x), `numpy` (1.21.2 -> 1.26.x), `matplotlib` (3.5.0 -> 3.8+),
-  `pytz` (2021.3 -> 2024+).
-- Fixed: `pandas` 2.x compatibility. `DataFrame.append()` (removed in pandas 2.0) was replaced with `pd.concat()`
-  in `ops.stats.calc`. `DataFrame.pivot()` in `ops.vis.availability_heatmap` now uses keyword arguments
-  (`index=`/`columns=`/`values=`), which became mandatory in pandas 2.0. Removed the now-deprecated
-  `date_parser=None` and `keep_date_col=True` arguments from `pd.read_csv` calls in `bico.py` and
-  `ops.file.read_converted_ascii`.
-- Fixed: `matplotlib` compatibility. Replaced the removed `Axes.plot_date()` with `Axes.plot()` and the removed
-  `Tick.label` attribute with `Axes.tick_params(labelsize=...)` in `ops.vis`.
-- Verified: converting the test files (site CH-DAV, `HS50-A` + `IRGA72-A` + `QCL-C3`) on the new stack produces
-  output identical to the previous `poetry` / Python 3.9 version.
-- Improved: binary-to-ASCII conversion is ~2.7x faster (test file: 432k rows in ~7.6s instead of ~20.8s). The
-  per-row loop in `ops.bin` now uses a precomputed per-datablock plan (block size, variable count and bit map dict
-  are computed once instead of every row) and decodes values with `int.from_bytes` instead of recombining bytes in
-  Python. Output is byte-for-byte identical to before.
-- Improved: files are now converted in parallel across processes (one file per worker, up to about the CPU count),
-  which speeds up multi-file runs roughly with the number of cores, on top of the per-file speedup. Single-file or
-  single-worker runs fall back to sequential processing, and a failing file no longer aborts the whole run. Per-file
-  output is unchanged (byte-for-byte identical). The optional `num_processes` setting overrides the worker count.
-- Added: a `pytest` test suite (`tests/`). It includes a golden-file test that converts a small truncated real
-  binary file and compares the result against a committed expected output (guarding against unintended changes to
-  converted values or formatting), an explicit test for the short/missing data-block fill path (the IRGA72
-  16-vs-26-byte case), and a test that keeps the version in `pyproject.toml` and `bico/settings/_version.py` in sync.
-  Run with `uv run pytest`.
-- Changed: settings handling. A run no longer rewrites the source `BICO.settings` file; instead it writes a
-  settings snapshot into the run's output folder. Saving from the GUI no longer persists derived/runtime keys
-  (run id, machine-specific paths). The tracked `BICO.settings` was cleaned of derived keys and machine paths, and
-  stale `BICO.settings.BAK` / `BICO.settingsOld` files were removed from the repository.
-- Changed: project layout. The source moved from `src/` to an installed package `bico/` with package-qualified
-  imports and a `bico` console entry point. Run with `uv run bico` (or `uv run python -m bico`) instead of
-  `python src/bico.py`. The previous `os.chdir()` working-directory hack was removed; the GUI now resolves its
-  logo/stylesheet via paths relative to the package. **This changes how scheduled jobs invoke bico** (use
-  `uv run bico ...` instead of calling the script by path).
+- Conversion is ~2.7x faster (432k rows in ~7.6s instead of ~20.8s) via a precomputed per-datablock plan and
+  `int.from_bytes`. Output is byte-for-byte identical to known-good earlier bico releases (around 1.6.0), verified
+  across 7 cases (24 files) spanning 6 sites: CH-DAV, CH-AWS, CH-CHA, CH-DAS, CH-LAE, CH-OE2.
+- Files now convert in parallel, one per worker up to about the CPU count; single-file or single-worker runs fall
+  back to sequential, and a failing file no longer aborts the run. `num_processes` overrides the worker count.
+
+### Tooling: `uv` and Python 3.12
+
+- Moved dependency management from `poetry` to [`uv`](https://docs.astral.sh/uv/): PEP 621 `pyproject.toml`,
+  `uv.lock` replaces `poetry.lock`. Set up with `uv sync`.
+- Minimum Python is now 3.12 (was 3.9). Updated `pandas` (1.3.4 -> 2.x), `numpy` (1.21.2 -> 1.26.x),
+  `matplotlib` (3.5.0 -> 3.8+), `pytz` (2021.3 -> 2024+).
+- Fixed pandas 2.x compatibility: `DataFrame.append()` -> `pd.concat()` in `ops.stats.calc`, keyword-only
+  `DataFrame.pivot()` in `ops.vis.availability_heatmap`, and removed deprecated `pd.read_csv` arguments.
+- Fixed matplotlib compatibility: `Axes.plot_date()` -> `Axes.plot()` and `Tick.label` -> `tick_params(labelsize=...)`
+  in `ops.vis`.
+- Added a `pytest` suite (`tests/`): a golden-file conversion test, the short/missing data-block fill case (IRGA72
+  16-vs-26-byte), and a version-sync check between `pyproject.toml` and `bico/settings/_version.py`. Run with
+  `uv run pytest`.
+
+### Settings, files, and project layout
+
+- Removed the separate "file extension" setting; the search pattern now comes from the filename datetime format. A
+  name that matches the pattern but not the format is skipped instead of aborting the run. Start/end dates are
+  inclusive on both ends. Default `num_processes` is now `1`.
+- The source folder is searched recursively (subfolders included). If the same filename turns up in more than one
+  subfolder, the larger file is converted and the duplicate is logged and skipped.
+- Log files use an aligned `time | LEVEL | message` format, and the logger resets per run so each run gets its own
+  file.
+- The settings file is now lowercase `bico.settings` (was `BICO.settings`); the headless CLI still finds a legacy
+  `BICO.settings` case-insensitively. A run no longer rewrites the source settings file; it writes a snapshot into
+  the output folder, and saving no longer persists derived/runtime keys.
+- Source moved from `src/` to an installed `bico/` package with a `bico` console entry point. Run `uv run bico`
+  (or `uv run python -m bico`) instead of `python src/bico.py`. **This changes how scheduled jobs invoke bico.**
 
 ## v1.6.11 | 20 Nov 2025
 

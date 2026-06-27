@@ -4,6 +4,7 @@
 __version__ = "2.0"
 __date__ = ""
 __link_changelog__ = "https://github.com/holukas/bico/blob/master/CHANGELOG.md"
+__link_readme__ = "https://github.com/holukas/bico/blob/master/README.md"
 __link_source_code__ = "https://github.com/holukas/bico"
 __link_releases__ = "https://github.com/holukas/bico/releases"
 __license__ = "https://github.com/holukas/bico/blob/master/LICENSE"
