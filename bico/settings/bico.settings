@@ -1,10 +1,19 @@
+# ==========================================================================
+# bico.settings - configuration for the bico binary converter
+# ==========================================================================
+# Read by the TUI (uv run bico -t) and the headless CLI (uv run bico -f ...).
+# This is the canonical layout: Export and the per-run snapshot written to each
+# output folder use the exact same structure. Lines are "key=value"; lines
+# starting with "#" are comments. Only the keys below are recognised; anything
+# else is ignored when read and dropped when the file is rewritten.
+
 # INSTRUMENTS
 # ===========
 
 # Site
 site=CH-DAV
 
-# Data Blocks
+# Data blocks (logger header + the sonic and up to two gas analyzers, in order)
 header=WECOM3
 instrument_1=HS50-A
 instrument_2=IRGA72-A
@@ -13,32 +22,37 @@ instrument_3=QCL-C2
 # RAW DATA
 # ========
 
-# Source Folder
+# Folder with the binary files (searched recursively)
 dir_source=
 
-# Time Range
+# Time range, both ends inclusive (YYYY-MM-DD HH:MM)
 start_date=2026-06-24 07:00
 end_date=2026-06-25 07:00
 
-# File Settings
+# Filename datetime format (incl. extension); also selects which files match
 filename_datetime_format=yyyymmddHH.XMM
+
+# File selection (0 = no limit / no minimum / no random selection)
 file_size_min=900
 file_limit=0
 row_limit=0
-
-# Special
 select_random_files=0
 
 # OUTPUT
 # ======
+
+# Folder the converted files are written to
 dir_out=
 
+# Run output folder name prefix
 output_folder_name_prefix=test
+
+# Output format
 file_compression=gzip
 num_processes=1
-
 add_instr_to_varname=1
 
+# Plots generated per run
 plot_file_availability=1
 plot_ts_hires=1
 plot_histogram_hires=0

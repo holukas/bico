@@ -1,5 +1,13 @@
 # BICO Changelog
 
+## v2.0.2 | 28 Jun 2026
+
+- Changed: every `bico.settings` bico writes now has one canonical structure (sections, comments, key order). The
+  per-run snapshot written to the output folder previously used a different, flat `key=value` dump; it now renders
+  from the same packaged template as Export/Save. The snapshot holds only user settings (a ready-to-rerun file); the
+  run's derived values (run id, resolved output dirs, version) stay in the run log. The packaged `bico.settings` was
+  also tidied with a header banner and grouped comments.
+
 ## v2.0.1 | 28 Jun 2026
 
 - Fixed: the TUI **Export…** could write an incomplete or stale `bico.settings`. It updated only keys already present
