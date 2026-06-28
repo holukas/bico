@@ -48,27 +48,54 @@ def test_save_settings_drops_derived_keys_and_updates_user_keys(tmp_path):
     assert not (tmp_path / "bico.settingsTemp").exists()
 
 
-def test_run_snapshot_includes_all_keys_and_leaves_source_untouched(tmp_path):
-    source = _write(tmp_path / "bico.settings", "site=CH-DAV\n")
-    source_before = source.read_text()
-
+def test_run_snapshot_uses_canonical_structure_and_drops_derived(tmp_path):
     outdir = tmp_path / "run_out"
     outdir.mkdir()
     settings_dict = {
-        "dir_settings": str(tmp_path),
         "site": "CH-DAV",
-        "run_id": "BICO-xyz",
-        "dir_out_run": str(outdir),
+        "dir_source": "/data/in",
+        "run_id": "BICO-xyz",          # derived -> not persisted to the snapshot
+        "dir_out_run": str(outdir),    # derived -> not persisted to the snapshot
     }
 
     snapshot = bfile.write_run_settings_snapshot(settings_dict, outdir)
     snap_text = snapshot.read_text()
 
-    # snapshot is a full provenance record (derived keys included)
+    # user settings written, with the canonical structure (sections + comments)
     assert "site=CH-DAV" in snap_text
-    assert "run_id=BICO-xyz" in snap_text
-    # the source settings file is untouched by a run
-    assert source.read_text() == source_before
+    assert "dir_source=/data/in" in snap_text
+    assert "# INSTRUMENTS" in snap_text
+    assert "num_processes" in snap_text   # present because the canonical file has it
+    # derived/runtime keys are not persisted to the snapshot
+    assert "run_id" not in snap_text
+    assert "dir_out_run" not in snap_text
+
+
+def test_snapshot_and_export_produce_identical_files(tmp_path):
+    """The run-folder snapshot and an Export of the same settings must be byte
+    identical: one canonical structure no matter where bico writes it."""
+    settings_dict = {
+        "site": "CH-DAV", "header": "WECOM3",
+        "instrument_1": "HS50-A", "instrument_2": "IRGA72-A", "instrument_3": "QCL-C2",
+        "dir_source": "Y:/in", "dir_out": "Z:/out",
+        "start_date": "2026-06-22 07:33", "end_date": "2099-06-22 07:00",
+        "filename_datetime_format": "yyyymmddHH.XMM",
+        "file_size_min": "900", "file_limit": "0", "row_limit": "0",
+        "select_random_files": "0",
+        "output_folder_name_prefix": "CH-DAV_AUTOTASK", "file_compression": "gzip",
+        "num_processes": "1", "add_instr_to_varname": "1",
+        "plot_file_availability": "1", "plot_ts_hires": "1",
+        "plot_histogram_hires": "0", "plot_ts_agg": "1",
+        # derived/runtime keys present in the run dict, must not affect either file
+        "run_id": "BICO-xyz", "dir_out_run": "/run",
+    }
+    exp_dir = tmp_path / "exp"; exp_dir.mkdir()
+    snap_dir = tmp_path / "snap"; snap_dir.mkdir()
+
+    exp = bfile.export_settings_to_folder(settings_dict, exp_dir)
+    snap = bfile.write_run_settings_snapshot(settings_dict, snap_dir)
+
+    assert exp.read_text() == snap.read_text()
 
 
 def test_export_settings_to_folder_renders_from_template(tmp_path):

@@ -272,6 +272,12 @@ def export_stats_collection_csv(df, outdir, run_id, logger):
 # copy of this name into each output folder as a provenance snapshot.
 SETTINGS_FILENAME = 'bico.settings'
 
+# The packaged bico.settings is the single source of the file's layout (sections,
+# comments, key order). Export and the per-run snapshot both render from it, so
+# every bico.settings bico writes has the same structure regardless of where it
+# is written. (bico/ops/file.py -> bico/settings/bico.settings)
+CANONICAL_SETTINGS_PATH = Path(__file__).resolve().parent.parent / 'settings' / SETTINGS_FILENAME
+
 
 def find_settings_file(directory):
     """Return the path of the settings file in `directory`, or None if absent.
@@ -422,30 +428,31 @@ def save_settings_to_file(settings_dict):
     _write_settings_from_template(settings_path, settings_path, settings_dict)
 
 
-def export_settings_to_folder(settings_dict, dest_dir, template_path):
+def export_settings_to_folder(settings_dict, dest_dir, template_path=None):
     """Write a bico.settings into `dest_dir` for a headless run there.
 
-    Renders from `template_path` (an existing bico.settings whose comments and
-    layout are kept) with the current values from `settings_dict`. Returns the
-    written path. Used by the TUI's "Export" so settings edited on screen can be
-    dropped into a headless run folder.
+    Renders from the canonical packaged bico.settings (so the structure matches
+    every other bico.settings bico writes) with the current values from
+    `settings_dict`. `template_path` overrides the template (used by tests).
+    Returns the written path. Used by the TUI's "Export" so settings edited on
+    screen can be dropped into a headless run folder.
     """
     dest_path = Path(dest_dir) / SETTINGS_FILENAME
-    _write_settings_from_template(template_path, dest_path, settings_dict)
+    _write_settings_from_template(template_path or CANONICAL_SETTINGS_PATH, dest_path, settings_dict)
     return dest_path
 
 
 def write_run_settings_snapshot(settings_dict, outdir):
-    """Write the full effective settings of a run to its output folder.
+    """Write a bico.settings snapshot of this run into its output folder.
 
-    This is a provenance record of exactly what was run (it intentionally includes
-    derived keys). It is written only into the run output folder; the source
-    bico.settings file is never modified by a run.
+    Rendered from the same canonical template as Export/Save, so the run-folder
+    file has the identical structure (sections, comments, key order) and is a
+    ready-to-rerun bico.settings. Only user settings are written; the run's
+    derived values (run id, resolved output dirs, version) live in the run log,
+    not here. The source bico.settings file is never modified by a run.
     """
     snapshot_path = Path(outdir) / SETTINGS_FILENAME
-    with open(snapshot_path, 'w') as outfile:
-        for key, val in settings_dict.items():
-            outfile.write(f"{key}={val}\n")
+    _write_settings_from_template(CANONICAL_SETTINGS_PATH, snapshot_path, settings_dict)
     return snapshot_path
 
 

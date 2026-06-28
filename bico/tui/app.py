@@ -378,13 +378,11 @@ class BicoApp(App):
             if not dest.is_dir():
                 self.notify(f'Not a folder: {path}', severity='error')
                 return
-            # Always render from the canonical packaged bico.settings (current and
-            # complete), not whatever file may already sit in the target — a stale
-            # file there could be missing newer keys (e.g. num_processes) or carry
-            # old paths, producing an incomplete export.
-            template = SETTINGS_DIR / bfile.SETTINGS_FILENAME
+            # Renders from the canonical packaged bico.settings (current and
+            # complete), so the export matches every other bico.settings bico
+            # writes and never drops newer keys or carries stale ones.
             try:
-                out = bfile.export_settings_to_folder(settings, dest, template)
+                out = bfile.export_settings_to_folder(settings, dest)
             except Exception as exc:
                 self.notify(f'Export failed: {exc}', severity='error')
                 return
