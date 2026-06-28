@@ -103,11 +103,16 @@ class BicoEngine:
         bin_found_files_dict = file.SearchAll(settings_dict=self.settings_dict,
                                               logger=self.logger).keep_valid_files()
 
-        # List all files (filenames only) already in dir_out (the base output dir,
-        # not the run dir). This info is later used to avoid converting a binary file
-        # that is already somewhere in dir_out (optional), i.e. to avoid duplicates.
+        # List the converted data files (filenames only) already in dir_out (the base
+        # output dir, not the run dir). This info is later used to avoid converting a
+        # binary file that is already somewhere in dir_out (optional), i.e. to avoid
+        # duplicates. Only converted data files matter here, so restrict the search to
+        # them ('{site}_*.csv*'); searching '*' would also pull in plots, logs and
+        # settings from every run folder and flood the log with false "duplicate
+        # filename" collisions (e.g. each run's identically named .png plots).
         if self.avoidduplicates:
-            availablefiles = file.SearchAll.search_all(dir=self.settings_dict['dir_out'], file_id='*',
+            data_file_glob = f"{self.settings.site}_*.csv*"
+            availablefiles = file.SearchAll.search_all(dir=self.settings_dict['dir_out'], file_id=data_file_glob,
                                                        logger=self.logger)
             availablefiles = list(availablefiles.keys())
             # availablefiles = [f.stem for f in availablefiles]
