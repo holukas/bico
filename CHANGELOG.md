@@ -1,5 +1,12 @@
 # BICO Changelog
 
+## v2.0.3 | 28 Jun 2026
+
+- Fixed: the avoid-duplicates check scanned the whole output folder (`file_id='*'`), so plots, logs and settings
+  counted as candidates. Files are keyed by name, so each run's identically named plots (e.g. the `stats_agg_*.png`
+  set) collided across run folders and filled the log with false "duplicate filename" lines. The search now matches
+  only converted data files (`{site}_*.csv*`).
+
 ## v2.0.2 | 28 Jun 2026
 
 - Changed: every `bico.settings` bico writes now has one canonical structure (sections, comments, key order). The
