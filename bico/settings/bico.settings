@@ -11,26 +11,26 @@
 # ===========
 
 # Site
-site=CH-DAV
+site=CH-LAE
 
 # Data blocks (logger header + the sonic and up to two gas analyzers, in order)
 header=WECOM3
-instrument_1=HS50-A
+instrument_1=HS50-B
 instrument_2=IRGA72-A
-instrument_3=QCL-C2
+instrument_3=-None-
 
 # RAW DATA
 # ========
 
 # Folder with the binary files (searched recursively)
-dir_source=
+dir_source=F:\CURRENT\LAE_FP2026\2026\1-BICO\bin
 
 # Time range, both ends inclusive (YYYY-MM-DD HH:MM)
-start_date=2026-06-24 07:00
-end_date=2026-06-25 07:00
+start_date=2025-12-31 19:00
+end_date=2026-09-30 19:00
 
 # Filename datetime format (incl. extension); also selects which files match
-filename_datetime_format=yyyymmddHH.XMM
+filename_datetime_format=yyyymmddHH.LMM
 
 # File selection (0 = no limit / no minimum / no random selection)
 file_size_min=900
@@ -42,10 +42,10 @@ select_random_files=0
 # ======
 
 # Folder the converted files are written to
-dir_out=
+dir_out=F:\CURRENT\LAE_FP2026\2026\1-BICO
 
 # Run output folder name prefix
-output_folder_name_prefix=test
+output_folder_name_prefix=CH-LAE_2026.09
 
 # Output format
 file_compression=gzip
