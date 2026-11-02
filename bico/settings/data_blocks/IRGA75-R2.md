@@ -4,8 +4,8 @@
 
 - CO2_CONC / LI75_CO2_CONC ... CO2 concentration density, molar density (mmol m-3)
 - H2O_CONC / LI75_H2O_CONC ... H2O concentration density, molar density (mmol m-3)
-- TEMP_BOX / LI75_TEMP_BOX ... Ambient temperature measured in the control box (degC)
-- PRESS_BOX / LI75_PRESS_BOX ... Atmospheric pressure measured in the control box (kPa)
+- TEMP_BOX / LI75_TEMP_BOX / TEMP_DSI ... Ambient temperature measured in the control box (degC)
+- PRESS_BOX / LI75_PRESS_BOX / PRESS_DSI ... Atmospheric pressure measured in the control box (kPa)
 - COOLER_V / LI75_COOLER_V ... Cooler voltage (V)
 - GA_DIAG_CODE / LI75_DIAG_CODE ... IRGA diagnostic value
   - same as GA_DIAG_VALUE found in other datablocks
@@ -24,7 +24,7 @@
 - AGC / LI75_AGC ... Automatic gain control from the LI-7500 (%)
   - low values close to 50 mean good signal
   - extracted from GA_DIAG_CODE
-- STATUS_CODE / LI75_STATUS_CODE ... Status of IRGA data aquisition, see Table 7 in WE's [sonicread.pdf](../../../docs/sonicread_20190503.pdf)
+- STATUS_CODE / LI75_STATUS_CODE / LI75DS_STATUS_CODE ... Status of IRGA data aquisition, see Table 7 in WE's [sonicread.pdf](../../../docs/sonicread_20190503.pdf)
     - same as STATUS_CODE found in other datablocks
     - octal value converted to integer yields:
     - 0 .. Status OK, no problems (octal 0000)
