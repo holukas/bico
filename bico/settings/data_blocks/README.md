@@ -105,3 +105,4 @@ informational and are not used for conversion (hence no companion `.dblock`).
 - [IRGA72-R2.md](IRGA72-R2.md)
 - [IRGA75-R1.md](IRGA75-R1.md)
 - [IRGA75-R2.md](IRGA75-R2.md)
+- [MGA4-R1.md](MGA4-R1.md)
